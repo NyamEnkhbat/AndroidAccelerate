@@ -58,7 +58,7 @@ public class PracticeActivity extends Activity {
 
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
-    private String[] mPlanetTitles;
+    private String[] mSectionTitles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,15 +66,15 @@ public class PracticeActivity extends Activity {
         setContentView(R.layout.activity_practice);
 
         mTitle = mDrawerTitle = getTitle();
-        mPlanetTitles = getResources().getStringArray(R.array.sections_array);
+        mSectionTitles = getResources().getStringArray(R.array.sections_array);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
         // set a custom shadow that overlays the main content when the drawer opens
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         // set up the drawer's list view with items and click listener
-        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
-                R.layout.drawer_list_item, mPlanetTitles));
+        mDrawerList.setAdapter(new ArrayAdapter<>(this,
+                R.layout.drawer_list_item, mSectionTitles));
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
         // enable ActionBar app icon to behave as action to toggle nav drawer
@@ -158,9 +158,9 @@ public class PracticeActivity extends Activity {
 
     private void selectItem(int position) {
         // update the main content by replacing fragments
-        Fragment fragment = new PlanetFragment();
+        Fragment fragment = new SectionFragment();
         Bundle args = new Bundle();
-        args.putInt(PlanetFragment.ARG_PLANET_NUMBER, position);
+        args.putInt(SectionFragment.ARG_PLANET_NUMBER, position);
         fragment.setArguments(args);
 
         FragmentManager fragmentManager = getFragmentManager();
@@ -168,7 +168,7 @@ public class PracticeActivity extends Activity {
 
         // update selected item and title, then close the drawer
         mDrawerList.setItemChecked(position, true);
-        setTitle(mPlanetTitles[position]);
+        setTitle(mSectionTitles[position]);
         mDrawerLayout.closeDrawer(mDrawerList);
     }
 
@@ -200,10 +200,10 @@ public class PracticeActivity extends Activity {
     /**
      * Fragment that appears in the "content_frame", shows a planet
      */
-    public static class PlanetFragment extends Fragment {
+    public static class SectionFragment extends Fragment {
         public static final String ARG_PLANET_NUMBER = "planet_number";
 
-        public PlanetFragment() {
+        public SectionFragment() {
             // Empty constructor required for fragment subclasses
         }
 
@@ -212,12 +212,12 @@ public class PracticeActivity extends Activity {
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_practice, container, false);
             int i = getArguments().getInt(ARG_PLANET_NUMBER);
-            String planet = getResources().getStringArray(R.array.sections_array)[i];
+            String sectionName = getResources().getStringArray(R.array.sections_array)[i];
 
-            int imageId = getResources().getIdentifier(planet.toLowerCase(Locale.getDefault()),
+            int imageId = getResources().getIdentifier(sectionName.toLowerCase(Locale.getDefault()),
                     "drawable", getActivity().getPackageName());
             ((ImageView) rootView.findViewById(R.id.image)).setImageResource(imageId);
-            getActivity().setTitle(planet);
+            getActivity().setTitle(sectionName);
             return rootView;
         }
     }

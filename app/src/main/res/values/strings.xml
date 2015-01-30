@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Accelerate</string>
+    <string name="app_name" translatable="false">Accelerate</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_practice">PracticeActivity</string>
     <string name="hello_world">Hello world!</string>
@@ -16,7 +16,7 @@
         <item>Your Laps</item>
         <item>Improvement</item>
         <item>Top Racers</item>
-        <item> </item>
+        <item>Profile</item>
         <item>Help and Feedback</item>
         <item>Settings</item>
     </string-array>
