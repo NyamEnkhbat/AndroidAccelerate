@@ -1,32 +1,85 @@
 package eu.isawsm.accelerate.Model;
 
-import java.util.List;
+import android.graphics.Bitmap;
+import android.media.Image;
+
+import java.net.URI;
+import java.net.URL;
+
 
 /**
  * Created by olfad on 29.01.2015.
  */
 public class Driver {
-    private List<Car> cars;
-    private String name;
+    private String firstname;
+    private String lastname;
+    private String acronym;
+    private Bitmap image;
+    private URI mail;
+    private String password;
+    private String Salt;
 
-    public Driver(List<Car> cars, String name) {
-        this.cars = cars;
-        this.name = name;
+    public Driver(String firstname, String lastname, String acronym, Bitmap image, URI mail) {
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.acronym = acronym;
+        this.image = image;
+        this.mail = mail;
     }
 
-    public List<Car> getCars() {
-        return cars;
+    public String getFirstname() {
+        return firstname;
     }
 
-    public void setCars(List<Car> cars) {
-        this.cars = cars;
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
     }
 
-    public String getName() {
-        return name;
+    public String getLastname() {
+        return lastname;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
+
+    public String getAcronym() {
+        return acronym;
+    }
+
+    public void setAcronym(String acronym) {
+        this.acronym = acronym;
+    }
+
+    public Bitmap getImage() {
+        return image;
+    }
+
+    public void setImage(Bitmap image) {
+        this.image = image;
+    }
+
+    public URI getMail() {
+        return mail;
+    }
+
+    public void setMail(URI mail) {
+        this.mail = mail;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getSalt() {
+        return Salt;
+    }
+
+    public void setSalt(String salt) {
+        Salt = salt;
     }
 }

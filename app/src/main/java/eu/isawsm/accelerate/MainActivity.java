@@ -4,10 +4,24 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
 
+import org.json.JSONException;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.concurrent.ExecutionException;
+
+import eu.isawsm.accelerate.Model.Driver;
+
+import com.github.nkzawa.emitter.Emitter;
+import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.socketio.client.Socket;
 
 public class MainActivity extends Activity {
 
@@ -40,8 +54,42 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        mSocket.disconnect();
+        mSocket.off();
+    }
+
     public void onSubmitClick(View view){
-        Intent intent = new Intent(this, PracticeActivity.class);
-        startActivity(intent);
+        EditText name = (EditText) findViewById(R.id.etName);
+        mSocket.connect();
+
+        String message = name.getText().toString().trim();
+        if (TextUtils.isEmpty(message)) {
+            return;
+        }
+
+        name.setText("");
+
+        mSocket.emit("new message", message);
+
+        mSocket.on("", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+
+            }
+        });
+
+//       /
+    }
+    private Socket mSocket;
+    {
+        try {
+            mSocket = IO.socket("http://raspberrypi/axilerate/index.js");
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 }

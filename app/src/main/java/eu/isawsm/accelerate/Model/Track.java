@@ -4,24 +4,12 @@ package eu.isawsm.accelerate.Model;
  * Created by olfad on 29.01.2015.
  */
 public class Track {
-    private String name;
     private String type;
-    private String course;
-    private String club;
+    private Club club;
 
-    public Track(String name, String type, String course, String club) {
-        this.name = name;
+    public Track(String type, Club club) {
         this.type = type;
-        this.course = course;
         this.club = club;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getType() {
@@ -32,19 +20,11 @@ public class Track {
         this.type = type;
     }
 
-    public String getCourse() {
-        return course;
-    }
-
-    public void setCourse(String course) {
-        this.course = course;
-    }
-
-    public String getClub() {
+    public Club getClub() {
         return club;
     }
 
-    public void setClub(String club) {
+    public void setClub(Club club) {
         this.club = club;
     }
 }

@@ -1,53 +1,63 @@
 package eu.isawsm.accelerate.Model;
 
+import android.graphics.Bitmap;
 import android.media.Image;
 
 /**
  * Created by olfad on 29.01.2015.
  */
 public class Car {
-    private String manufacturer;
-    private String model;
-    private String clazz;
-    private Image picture;
+    private Driver driver;
+    private Model model;
+    private Clazz clazz;
+    private long transponderID;
+    private Bitmap picture;
 
-    public Car(String manufacturer, String model, String clazz, Image picture) {
-        this.manufacturer = manufacturer;
+    public Car(Driver driver, Model model, Clazz clazz, long transponderID, Bitmap picture) {
+        this.driver = driver;
         this.model = model;
         this.clazz = clazz;
+        this.transponderID = transponderID;
         this.picture = picture;
-
     }
 
-    public String getManufacturer() {
-        return manufacturer;
+    public Driver getDriver() {
+        return driver;
     }
 
-    public void setManufacturer(String manufacturer) {
-        this.manufacturer = manufacturer;
+    public void setDriver(Driver driver) {
+        this.driver = driver;
     }
 
-    public String getModel() {
+    public Model getModel() {
         return model;
     }
 
-    public void setModel(String model) {
+    public void setModel(Model model) {
         this.model = model;
     }
 
-    public String getClazz() {
+    public Clazz getClazz() {
         return clazz;
     }
 
-    public void setClazz(String clazz) {
+    public void setClazz(Clazz clazz) {
         this.clazz = clazz;
     }
 
-    public Image getPicture() {
+    public long getTransponderID() {
+        return transponderID;
+    }
+
+    public void setTransponderID(long transponderID) {
+        this.transponderID = transponderID;
+    }
+
+    public Bitmap getPicture() {
         return picture;
     }
 
-    public void setPicture(Image picture) {
+    public void setPicture(Bitmap picture) {
         this.picture = picture;
     }
 }

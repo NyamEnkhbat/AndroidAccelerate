@@ -4,24 +4,14 @@ package eu.isawsm.accelerate.Model;
  * Created by olfad on 29.01.2015.
  */
 public class Lap {
-    private Driver driver;
     private Car car;
     private long time;
-    private Track track;
+    private Course course;
 
-    public Lap(Driver driver, Car car, long time, Track track) {
-        this.driver = driver;
+    public Lap(Car car, long time, Course course) {
         this.car = car;
         this.time = time;
-        this.track = track;
-    }
-
-    public Driver getDriver() {
-        return driver;
-    }
-
-    public void setDriver(Driver driver) {
-        this.driver = driver;
+        this.course = course;
     }
 
     public Car getCar() {
@@ -40,11 +30,11 @@ public class Lap {
         this.time = time;
     }
 
-    public Track getTrack() {
-        return track;
+    public Course getCourse() {
+        return course;
     }
 
-    public void setTrack(Track track) {
-        this.track = track;
+    public void setCourse(Course course) {
+        this.course = course;
     }
 }

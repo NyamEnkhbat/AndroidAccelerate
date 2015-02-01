@@ -13,7 +13,6 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 
 
-import eu.isawsm.accelerate.dummy.DummyContent;
 
 /**
  * A fragment representing a list of Items.
@@ -75,8 +74,8 @@ public class LapFragment extends Fragment implements AbsListView.OnItemClickList
         }
 
         // TODO: Change Adapter to display your content
-        mAdapter = new ArrayAdapter<DummyContent.DummyItem>(getActivity(),
-                android.R.layout.simple_list_item_1, android.R.id.text1, DummyContent.ITEMS);
+//        mAdapter = new ArrayAdapter<DummyContent.DummyItem>(getActivity(),
+//                android.R.layout.simple_list_item_1, android.R.id.text1, DummyContent.ITEMS);
     }
 
     @Override
@@ -117,7 +116,8 @@ public class LapFragment extends Fragment implements AbsListView.OnItemClickList
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
-            mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
+            //TODO
+            //Listener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
         }
     }
 

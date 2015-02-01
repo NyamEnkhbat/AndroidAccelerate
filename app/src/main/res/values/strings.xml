@@ -11,6 +11,7 @@
     <string name="drawer_close">Close navigation drawer</string>
     <string name="action_websearch">Web search</string>
     <string name="app_not_available">Sorry, there\'s no web browser available</string>
+
     <string-array name="sections_array">
         <item>All Laps</item>
         <item>Your Laps</item>
@@ -20,4 +21,8 @@
         <item>Help and Feedback</item>
         <item>Settings</item>
     </string-array>
+
+    <string name="title_activity_user_setup">UserSetup</string>
+    <string name="title_activity_main_menu">MainMenu</string>
+
 </resources>

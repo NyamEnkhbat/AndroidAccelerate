@@ -5,15 +5,8 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity"
-    android:background="#fff4f4f4">
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:ems="10"
-        android:id="@+id/etName"
-        android:hint="Your Name" />
+    android:background="#fff4f4f4"
+    android:weightSum="1">
 
     <MultiAutoCompleteTextView
         android:layout_width="match_parent"
@@ -23,24 +16,27 @@
         android:hint="Timing Server Adress"
         android:selectAllOnFocus="false" />
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="number"
-        android:ems="10"
-        android:id="@+id/etTransponder"
-        android:layout_gravity="center_horizontal"
-        android:hint="Transponder Number" />
-
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Submit"
+        android:text="Test Connection"
         android:id="@+id/bSubmit"
         android:layout_gravity="right"
-        android:background="#ffff9200"
-        android:textColor="#fff4f4f4"
         android:onClick="onSubmitClick"
-        android:nestedScrollingEnabled="false" />
+        android:nestedScrollingEnabled="false"
+        style="@style/defaultButton" />
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/scrollView"
+        android:paddingTop="5dp"
+        android:fillViewport="false">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView" />
+    </ScrollView>
 
 </LinearLayout>

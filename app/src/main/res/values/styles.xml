@@ -5,4 +5,9 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="defaultButton">
+        <item name="android:background">#ffff9200</item>
+        <item name="android:textColor">#fff4f4f4</item>
+    </style>
+
 </resources>
