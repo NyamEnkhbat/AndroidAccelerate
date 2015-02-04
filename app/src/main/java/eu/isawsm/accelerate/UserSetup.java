@@ -2,6 +2,7 @@ package eu.isawsm.accelerate;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -94,7 +95,7 @@ public class UserSetup extends Activity {
             Manufacturer manufacturer = new Manufacturer(acTvManufacturer.getText().toString().trim(), null);
             Model model = new Model(manufacturer, acTvModel.getText().toString().trim(), "", "", "", "");
 
-            long transponderId = Long.parseLong(etTransponder.getText().toString().trim());
+            final long transponderId = Long.parseLong(etTransponder.getText().toString().trim());
 
             Car car = new Car(driver, model, clazz, transponderId, null);
 
@@ -107,20 +108,27 @@ public class UserSetup extends Activity {
             editor.putString("Car", carJson);
 
             mSocket.connect();
-            System.out.println(carJson);
-            mSocket.emit("Register Car", carJson);
 
-            mSocket.on("TransponderID in use" ,new Emitter.Listener() {
+            mSocket.emit("registerNewTransponder", carJson);
+
+            mSocket.on("registerTransponderSuccess" ,new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-                    tvErrorText.setText("Your Transponder ID is already registerd to another Person");
+                   // if((new Gson().fromJson(args[0].toString(), Car.class)).getTransponderID() == transponderId)
+
+                    Looper.prepare();
+                    showToast("Transponder Accepted");
                 }
             });
 
         } catch (java.lang.NumberFormatException e){
             e.printStackTrace();
-            Toast.makeText(this,"Transponder ID not accepted",Toast.LENGTH_LONG);
+            Toast.makeText(this,"Transponder ID not accepted",Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void showToast(String s){
+        Toast.makeText(this,s,Toast.LENGTH_SHORT).show();
     }
     private Socket mSocket;
     {

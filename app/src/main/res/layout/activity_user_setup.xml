@@ -19,44 +19,30 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent">
-
-                <EditText
-                    android:layout_width="155dp"
-                    android:layout_height="wrap_content"
-                    android:inputType="textPersonName"
-                    android:ems="10"
-                    android:id="@+id/etName"
-                    android:hint="Firstname"
-                    android:singleLine="true"
-                    android:textIsSelectable="true" />
-
-                <EditText
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:inputType="textPersonName"
-                    android:ems="10"
-                    android:id="@+id/etLastname"
-                    android:hint="Lastname" />
-            </LinearLayout>
-
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
+                android:inputType="textPersonName"
                 android:ems="10"
-                android:id="@+id/editText"
-                android:hint="E-Mail" />
+                android:id="@+id/etName"
+                android:hint="Your Name"
+                android:singleLine="true"
+                android:textIsSelectable="true" />
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Car Information:"
-                android:id="@+id/textView" />
+                android:layout_gravity="center_horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Car Information:"
+                    android:id="@+id/textView" />
+
+            </LinearLayout>
 
             <LinearLayout
                 android:orientation="horizontal"
