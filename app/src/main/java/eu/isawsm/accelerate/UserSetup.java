@@ -90,34 +90,32 @@ public class UserSetup extends Activity {
     public void onSubmitClick(View view){
         try {
 
+            //Create Objects
             Driver driver = new Driver(etName.getText().toString(), "", "", null, null);
             Clazz clazz = new Clazz(acTvClass.getText().toString().trim(), "");
             Manufacturer manufacturer = new Manufacturer(acTvManufacturer.getText().toString().trim(), null);
             Model model = new Model(manufacturer, acTvModel.getText().toString().trim(), "", "", "", "");
 
             final long transponderId = Long.parseLong(etTransponder.getText().toString().trim());
-
             Car car = new Car(driver, model, clazz, transponderId, null);
 
+            //Save in Application
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-
             SharedPreferences.Editor editor = preferences.edit();
 
             String carJson = new Gson().toJson(car);
-
             editor.putString("Car", carJson);
 
+            //Send to Server
             mSocket.connect();
-
             mSocket.emit("registerNewTransponder", carJson);
-
             mSocket.on("registerTransponderSuccess" ,new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-                   // if((new Gson().fromJson(args[0].toString(), Car.class)).getTransponderID() == transponderId)
-
-                    Looper.prepare();
-                    showToast("Transponder Accepted");
+                   if((new Gson().fromJson(args[0].toString(), Car.class)).getTransponderID() == transponderId) {
+                       if(Looper.myLooper() == null) Looper.prepare();
+                       showToast("Transponder Accepted");
+                   }
                 }
             });
 

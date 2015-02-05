@@ -1,34 +1,25 @@
 package eu.isawsm.accelerate;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
 
-import org.json.JSONException;
-
-import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.concurrent.ExecutionException;
-
-import eu.isawsm.accelerate.Model.Driver;
 
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
-public class MainActivity extends Activity {
+public class ServerConfigActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_server_config);
     }
 
 
@@ -63,7 +54,7 @@ public class MainActivity extends Activity {
     }
 
     public void onSubmitClick(View view){
-        EditText name = (EditText) findViewById(R.id.etName);
+        EditText name = (EditText) findViewById(R.id.etServer);
         mSocket.connect();
 
         String message = name.getText().toString().trim();
