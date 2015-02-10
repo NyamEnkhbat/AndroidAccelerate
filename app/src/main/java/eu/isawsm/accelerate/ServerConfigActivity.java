@@ -1,12 +1,20 @@
 package eu.isawsm.accelerate;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
+import android.widget.Button;
+import android.widget.MultiAutoCompleteTextView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.net.URISyntaxException;
 
@@ -15,11 +23,23 @@ import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
 public class ServerConfigActivity extends Activity {
+    private Button bTestConnection;
+    private MultiAutoCompleteTextView mAcTVServerAdress;
+    private TextView textView;
+    private ProgressBar progressBar;
+    private int DEFAULT_PORT = 3000;
+    private Socket socket;
+    private SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_server_config);
+
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        bTestConnection = (Button) findViewById(R.id.bTestConnection);
+        mAcTVServerAdress = (MultiAutoCompleteTextView) findViewById(R.id.etServer);
     }
 
 
@@ -49,38 +69,78 @@ public class ServerConfigActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
 
-        mSocket.disconnect();
-        mSocket.off();
+        socket.disconnect();
+        socket.off();
     }
 
     public void onSubmitClick(View view){
-        EditText name = (EditText) findViewById(R.id.etServer);
-        mSocket.connect();
 
-        String message = name.getText().toString().trim();
+
+        String message = mAcTVServerAdress.getText().toString().trim();
         if (TextUtils.isEmpty(message)) {
+            textView.setText("Please enter a Valid address");
             return;
         }
+        tryConnect(message);
+        bTestConnection.setEnabled(false);
+        mAcTVServerAdress.setEnabled(false);
+        bTestConnection.setText("Connecting...");
 
-        name.setText("");
 
-        mSocket.emit("new message", message);
-
-        mSocket.on("", new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-
-            }
-        });
-
-//       /
     }
-    private Socket mSocket;
-    {
+
+    public boolean tryConnect(String address) {
+
+        if(!address.startsWith("http"))
+            address = "http://"+ address;
+
+
+        preferences.edit().putString("AxServerAddress", address).apply();
         try {
-            mSocket = IO.socket("http://raspberrypi/axilerate/index.js");
+            System.out.println(address);
+            socket = IO.socket(address);
+            socket.connect();
+
+            socket.on("Welcome", onConnectionSuccess);
+            socket.on(Socket.EVENT_ERROR, onConnectionError);
+            socket.on(Socket.EVENT_CONNECT_ERROR, onConnectionError);
+            socket.on(Socket.EVENT_CONNECT_TIMEOUT, onConnectionError);
+
+            socket.emit("TestConnection", socket.id());
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            return false;
         }
+        return true;
+
+    }
+    private Emitter.Listener onConnectionError = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    bTestConnection.setEnabled(true);
+                    bTestConnection.setText("Test Connection");
+                    mAcTVServerAdress.setEnabled(true);
+                    mAcTVServerAdress.setError("Connection Failed");
+                }
+            });
+        }
+    };
+
+
+    private Emitter.Listener onConnectionSuccess = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            Intent intent = new Intent();
+            setResult(RESULT_OK, intent);
+            if(Looper.myLooper() == null) Looper.prepare();
+
+            showToast("Successfully connected!");
+            finish();
+        }
+    };
+    private void showToast(String s) {
+        Toast.makeText(this, s,Toast.LENGTH_LONG).show();
     }
 }

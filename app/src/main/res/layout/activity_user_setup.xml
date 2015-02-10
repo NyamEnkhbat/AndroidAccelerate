@@ -27,7 +27,8 @@
                 android:id="@+id/etName"
                 android:hint="Your Name"
                 android:singleLine="true"
-                android:textIsSelectable="true" />
+                android:textIsSelectable="true"
+                android:imeOptions="actionNext"/>
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -55,20 +56,29 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/acTvManufacturer"
                     android:layout_gravity="center_horizontal"
-                    android:hint="Manufacturer" />
+                    android:hint="Manufacturer"
+                    android:singleLine="true"
+                    android:inputType="text"
+                    android:imeOptions="actionNext"/>
 
                 <AutoCompleteTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/acTvModel"
-                    android:hint="Model" />
+                    android:hint="Model"
+                    android:singleLine="true"
+                    android:inputType="text"
+                    android:imeOptions="actionNext" />
             </LinearLayout>
 
             <AutoCompleteTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/acTvClass"
-                android:hint="Class" />
+                android:hint="Class"
+                android:singleLine="true"
+                android:inputType="text"
+                android:imeOptions="actionNext"/>
 
             <EditText
                 android:layout_width="match_parent"
@@ -77,7 +87,9 @@
                 android:ems="10"
                 android:id="@+id/etTransponder"
                 android:numeric="integer"
-                android:hint="Transponder Number" />
+                android:hint="Transponder Number"
+                android:singleLine="true"
+                android:imeOptions="actionDone|actionGo" />
 
             <TextView
                 android:layout_width="wrap_content"

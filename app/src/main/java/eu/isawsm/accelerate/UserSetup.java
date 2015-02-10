@@ -1,10 +1,10 @@
 package eu.isawsm.accelerate;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Looper;
 import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -40,6 +40,8 @@ public class UserSetup extends Activity {
     private EditText etTransponder;
     private Button bSubmit;
     private TextView tvErrorText;
+    private Car car;
+    private SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,58 +84,78 @@ public class UserSetup extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        mSocket.disconnect();
-        mSocket.off();
+        try {
+            getSocket().disconnect();
+            getSocket().off();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void onSubmitClick(View view){
+    public void onSubmitClick(View view) {
         try {
 
             //Create Objects
-            Driver driver = new Driver(etName.getText().toString(), "", "", null, null);
-            Clazz clazz = new Clazz(acTvClass.getText().toString().trim(), "");
-            Manufacturer manufacturer = new Manufacturer(acTvManufacturer.getText().toString().trim(), null);
-            Model model = new Model(manufacturer, acTvModel.getText().toString().trim(), "", "", "", "");
-
-            final long transponderId = Long.parseLong(etTransponder.getText().toString().trim());
-            Car car = new Car(driver, model, clazz, transponderId, null);
+            car = createCarFromUserInputs();
 
             //Save in Application
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-            SharedPreferences.Editor editor = preferences.edit();
-
+            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
             String carJson = new Gson().toJson(car);
             editor.putString("Car", carJson);
+            editor.apply();
 
             //Send to Server
-            mSocket.connect();
-            mSocket.emit("registerNewTransponder", carJson);
-            mSocket.on("registerTransponderSuccess" ,new Emitter.Listener() {
-                @Override
-                public void call(Object... args) {
-                   if((new Gson().fromJson(args[0].toString(), Car.class)).getTransponderID() == transponderId) {
-                       if(Looper.myLooper() == null) Looper.prepare();
-                       showToast("Transponder Accepted");
-                   }
-                }
-            });
+            if(!getSocket().connected()) getSocket().connect();
+
+            getSocket().on("registerTransponderSuccess", onRegisterTransponderSuccess);
+            getSocket().emit("registerNewTransponder", carJson);
 
         } catch (java.lang.NumberFormatException e){
             e.printStackTrace();
             Toast.makeText(this,"Transponder ID not accepted",Toast.LENGTH_LONG).show();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            Toast.makeText(this,"Connection Error",Toast.LENGTH_LONG).show();
         }
+    }
+
+    private Emitter.Listener onRegisterTransponderSuccess = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+
+            String data = (String) args[0];
+            System.out.println(data);
+            if(data.equals(new Gson().toJson(car))) {
+                if(Looper.myLooper() == null) Looper.prepare();
+                showToast("Transponder Accepted");
+
+                preferences.edit().putString("Car", data.toString());
+                preferences.edit().apply();
+
+                Intent intent = new Intent();
+                setResult(RESULT_OK, intent);
+                finish();
+            }
+        }
+    };
+
+    private Car createCarFromUserInputs() {
+        Driver driver = new Driver(etName.getText().toString(), "", "", null, null);
+        Clazz clazz = new Clazz(acTvClass.getText().toString().trim(), "");
+        Manufacturer manufacturer = new Manufacturer(acTvManufacturer.getText().toString().trim(), null);
+        Model model = new Model(manufacturer, acTvModel.getText().toString().trim(), "", "", "", "");
+
+        long transponderId = Long.parseLong(etTransponder.getText().toString().trim());
+        return new Car(driver, model, clazz, transponderId, null);
     }
 
     private void showToast(String s){
         Toast.makeText(this,s,Toast.LENGTH_SHORT).show();
     }
-    private Socket mSocket;
-    {
-        try {
-            mSocket = IO.socket("http://192.168.1.7:3000");
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
+    private Socket socket;
+    private Socket getSocket() throws URISyntaxException {
+        preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        if(socket == null) socket = IO.socket(preferences.getString("AxServerAddress", "http://192.168.1.7:3000"));
+        return socket;
     }
 }

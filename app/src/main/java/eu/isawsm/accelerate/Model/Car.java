@@ -60,4 +60,26 @@ public class Car {
     public void setPicture(Bitmap picture) {
         this.picture = picture;
     }
+
+    public double getAvgTime() {
+        //TODO:
+        return 0.0;
+    }
+
+    public double getBestTime() {
+        //TODO
+        return 0;
+    }
+
+    public int getLapCount() {
+        //TODO
+        return 0;
+    }
+
+    public String getFullName() {
+        String retVal = "";
+        retVal += getModel().getManufacturer().getName();
+        retVal += getModel().getName();
+        return retVal;
+    }
 }

@@ -20,23 +20,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Test Connection"
-        android:id="@+id/bSubmit"
+        android:id="@+id/bTestConnection"
         android:layout_gravity="right"
         android:onClick="onSubmitClick"
         android:nestedScrollingEnabled="false"
         style="@style/defaultButton" />
-
-    <ScrollView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/scrollView"
-        android:paddingTop="5dp"
-        android:fillViewport="false">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/textView" />
-    </ScrollView>
 
 </LinearLayout>

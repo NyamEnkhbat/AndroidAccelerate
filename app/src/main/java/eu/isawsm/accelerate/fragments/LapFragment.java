@@ -1,4 +1,4 @@
-package eu.isawsm.accelerate;
+package eu.isawsm.accelerate.fragments;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -8,10 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import eu.isawsm.accelerate.R;
 
 
 /**
@@ -27,12 +28,12 @@ public class LapFragment extends Fragment implements AbsListView.OnItemClickList
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    public static final String ARG_PARAM1 = "param1";
+    public static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private int mParam1;
+    private int mParam2;
 
     private OnFragmentInteractionListener mListener;
 
@@ -69,8 +70,8 @@ public class LapFragment extends Fragment implements AbsListView.OnItemClickList
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            mParam1 = getArguments().getInt(ARG_PARAM1);
+            mParam2 = getArguments().getInt(ARG_PARAM2);
         }
 
         // TODO: Change Adapter to display your content
@@ -84,7 +85,7 @@ public class LapFragment extends Fragment implements AbsListView.OnItemClickList
         View view = inflater.inflate(R.layout.fragment_lap, container, false);
 
         // Set the adapter
-        mListView = (AbsListView) view.findViewById(android.R.id.list);
+        mListView = (AbsListView) view.findViewById(R.id.lap_list);
         ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
 
         // Set OnItemClickListener so we can be notified on item clicks
