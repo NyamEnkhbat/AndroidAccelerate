@@ -24,5 +24,6 @@
 
     <string name="title_activity_user_setup">UserSetup</string>
     <string name="title_activity_main_menu">MainMenu</string>
+    <string name="title_activity_main">MainActivity</string>
 
 </resources>

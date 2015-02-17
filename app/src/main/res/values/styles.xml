@@ -1,13 +1,22 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light">
-        <!-- Customize your theme here. -->
+    <style name="AppTheme" parent="AppTheme.Base">
+
+    </style>
+
+    <style name="AppTheme.Base" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <!--<item name="textColor">@color/textColorPrimary</item>-->
+        <!--<item name="windowBackground">@color/windowBackground</item>-->
+        <!--<item name="navigationBarColor">@color/navigationBarColor</item>-->
     </style>
 
     <style name="defaultButton">
-        <item name="android:background">#ffff9200</item>
-        <item name="android:textColor">#fff4f4f4</item>
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:textColor">@color/textColorPrimary</item>
+
     </style>
 
 </resources>
