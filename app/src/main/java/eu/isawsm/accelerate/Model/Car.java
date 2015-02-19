@@ -79,7 +79,7 @@ public class Car {
     public String getFullName() {
         String retVal = "";
         retVal += getModel().getManufacturer().getName();
-        retVal += getModel().getName();
-        return retVal;
+        retVal += " "+getModel().getName();
+        return retVal.trim();
     }
 }
