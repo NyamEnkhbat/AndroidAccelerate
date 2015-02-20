@@ -81,7 +81,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/avgIcon"
-        android:background="@drawable/avg_19x19"
+
         android:layout_alignTop="@+id/avgTime"
         android:layout_alignLeft="@+id/driverName"
         android:layout_alignStart="@+id/driverName" />
@@ -90,7 +90,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/bestIcon"
-        android:background="@drawable/best_19x19"
+
         android:layout_marginLeft="40dp"
         android:layout_marginStart="40dp"
         android:layout_alignBottom="@+id/bestTime"
@@ -112,7 +112,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/lapsIcon"
-        android:background="@drawable/laps_19x19"
+
         android:layout_alignBottom="@+id/lapsCounter"
         android:layout_toLeftOf="@+id/lapsCounter"
         android:layout_toStartOf="@+id/lapsCounter" />

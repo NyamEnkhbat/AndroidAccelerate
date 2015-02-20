@@ -25,5 +25,7 @@
     <string name="title_activity_user_setup">UserSetup</string>
     <string name="title_activity_main_menu">MainMenu</string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="timingserveraddresshint">Timing Server Adress</string>
+    <string name="text_connection">Test Connection</string>
 
 </resources>
