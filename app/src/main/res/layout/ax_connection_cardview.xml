@@ -7,8 +7,7 @@
     <!-- A CardView that contains a TextView -->
     <android.support.v7.widget.CardView
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/card_view"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         card_view:cardCornerRadius="1dp"
         card_view:cardElevation="1dp"
@@ -16,20 +15,27 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:paddingTop="@dimen/activity_vertical_margin"
+            android:layout_height="match_parent"
             android:orientation="vertical"
-            android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity"
+            tools:context=".MainActivity"
             android:background="#fff4f4f4"
             android:weightSum="1">
+
 
             <MultiAutoCompleteTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/etServer"
                 android:hint="@string/timingserveraddresshint"
-                android:selectAllOnFocus="false" />
+                android:selectAllOnFocus="false"
+                android:textColor="@android:color/black"
+                android:textColorHint="@color/genre"
+                android:inputType="textUri"
+                android:imeOptions="actionDone|actionGo|actionSend"
+                android:singleLine="true"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginRight="15dp" />
 
             <Button
                 android:layout_width="match_parent"

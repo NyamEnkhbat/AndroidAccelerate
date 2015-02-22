@@ -7,4 +7,5 @@
     <dimen name="genre">13dip</dimen>
     <dimen name="year">12dip</dimen>
     <dimen name="cardview_layout_width">250dp</dimen>
+    <dimen name="headlineHight">48dp</dimen>
 </resources>

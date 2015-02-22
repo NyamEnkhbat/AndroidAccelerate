@@ -181,7 +181,7 @@ theme attribute (in the form
 containing a value of this type.
           @attr name com.echo.holographlibrary:barAxisColor
         */
-        public static final int BarGraph_barAxisColor = 0;
+        public static int BarGraph_barAxisColor = 0;
         /**
           <p>This symbol is the offset where the {@link com.echo.holographlibrary.R.attr#barShowAxis}
           attribute's value can be found in the {@link #BarGraph} array.
@@ -195,7 +195,7 @@ theme attribute (in the form
 containing a value of this type.
           @attr name com.echo.holographlibrary:barShowAxis
         */
-        public static final int BarGraph_barShowAxis = 2;
+        public static int BarGraph_barShowAxis = 2;
         /**
           <p>This symbol is the offset where the {@link com.echo.holographlibrary.R.attr#barShowAxisLabel}
           attribute's value can be found in the {@link #BarGraph} array.
@@ -209,7 +209,7 @@ theme attribute (in the form
 containing a value of this type.
           @attr name com.echo.holographlibrary:barShowAxisLabel
         */
-        public static final int BarGraph_barShowAxisLabel = 3;
+        public static int BarGraph_barShowAxisLabel = 3;
         /**
           <p>This symbol is the offset where the {@link com.echo.holographlibrary.R.attr#barShowPopup}
           attribute's value can be found in the {@link #BarGraph} array.
@@ -223,7 +223,7 @@ theme attribute (in the form
 containing a value of this type.
           @attr name com.echo.holographlibrary:barShowPopup
         */
-        public static final int BarGraph_barShowPopup = 5;
+        public static int BarGraph_barShowPopup = 5;
         /**
           <p>This symbol is the offset where the {@link com.echo.holographlibrary.R.attr#barShowText}
           attribute's value can be found in the {@link #BarGraph} array.
@@ -237,7 +237,7 @@ theme attribute (in the form
 containing a value of this type.
           @attr name com.echo.holographlibrary:barShowText
         */
-        public static final int BarGraph_barShowText = 4;
+        public static int BarGraph_barShowText = 4;
         /**
           <p>This symbol is the offset where the {@link com.echo.holographlibrary.R.attr#orientation}
           attribute's value can be found in the {@link #BarGraph} array.
@@ -254,7 +254,7 @@ containing a value of this type.
 </table>
           @attr name com.echo.holographlibrary:orientation
         */
-        public static final int BarGraph_orientation = 1;
+        public static int BarGraph_orientation = 1;
         /** Attributes that can be used with a LineGraph.
            <p>Includes the following attributes:</p>
            <table>
@@ -293,7 +293,7 @@ theme attribute (in the form
 containing a value of this type.
           @attr name com.echo.holographlibrary:lineAxisColor
         */
-        public static final int LineGraph_lineAxisColor = 1;
+        public static int LineGraph_lineAxisColor = 1;
         /**
           <p>This symbol is the offset where the {@link com.echo.holographlibrary.R.attr#lineBackground}
           attribute's value can be found in the {@link #LineGraph} array.
@@ -308,7 +308,7 @@ theme attribute (in the form
 containing a value of this type.
           @attr name com.echo.holographlibrary:lineBackground
         */
-        public static final int LineGraph_lineBackground = 5;
+        public static int LineGraph_lineBackground = 5;
         /**
           <p>This symbol is the offset where the {@link com.echo.holographlibrary.R.attr#lineStrokeColor}
           attribute's value can be found in the {@link #LineGraph} array.
@@ -323,7 +323,7 @@ theme attribute (in the form
 containing a value of this type.
           @attr name com.echo.holographlibrary:lineStrokeColor
         */
-        public static final int LineGraph_lineStrokeColor = 0;
+        public static int LineGraph_lineStrokeColor = 0;
         /**
           <p>This symbol is the offset where the {@link com.echo.holographlibrary.R.attr#lineStrokeSpacing}
           attribute's value can be found in the {@link #LineGraph} array.
@@ -339,7 +339,7 @@ theme attribute (in the form
 containing a value of this type.
           @attr name com.echo.holographlibrary:lineStrokeSpacing
         */
-        public static final int LineGraph_lineStrokeSpacing = 3;
+        public static int LineGraph_lineStrokeSpacing = 3;
         /**
           <p>This symbol is the offset where the {@link com.echo.holographlibrary.R.attr#lineStrokeWidth}
           attribute's value can be found in the {@link #LineGraph} array.
@@ -355,7 +355,7 @@ theme attribute (in the form
 containing a value of this type.
           @attr name com.echo.holographlibrary:lineStrokeWidth
         */
-        public static final int LineGraph_lineStrokeWidth = 2;
+        public static int LineGraph_lineStrokeWidth = 2;
         /**
           <p>This symbol is the offset where the {@link com.echo.holographlibrary.R.attr#lineUseDip}
           attribute's value can be found in the {@link #LineGraph} array.
@@ -369,7 +369,7 @@ theme attribute (in the form
 containing a value of this type.
           @attr name com.echo.holographlibrary:lineUseDip
         */
-        public static final int LineGraph_lineUseDip = 4;
+        public static int LineGraph_lineUseDip = 4;
         /** Attributes that can be used with a PieGraph.
            <p>Includes the following attributes:</p>
            <table>
@@ -398,7 +398,7 @@ theme attribute (in the form
 containing a value of this type.
           @attr name com.echo.holographlibrary:pieInnerCircleRatio
         */
-        public static final int PieGraph_pieInnerCircleRatio = 0;
+        public static int PieGraph_pieInnerCircleRatio = 0;
         /**
           <p>This symbol is the offset where the {@link com.echo.holographlibrary.R.attr#pieSlicePadding}
           attribute's value can be found in the {@link #PieGraph} array.
@@ -414,6 +414,6 @@ theme attribute (in the form
 containing a value of this type.
           @attr name com.echo.holographlibrary:pieSlicePadding
         */
-        public static final int PieGraph_pieSlicePadding = 1;
+        public static int PieGraph_pieSlicePadding = 1;
     };
 }

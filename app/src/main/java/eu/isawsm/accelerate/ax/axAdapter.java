@@ -1,16 +1,22 @@
 package eu.isawsm.accelerate.ax;
 
+import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
+import android.location.Location;
+import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,17 +27,37 @@ import com.echo.holographlibrary.LinePoint;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.drive.Drive;
+import com.google.android.gms.location.LocationServices;
 
+import org.json.JSONObject;
+
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.BreakIterator;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 import eu.isawsm.accelerate.Model.Car;
+import eu.isawsm.accelerate.Model.Club;
 import eu.isawsm.accelerate.R;
+import eu.isawsm.accelerate.ax.Util.RemoteFetch;
+import eu.isawsm.accelerate.ax.viewholders.AxViewHolder;
+import eu.isawsm.accelerate.ax.viewholders.CarSettingsViewHolder;
+import eu.isawsm.accelerate.ax.viewholders.CarViewHolder;
+import eu.isawsm.accelerate.ax.viewholders.ClubViewHolder;
+import eu.isawsm.accelerate.ax.viewholders.ConnectionViewHolder;
+import eu.isawsm.accelerate.ax.viewmodel.CarSetup;
+import eu.isawsm.accelerate.ax.viewmodel.ConnectionSetup;
 
-public class AxAdapter extends RecyclerView.Adapter<AxAdapter.AxViewHolder> {
-    private ArrayList<Car> mDataset;
+public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
+    private ArrayList<AxCardItem> mDataset;
 
-    private Context context;
+    private Activity context;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -46,31 +72,59 @@ public class AxAdapter extends RecyclerView.Adapter<AxAdapter.AxViewHolder> {
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public AxAdapter(ArrayList<Car> myDataset, Context context) {
+    public AxAdapter(ArrayList<AxCardItem> myDataset, Activity context) {
         mDataset = myDataset;
         this.context = context;
+
+
     }
 
     @Override
     public int getItemViewType(int position){
-        return R.layout.ax_car_cardview;
+        if(mDataset.get(position).get() instanceof Car)
+            return R.layout.ax_car_cardview;
+        else if (mDataset.get(position).get()instanceof ConnectionSetup)
+            return R.layout.ax_connection_cardview;
+        else if(mDataset.get(position).get () instanceof Club) {
+            return R.layout.ax_club_cardview;
+        } else if(mDataset.get(position).get() instanceof CarSetup) {
+            return R.layout.ax_car_settings_cardview;
+        } else
+            return -1;
     }
 
     // Create new views (invoked by the layout manager)
     @Override
-    public AxAdapter.AxViewHolder onCreateViewHolder(ViewGroup parent,
+    public AxViewHolder onCreateViewHolder(ViewGroup parent,
                                                    int viewType) {
         if(viewType == R.layout.ax_car_cardview) {
-            // create a new view
             View v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.ax_car_cardview, parent, false);
             // set the view's size, margins, paddings and layout parameters
-            //...
-            CarViewHolder vh = new CarViewHolder(v);
-            return vh;
+
+            return new CarViewHolder(v, this, context);
+        } else if(viewType == R.layout.ax_connection_cardview) {
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.ax_connection_cardview, parent, false);
+            // set the view's size, margins, paddings and layout parameters
+
+            return new ConnectionViewHolder(v, this, context);
+
+        } else if(viewType == R.layout.ax_club_cardview) {
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.ax_club_cardview, parent, false);
+
+            return new ClubViewHolder(v, this, context);
+
+        } else if(viewType == R.layout.ax_car_settings_cardview){
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.ax_car_settings_cardview, parent, false);
+
+            return new CarSettingsViewHolder(v, this, context);
         } else {
             throw new RuntimeException("Cardview not supported");
         }
+
     }
 
     @Override
@@ -83,151 +137,14 @@ public class AxAdapter extends RecyclerView.Adapter<AxAdapter.AxViewHolder> {
         return mDataset.size();
     }
 
-    public abstract class AxViewHolder extends AxAdapter.ViewHolder{
-
-        public AxViewHolder(View v) {
-            super(v);
-        }
-
-        public abstract void onBindViewHolder(AxAdapter.ViewHolder holder, int position);
+    public ArrayList<AxCardItem> getDataset(){
+        return mDataset;
     }
 
-    public class CarViewHolder extends AxViewHolder{
-
-        public CarViewHolder(View v) {
-            super(v);
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
-            TextView tfCarName = (TextView) holder.mView.findViewById(R.id.tfCarName);
-            TextView tfConsistencyValue = (TextView) holder.mView.findViewById(R.id.tfConsistencyValue);
-
-            TextView tfAvg = (TextView) holder.mView.findViewById(R.id.tfAvg);
-            TextView tfBest = (TextView) holder.mView.findViewById(R.id.tfBest);
-            TextView tfLaps = (TextView) holder.mView.findViewById(R.id.tfLaps);
-            LineGraph lgGraph = (LineGraph) holder.mView.findViewById(R.id.linegraph);
-
-            fillLineGraph(lgGraph);
-
-            Car car = mDataset.get(position);
-
-            tfCarName.setText(car.getFullName());
-        }
-
-        private void fillLineGraph(LineGraph lgGraph) {
-            Line l = new Line();
-            l.setUsingDips(true);
-            LinePoint p = new LinePoint();
-            p.setX(0);
-            p.setY(5);
-            p.setColor(context.getResources().getColor(R.color.colorPrimary));
-            l.addPoint(p);
-            p = new LinePoint();
-            p.setX(8);
-            p.setY(8);
-            p.setColor(context.getResources().getColor(R.color.colorPrimary));
-            l.addPoint(p);
-            p = new LinePoint();
-            p.setX(10);
-            p.setY(4);
-            p.setColor(context.getResources().getColor(R.color.colorPrimary));
-            l.addPoint(p);
-
-            l.setColor(context.getResources().getColor(R.color.colorPrimary));
-
-            lgGraph.setUsingDips(true);
-            lgGraph.addLine(l);
-            lgGraph.setRangeY(0, 10);
-            lgGraph.setLineToFill(0);
-        }
+    public void removeCard(final int position) {
+        if(position == -1) return; //Card is not already removed
+        mDataset.remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, mDataset.size());
     }
-
-    public class ConnectionViewHolder extends  AxViewHolder {
-        private SharedPreferences preferences;
-        private Button bTestConnection;
-        private  MultiAutoCompleteTextView mAcTVServerAdress;
-
-        public ConnectionViewHolder(View v) {
-            super(v);
-        }
-
-
-        @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
-            preferences = PreferenceManager.getDefaultSharedPreferences(context);
-
-            bTestConnection = (Button) holder.mView.findViewById(R.id.bTestConnection);
-            mAcTVServerAdress = (MultiAutoCompleteTextView) holder.mView.findViewById(R.id.etServer);
-
-            bTestConnection.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onTestConnectionClick(v);
-                }
-            });
-        }
-
-        public void onTestConnectionClick(View view) {
-            String message = mAcTVServerAdress.getText().toString().trim();
-            if (TextUtils.isEmpty(message)) {
-                mAcTVServerAdress.setText("Please enter a Valid address");
-                return;
-            }
-            tryConnect(message);
-            bTestConnection.setEnabled(false);
-            mAcTVServerAdress.setEnabled(false);
-            bTestConnection.setText("Connecting...");
-
-
-
-        }
-        public boolean tryConnect(String address) {
-
-            if(!address.startsWith("http"))
-                address = "http://"+ address;
-
-
-
-            preferences.edit().putString("AxServerAddress", address).apply();
-            try {
-                System.out.println(address);
-                Socket socket = IO.socket(address);
-                socket.connect();
-
-                socket.on("Welcome", onConnectionSuccess);
-                socket.on(Socket.EVENT_ERROR, onConnectionError);
-                socket.on(Socket.EVENT_CONNECT_ERROR, onConnectionError);
-                socket.on(Socket.EVENT_CONNECT_TIMEOUT, onConnectionError);
-
-                socket.emit("TestConnection", socket.id());
-            } catch (URISyntaxException e) {
-                return false;
-            }
-            return true;
-
-        }
-        private Emitter.Listener onConnectionError = new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                bTestConnection.setEnabled(true);
-                bTestConnection.setText("Test Connection");
-                mAcTVServerAdress.setEnabled(true);
-                mAcTVServerAdress.setError("Connection Failed");
-            }
-        };
-
-
-        private Emitter.Listener onConnectionSuccess = new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-
-                //TODO Hide Card and Show the club cardview
-            }
-        };
-        private void showToast(String s) {
-            Toast.makeText(context, s, Toast.LENGTH_LONG).show();
-        }
-    }
-
 }

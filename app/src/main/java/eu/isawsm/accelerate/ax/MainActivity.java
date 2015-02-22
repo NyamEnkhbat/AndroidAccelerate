@@ -3,43 +3,41 @@ package eu.isawsm.accelerate.ax;
 
 
 import android.annotation.TargetApi;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
-import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.MultiAutoCompleteTextView;
 import android.widget.Toast;
 
 import com.github.nkzawa.emitter.Emitter;
-import com.github.nkzawa.socketio.client.IO;
-import com.github.nkzawa.socketio.client.Socket;
 
-import java.net.URISyntaxException;
+import java.net.URI;
 import java.util.ArrayList;
 
 import eu.isawsm.accelerate.Model.Car;
 import eu.isawsm.accelerate.Model.Clazz;
+import eu.isawsm.accelerate.Model.Club;
 import eu.isawsm.accelerate.Model.Driver;
 import eu.isawsm.accelerate.Model.Manufacturer;
 import eu.isawsm.accelerate.Model.Model;
 import eu.isawsm.accelerate.R;
+import eu.isawsm.accelerate.ax.Util.AxPreferences;
+import eu.isawsm.accelerate.ax.Util.AxSocket;
+import eu.isawsm.accelerate.ax.viewholders.AxViewHolder;
+import eu.isawsm.accelerate.ax.viewmodel.CarSetup;
+import eu.isawsm.accelerate.ax.viewmodel.ConnectionSetup;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -47,7 +45,7 @@ public class MainActivity extends ActionBarActivity {
     private RecyclerView mRecyclerView;
     private StaggeredGridLayoutManager mLayoutManager;
     private CardView carCardView;
-
+    private AxAdapter axAdapter;
 
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -70,7 +68,12 @@ public class MainActivity extends ActionBarActivity {
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mRecyclerView.setAdapter(new AxAdapter(getTestCarList(), this));
+        axAdapter = new AxAdapter(getCarsFromPreferences(), this);
+
+        mRecyclerView.setAdapter(axAdapter);
+
+        axAdapter.getDataset().add(new AxCardItem<>(new CarSetup()));
+
         mRecyclerView.getViewTreeObserver().addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
@@ -84,29 +87,56 @@ public class MainActivity extends ActionBarActivity {
                     }
                 });
 
+        if(!AxSocket.isConnected()) {
+            String address = AxPreferences.getSharedPreferencesString(this, AxPreferences.AX_SERVER_ADDRESS,"");
+            AxSocket.tryConnect(address, onConnectionSuccess, onConnectionError, onConnectionError);
+        }
+
     }
 
+    private Emitter.Listener onConnectionError = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            AxSocket.off();
+            if (Looper.myLooper() == null) Looper.prepare();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    showConnectionSetup();
+                }
+            });
 
-    private ArrayList<Car> getTestCarList(){
-        ArrayList<Car> retVal = new ArrayList<>();
+        }
+    };
 
-        Driver driver = new Driver("Oliver", "Faderbauer", "Awli", null, null);
-        Manufacturer manufacturer = new Manufacturer("Xray", null);
-        Model model = new Model(manufacturer,"T4'15", "4WD", "17.5", "Touring Car", "1:10");
-        Clazz clazz = new Clazz("17.5 Blinky", "Stock Class");
-        long transponderID = 123456789;
-        Bitmap picture = null;
+    private Emitter.Listener onConnectionSuccess = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            //Todo Test Club Card
+            AxPreferences.putSharedPreferencesString(getApplicationContext(), AxPreferences.AX_SERVER_ADDRESS, AxSocket.getLastAddress());
 
+            AxCardItem clubCard = new AxCardItem<>(new Club("RCC Graphenwörth", URI.create("rcc.com"), null));
+            axAdapter.getDataset().add(clubCard);
+        }
+    };
+    private void showConnectionSetup(){
+        Handler handler = new Handler();
+        if(Looper.myLooper() == null) Looper.prepare();
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                axAdapter.getDataset().add(0, new AxCardItem<>(new ConnectionSetup()));
+                axAdapter.notifyItemInserted(0);
+            }
+        });
+    }
 
-        retVal.add(new Car(driver, model, clazz, transponderID, picture));
-        retVal.add(new Car(driver, model, clazz, transponderID, picture));
-        retVal.add(new Car(driver, model, clazz, transponderID, picture));
-        retVal.add(new Car(driver, model, clazz, transponderID, picture));
-        retVal.add(new Car(driver, model, clazz, transponderID, picture));
-        retVal.add(new Car(driver, model, clazz, transponderID, picture));
-        retVal.add(new Car(driver, model, clazz, transponderID, picture));
-        retVal.add(new Car(driver, model, clazz, transponderID, picture));
+    private ArrayList<AxCardItem> getCarsFromPreferences(){
+        ArrayList<AxCardItem> retVal = new ArrayList<>();
 
+        for(Car car : AxPreferences.getSharedPreferencesCars(this)){
+            retVal.add(new AxCardItem<>(car));
+        }
         return retVal;
     }
 
@@ -131,6 +161,7 @@ public class MainActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 
 
 }

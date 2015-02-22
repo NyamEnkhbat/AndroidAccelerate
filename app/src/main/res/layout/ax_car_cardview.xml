@@ -7,7 +7,6 @@
     <!-- A CardView that contains a TextView -->
         <android.support.v7.widget.CardView
             xmlns:card_view="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/card_view"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             card_view:cardCornerRadius="1dp"
@@ -22,46 +21,69 @@
 
              <TextView
                  android:layout_width="fill_parent"
-                 android:layout_height="80dp"
+                 android:layout_height="@dimen/headlineHight"
                  android:text="Xray T4&apos;15"
                  android:id="@+id/tfCarName"
-                 android:textColor="@color/textColorPrimary"
+                 android:textColor="@android:color/tertiary_text_light"
                  android:textSize="24dp"
                  android:gravity="fill_horizontal|fill_vertical"
                  android:layout_alignParentTop="true"
-                 android:layout_toRightOf="@+id/button_menu"
-                 android:layout_above="@+id/linearLayout2"
-                 android:background="@color/colorPrimary"
                  android:layout_alignParentRight="true"
-                 android:layout_alignParentEnd="true" />
-
-             <ImageButton
-                 android:layout_width="48dp"
-                 android:layout_height="48dp"
-                 android:src="@drawable/abc_ic_ab_back_mtrl_am_alpha"
-                 android:background="@color/colorPrimary"
-                 android:id="@+id/button_menu"
-                 android:layout_alignParentTop="true"
+                 android:layout_alignParentEnd="true"
                  android:layout_alignParentLeft="true"
+                 android:layout_marginLeft="15dp"
                  android:layout_alignParentStart="true" />
 
              <LinearLayout
                  android:orientation="horizontal"
-                 android:layout_width="wrap_content"
+                 android:layout_width="fill_parent"
                  android:layout_height="wrap_content"
 
 
                  android:id="@+id/linearLayout2"
-                 android:layout_below="@+id/button_menu"
-                 android:layout_alignParentLeft="true"
+                 android:gravity="center"
+                 android:layout_below="@+id/tfCarName"
                  android:layout_alignParentStart="true"
                  android:layout_alignParentRight="true"
-                 android:layout_alignParentEnd="true"
-                 android:gravity="center">
+                 android:layout_alignParentEnd="true">
 
                  <LinearLayout
                      android:orientation="vertical"
-                     android:layout_width="115dp"
+                     android:layout_width="95dp"
+                     android:layout_height="match_parent"
+                     android:gravity="center"
+                     android:layout_alignTop="@+id/linearLayout2"
+                     android:layout_centerHorizontal="true"
+                     android:layout_alignBottom="@+id/ivCar"
+                     android:id="@+id/linearLayout4" >
+
+                     <TextView
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:textAppearance="?android:attr/textAppearanceLarge"
+                         android:text="1"
+                         android:id="@+id/textView2"
+                         android:layout_above="@+id/textView4"
+                         android:layout_toRightOf="@+id/ivCar"
+                         android:textColor="@color/colorPrimary"
+                         android:layout_alignRight="@+id/textView4"
+                         android:layout_alignEnd="@+id/textView4"
+                         android:textSize="31dp" />
+
+                     <TextView
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:text="Rank"
+                         android:id="@+id/textView4"
+                         android:textColor="@android:color/tertiary_text_light"
+                         android:layout_alignBottom="@+id/ivCar"
+                         android:layout_toRightOf="@+id/ivCar"
+                         android:layout_toEndOf="@+id/ivCar" />
+                 </LinearLayout>
+
+                 <LinearLayout
+                     android:orientation="vertical"
+                     android:layout_width="95dp"
                      android:layout_height="match_parent"
                      android:gravity="center"
                      android:layout_alignTop="@+id/linearLayout2"
@@ -77,7 +99,7 @@
                          android:id="@+id/tfConsistencyValue"
                          android:layout_above="@+id/textView6"
                          android:layout_toRightOf="@+id/ivCar"
-                         android:textColor="@color/genre"
+                         android:textColor="@color/colorPrimary"
                          android:layout_alignRight="@+id/textView6"
                          android:layout_alignEnd="@+id/textView6"
                          android:textSize="31dp" />
@@ -87,7 +109,7 @@
                          android:layout_height="wrap_content"
                          android:text="Consistency"
                          android:id="@+id/textView6"
-                         android:textColor="@color/genre"
+                         android:textColor="@android:color/tertiary_text_light"
                          android:layout_alignBottom="@+id/ivCar"
                          android:layout_toRightOf="@+id/ivCar"
                          android:layout_toEndOf="@+id/ivCar" />
@@ -95,7 +117,7 @@
 
                  <LinearLayout
                      android:orientation="vertical"
-                     android:layout_width="110dp"
+                     android:layout_width="95dp"
                      android:layout_height="fill_parent"
                      android:id="@+id/linearLayout"
                      android:padding="10dp"
@@ -106,43 +128,87 @@
                      android:layout_alignParentEnd="true"
                      >
 
-                     <TextView
-                         android:layout_width="wrap_content"
-                         android:layout_height="wrap_content"
-                         android:textAppearance="?android:attr/textAppearanceSmall"
-                         android:text="Avg;   15.54"
-                         android:id="@+id/tfAvg"
-                         android:textColor="@color/genre"
-                         android:layout_alignBaseline="@+id/tfLaps"
-                         android:layout_alignBottom="@+id/tfLaps"
-                         android:layout_toRightOf="@+id/imageView4"
-                         android:layout_toEndOf="@+id/imageView4"
-                         android:padding="2dp" />
+                     <LinearLayout
+                         android:orientation="horizontal"
+                         android:layout_width="fill_parent"
+                         android:layout_height="wrap_content">
 
-                     <TextView
-                         android:layout_width="wrap_content"
-                         android:layout_height="wrap_content"
-                         android:textAppearance="?android:attr/textAppearanceSmall"
-                         android:text="Best:  15.54"
-                         android:id="@+id/tfBest"
-                         android:textColor="@color/genre"
-                         android:layout_below="@+id/tfCarName"
-                         android:layout_toRightOf="@+id/imageView5"
-                         android:layout_toEndOf="@+id/imageView5"
-                         android:padding="2dp" />
+                         <TextView
+                             android:layout_width="wrap_content"
+                             android:layout_height="wrap_content"
+                             android:textAppearance="?android:attr/textAppearanceSmall"
+                             android:text="Avg:"
+                             android:id="@+id/tfAvg"
+                             android:textColor="@android:color/tertiary_text_light"
+                             android:layout_alignBaseline="@+id/tfLaps"
+                             android:layout_alignBottom="@+id/tfLaps"
+                             android:layout_toRightOf="@+id/ivCondition"
+                             android:layout_toEndOf="@+id/ivCondition"
+                             android:padding="2dp" />
 
-                     <TextView
-                         android:layout_width="wrap_content"
-                         android:layout_height="wrap_content"
-                         android:textAppearance="?android:attr/textAppearanceSmall"
-                         android:text="Laps: 1552"
-                         android:id="@+id/tfLaps"
-                         android:textColor="@color/genre"
-                         android:layout_alignTop="@+id/imageView6"
-                         android:layout_toRightOf="@+id/imageView6"
-                         android:layout_toEndOf="@+id/imageView6"
-                         android:padding="2dp" />
+                         <TextView
+                             android:layout_width="match_parent"
+                             android:layout_height="wrap_content"
+                             android:text="15.36"
+                             android:id="@+id/textView5"
+                             android:textColor="@color/colorPrimary"
+                             android:gravity="right" />
+                     </LinearLayout>
+
+                     <LinearLayout
+                         android:orientation="horizontal"
+                         android:layout_width="fill_parent"
+                         android:layout_height="wrap_content">
+
+                         <TextView
+                             android:layout_width="wrap_content"
+                             android:layout_height="wrap_content"
+                             android:textAppearance="?android:attr/textAppearanceSmall"
+                             android:text="Best:"
+                             android:id="@+id/tfBest"
+                             android:textColor="@android:color/tertiary_text_light"
+                             android:layout_below="@+id/tfCarName"
+                             android:layout_toRightOf="@+id/imageView5"
+                             android:layout_toEndOf="@+id/imageView5"
+                             android:padding="2dp" />
+
+                         <TextView
+                             android:layout_width="match_parent"
+                             android:layout_height="wrap_content"
+                             android:text="15.36"
+                             android:id="@+id/textView7"
+                             android:textColor="@color/colorPrimary"
+                             android:gravity="right" />
+                     </LinearLayout>
+
+                     <LinearLayout
+                         android:orientation="horizontal"
+                         android:layout_width="fill_parent"
+                         android:layout_height="wrap_content">
+
+                         <TextView
+                             android:layout_width="wrap_content"
+                             android:layout_height="wrap_content"
+                             android:textAppearance="?android:attr/textAppearanceSmall"
+                             android:text="Laps:"
+                             android:id="@+id/tfLaps"
+                             android:textColor="@android:color/tertiary_text_light"
+                             android:layout_alignTop="@+id/imageView6"
+                             android:layout_toRightOf="@+id/imageView6"
+                             android:layout_toEndOf="@+id/imageView6"
+                             android:padding="2dp" />
+
+                         <TextView
+                             android:layout_width="match_parent"
+                             android:layout_height="wrap_content"
+                             android:text="1254"
+                             android:id="@+id/textView8"
+                             android:textColor="@color/colorPrimary"
+                             android:gravity="right" />
+                     </LinearLayout>
+
                  </LinearLayout>
+
              </LinearLayout>
 
              <com.echo.holographlibrary.LineGraph

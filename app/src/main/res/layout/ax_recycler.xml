@@ -13,7 +13,7 @@
         android:id="@+id/ax_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/windowBackground"
+        android:background="#ffd9d9d9"
         android:padding="5dp" />
 
 </RelativeLayout>
