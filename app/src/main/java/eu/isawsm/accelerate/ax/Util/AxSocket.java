@@ -46,6 +46,7 @@ public class AxSocket {
 
             socket.emit("TestConnection", socket.id());
         } catch (URISyntaxException e) {
+            onConnectionError.call(e);
             return false;
         }
         return true;
@@ -54,6 +55,6 @@ public class AxSocket {
 
 
     public static void off() {
-        socket.off();
+        if(socket != null)socket.off();
     }
 }

@@ -3,11 +3,14 @@ package eu.isawsm.accelerate.ax;
 
 
 import android.annotation.TargetApi;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.ContactsContract;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -19,6 +22,7 @@ import android.view.MenuItem;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.nkzawa.emitter.Emitter;
@@ -38,28 +42,39 @@ import eu.isawsm.accelerate.ax.Util.AxSocket;
 import eu.isawsm.accelerate.ax.viewholders.AxViewHolder;
 import eu.isawsm.accelerate.ax.viewmodel.CarSetup;
 import eu.isawsm.accelerate.ax.viewmodel.ConnectionSetup;
+import eu.isawsm.accelerate.ax.viewmodel.Friends;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayout.OnRefreshListener {
 
     private Toolbar toolbar;
     private RecyclerView mRecyclerView;
     private StaggeredGridLayoutManager mLayoutManager;
     private CardView carCardView;
     private AxAdapter axAdapter;
+    private SwipeRefreshLayout swipeLayout;
 
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ax_recycler);
-        Window window = getWindow();
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
 
-        toolbar = (Toolbar) findViewById(R.id.app_bar);
-        setSupportActionBar(toolbar);
+        setSystemBarColor();
+        setToolBar();
+        initSwipeRefrehLayout();
+        initRecyclerView();
 
+        Cursor c = getApplication().getContentResolver().query(ContactsContract.Profile.CONTENT_URI, null, null, null, null);
+        c.moveToFirst();
+        TextView tvStatus = (TextView) findViewById(R.id.tfStatus);
+        tvStatus.setText(c.getString(c.getColumnIndex("display_name")));
+        c.close();
+
+        if(!AxSocket.isConnected()) {
+            String address = AxPreferences.getSharedPreferencesString(this, AxPreferences.AX_SERVER_ADDRESS,"");
+            AxSocket.tryConnect(address, onConnectionSuccess, onConnectionError, onConnectionError);
+        }
+    }
+
+    private void initRecyclerView() {
         mRecyclerView = (RecyclerView) findViewById(R.id.ax_recycler_view);
         mRecyclerView.setHasFixedSize(true);
 
@@ -72,10 +87,11 @@ public class MainActivity extends ActionBarActivity {
 
         mRecyclerView.setAdapter(axAdapter);
 
-        axAdapter.getDataset().add(new AxCardItem<>(new CarSetup()));
 
+        mRecyclerView.setAdapter(axAdapter);
         mRecyclerView.getViewTreeObserver().addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
                     @Override
                     public void onGlobalLayout() {
                         mRecyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
@@ -86,12 +102,37 @@ public class MainActivity extends ActionBarActivity {
                         mLayoutManager.requestLayout();
                     }
                 });
+    }
 
-        if(!AxSocket.isConnected()) {
-            String address = AxPreferences.getSharedPreferencesString(this, AxPreferences.AX_SERVER_ADDRESS,"");
-            AxSocket.tryConnect(address, onConnectionSuccess, onConnectionError, onConnectionError);
-        }
+    private void setToolBar() {
+        toolbar = (Toolbar) findViewById(R.id.app_bar);
+        setSupportActionBar(toolbar);
+    }
 
+    private void initSwipeRefrehLayout() {
+        swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        swipeLayout.setOnRefreshListener(this);
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void setSystemBarColor() {
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
+    }
+
+    @Override
+    public void onRefresh() {
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                swipeLayout.setRefreshing(false);
+                for (AxViewHolder viewHolder : AxViewHolder.viewHolders) {
+                    viewHolder.refresh();
+                }
+            }
+        });
     }
 
     private Emitter.Listener onConnectionError = new Emitter.Listener() {
@@ -120,15 +161,15 @@ public class MainActivity extends ActionBarActivity {
         }
     };
     private void showConnectionSetup(){
-        Handler handler = new Handler();
-        if(Looper.myLooper() == null) Looper.prepare();
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
+//        Handler handler = new Handler();
+//        if(Looper.myLooper() == null) Looper.prepare();
+//        handler.post(new Runnable() {
+//            @Override
+//            public void run() {
                 axAdapter.getDataset().add(0, new AxCardItem<>(new ConnectionSetup()));
-                axAdapter.notifyItemInserted(0);
-            }
-        });
+                axAdapter.notifyDataSetChanged();
+//          }
+//        });
     }
 
     private ArrayList<AxCardItem> getCarsFromPreferences(){
@@ -142,26 +183,33 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        switch (item.getItemId()) {
+            case R.id.action_add_car:
+                if(AxViewHolder.getCarSetupViewHolder() == null) {
+                    axAdapter.getDataset().add(0,new AxCardItem<>(new CarSetup()));
+                    axAdapter.notifyDataSetChanged();
+                } else AxViewHolder.getCarSetupViewHolder().startUserInput();
+                return true;
+            case R.id.action_add_firend:
+                axAdapter.getDataset().add(new AxCardItem<>(new Friends()));
+                return true;
+            case R.id.action_show_profile:
+                axAdapter.getDataset().get(0).toCar().getClazz().setName("Test");
+                axAdapter.notifyDataSetChanged();
+                return true;
+            case R.id.action_settings:
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
 
-        return super.onOptionsItemSelected(item);
+
     }
-
-
-
 }

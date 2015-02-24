@@ -2,9 +2,8 @@
 <resources>
 
     <string name="app_name" translatable="false">Accelerate</string>
-    <string name="action_settings">Settings</string>
+
     <string name="title_activity_practice">PracticeActivity</string>
-    <string name="hello_world">Hello world!</string>
     <string name="title_activity_list">Activities</string>
     <string name="title_activity_detail">Activity Detail</string>
     <string name="drawer_open">Open navigation drawer</string>
@@ -24,23 +23,18 @@
 
     <string name="title_activity_user_setup">UserSetup</string>
     <string name="title_activity_main_menu">MainMenu</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_main">Axelerate</string>
     <string name="timingserveraddresshint">Timing Server Adress</string>
     <string name="text_connection">Test Connection</string>
     <string name="connectionsuccessful">Connection Successful</string>
-
+    <!-- Menu -->
+    <string name="action_add_car">Add Car</string>
+    <string name="action_add_firend">Add Friend</string>
+    <string name="action_settings">Settings</string>
     <!-- Put your own APP ID here -->
     <string name="open_weather_maps_app_id">11111</string>
 
-    <string name="weather_sunny">&#xf00d;</string>
-    <string name="weather_clear_night">&#xf02e;</string>
-
-    <string name="weather_foggy">&#xf014;</string>
-    <string name="weather_cloudy">&#xf013;</string>
-    <string name="weather_rainy">&#xf019;</string>
-    <string name="weather_snowy">&#xf01b;</string>
-    <string name="weather_thunder">&#xf01e;</string>
-    <string name="weather_drizzle">&#xf01c;</string>
-
     <string name="place_not_found">Sorry, no weather data found.</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="action_show_profile">Profile...</string>
 </resources>

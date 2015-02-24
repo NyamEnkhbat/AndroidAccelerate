@@ -1,15 +1,22 @@
 package eu.isawsm.accelerate.ax.viewholders;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.nkzawa.emitter.Emitter;
@@ -52,17 +59,41 @@ public class CarSettingsViewHolder extends AxViewHolder {
         etTransponder = (EditText) holder.mView.findViewById(R.id.etTransponder);
         bSubmit = (Button) holder.mView.findViewById(R.id.bSubmit);
 
+        etTransponder.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    onSubmit();
+                }
+                return false;
+            }
+        });
+
+        startUserInput();
 
         bSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EditText[] inputs = {tvManufacturer,tvModel,tvClass,etTransponder};
-                for(EditText et : inputs){
-                    if(!checkInput(et)) return;
-                }
-                addCar();
+                onSubmit();
             }
         });
+    }
+
+
+    private void onSubmit() {
+        EditText[] inputs = {tvManufacturer,tvModel,tvClass,etTransponder};
+        for(EditText et : inputs){
+            if(!checkInput(et)) return;
+        }
+        addCar();
+    }
+
+    private void openKeyboard(View view) {
+        view.requestFocus();
+        InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (inputMethodManager != null) {
+            inputMethodManager.showSoftInput(view, 0);
+        }
     }
 
     private boolean checkInput(EditText v){
@@ -77,7 +108,7 @@ public class CarSettingsViewHolder extends AxViewHolder {
     private void addCar(){
         ArrayList<AxCardItem> retVal = new ArrayList<>();
 
-        Driver driver = new Driver("Oliver", "Faderbauer", "Awli", null, null);
+        Driver driver = new Driver("DriverName", "", "", null, null);
         Manufacturer manufacturer = new Manufacturer(tvManufacturer.getText().toString(), null);
         Model model = new Model(manufacturer,tvModel.getText().toString(), "4WD", "17.5", "Touring Car", "1:10");
         Clazz clazz = new Clazz(tvClass.getText().toString(), "");
@@ -91,7 +122,9 @@ public class CarSettingsViewHolder extends AxViewHolder {
 
         AxPreferences.putSharedPreferencesCar(context, car);
 
-        axAdapter.getDataset().set(getPosition(), new AxCardItem<>(car));
+        axAdapter.removeCard(getPosition());
+        axAdapter.getDataset().add(getPosition(),new AxCardItem<>(car));
+
         axAdapter.notifyItemChanged(getPosition());
 
         try {
@@ -104,5 +137,9 @@ public class CarSettingsViewHolder extends AxViewHolder {
             e.printStackTrace();
             showToast("Transponder already in use.");
         }
+    }
+
+    public void startUserInput() {
+        openKeyboard(tvManufacturer);
     }
 }

@@ -20,7 +20,7 @@ public class CarViewHolder extends AxViewHolder {
 
     public CarViewHolder(View v, AxAdapter mDataset, Activity context) {
         super(v, mDataset, context);
-
+        v.setTag(this);
     }
 
     @Override
@@ -31,6 +31,7 @@ public class CarViewHolder extends AxViewHolder {
         TextView tfAvg = (TextView) holder.mView.findViewById(R.id.tfAvg);
         TextView tfBest = (TextView) holder.mView.findViewById(R.id.tfBest);
         TextView tfLaps = (TextView) holder.mView.findViewById(R.id.tfLaps);
+        TextView tfClass = (TextView) holder.mView.findViewById(R.id.tfClass);
         LineGraph lgGraph = (LineGraph) holder.mView.findViewById(R.id.linegraph);
 
         fillLineGraph(lgGraph);
@@ -38,6 +39,7 @@ public class CarViewHolder extends AxViewHolder {
         Car car = axAdapter.getDataset().get(position).toCar();
 
         tfCarName.setText(car.getFullName());
+        tfClass.setText(car.getClazz().getName());
     }
 
     private void fillLineGraph(LineGraph lgGraph) {

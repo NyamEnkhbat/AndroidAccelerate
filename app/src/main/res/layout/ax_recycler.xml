@@ -8,12 +8,44 @@
         android:id="@+id/app_bar"
         layout="@layout/app_bar" />
 
-    <android.support.v7.widget.RecyclerView
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/app_bar"
-        android:id="@+id/ax_recycler_view"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/linearLayout5"
+        android:weightSum="1"
+        android:background="@color/colorPrimary"
+        android:paddingLeft="15dp"
+        android:paddingBottom="5dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Small Text"
+            android:id="@+id/tfStatus"
+            android:layout_weight="0.17" />
+    </LinearLayout>
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#ffd9d9d9"
-        android:padding="5dp" />
+        android:layout_below="@+id/linearLayout5"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+
+        <android.support.v7.widget.RecyclerView
+
+            android:id="@+id/ax_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#ffd9d9d9"
+            android:padding="5dp" />
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>
