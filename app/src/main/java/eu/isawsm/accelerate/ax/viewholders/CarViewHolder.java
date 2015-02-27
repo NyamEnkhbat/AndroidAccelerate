@@ -18,24 +18,33 @@ import eu.isawsm.accelerate.ax.AxAdapter;
  */
 public class CarViewHolder extends AxViewHolder {
 
+    TextView tfCarName;
+    TextView tfConsistencyValue;
+
+    TextView tfAvg;
+    TextView tfBest;
+    TextView tfLaps;
+    TextView tfClass;
+    LineGraph lgGraph;
+
     public CarViewHolder(View v, AxAdapter mDataset, Activity context) {
         super(v, mDataset, context);
         v.setTag(this);
+        tfCarName = (TextView) v.findViewById(R.id.tfCarName);
+        tfConsistencyValue = (TextView) v.findViewById(R.id.tfConsistencyValue);
+
+        tfAvg = (TextView) v.findViewById(R.id.tfAvg);
+        tfBest = (TextView) v.findViewById(R.id.tfBest);
+        tfLaps = (TextView) v.findViewById(R.id.tfLaps);
+        tfClass = (TextView)v.findViewById(R.id.tfClass);
+        lgGraph = (LineGraph) v.findViewById(R.id.linegraph);
+
+        fillLineGraph(lgGraph);
+
     }
 
     @Override
     public void onBindViewHolder(AxAdapter.ViewHolder holder, int position) {
-        TextView tfCarName = (TextView) holder.mView.findViewById(R.id.tfCarName);
-        TextView tfConsistencyValue = (TextView) holder.mView.findViewById(R.id.tfConsistencyValue);
-
-        TextView tfAvg = (TextView) holder.mView.findViewById(R.id.tfAvg);
-        TextView tfBest = (TextView) holder.mView.findViewById(R.id.tfBest);
-        TextView tfLaps = (TextView) holder.mView.findViewById(R.id.tfLaps);
-        TextView tfClass = (TextView) holder.mView.findViewById(R.id.tfClass);
-        LineGraph lgGraph = (LineGraph) holder.mView.findViewById(R.id.linegraph);
-
-        fillLineGraph(lgGraph);
-
         Car car = axAdapter.getDataset().get(position).toCar();
 
         tfCarName.setText(car.getFullName());

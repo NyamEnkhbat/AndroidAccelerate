@@ -20,15 +20,14 @@ public class AxDataset<T> extends ArrayList<T> {
 
     @Override
     public void add(int index, T t) {
-        super.add(index, t);
-        adapter.notifyItemInserted(index);
-        adapter.notifyItemRangeChanged(index, size());
+       super.add(index, t);
+       adapter.notifyItemInserted(index);
     }
 
     @Override
     public boolean add(T t) {
         super.add(t);
-        adapter.notifyItemInserted(size()-1);
+        adapter.notifyItemInserted(size());
         return true;
     }
 
@@ -36,7 +35,6 @@ public class AxDataset<T> extends ArrayList<T> {
     public void clear() {
         super.clear();
         adapter.notifyItemRangeRemoved(0, size());
-        adapter.notifyItemRangeChanged(0, size());
     }
 
     @Override
@@ -59,5 +57,10 @@ public class AxDataset<T> extends ArrayList<T> {
         T removedObject = super.remove(index);
         adapter.notifyItemRemoved(index);
         return removedObject;
+    }
+
+    @Override
+    public T get(int index) {
+        return super.get(index);
     }
 }

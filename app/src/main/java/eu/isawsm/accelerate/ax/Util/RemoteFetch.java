@@ -15,13 +15,13 @@ import eu.isawsm.accelerate.R;
 public class RemoteFetch {
 
     private static final String OPEN_WEATHER_MAP_API =
-            "api.openweathermap.org/data/2.5/weather?";
+            "http://api.openweathermap.org/data/2.5/weather?";
 
     public static JSONObject getJSON(Context context, double lat, double lon){
         try {
 
 
-            URL url = new URL(OPEN_WEATHER_MAP_API + "lar="+lat+"&lon="+lon);
+            URL url = new URL(OPEN_WEATHER_MAP_API + "lat="+lat+"&lon="+lon);
             HttpURLConnection connection =
                     (HttpURLConnection)url.openConnection();
 
@@ -42,11 +42,13 @@ public class RemoteFetch {
             // This value will be 404 if the request was not
             // successful
             if(data.getInt("cod") != 200){
+                Log.e("RemoteFetch", data.getInt("cod")+"");
                 return null;
             }
 
             return data;
         }catch(Exception e){
+            e.printStackTrace();
             return null;
         }
     }

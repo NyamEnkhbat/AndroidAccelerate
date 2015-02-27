@@ -2,27 +2,6 @@
 <resources>
 
     <string name="app_name" translatable="false">Accelerate</string>
-
-    <string name="title_activity_practice">PracticeActivity</string>
-    <string name="title_activity_list">Activities</string>
-    <string name="title_activity_detail">Activity Detail</string>
-    <string name="drawer_open">Open navigation drawer</string>
-    <string name="drawer_close">Close navigation drawer</string>
-    <string name="action_websearch">Web search</string>
-    <string name="app_not_available">Sorry, there\'s no web browser available</string>
-
-    <string-array name="sections_array">
-        <item>All Laps</item>
-        <item>Your Laps</item>
-        <item>Improvement</item>
-        <item>Top Racers</item>
-        <item>Profile</item>
-        <item>Help and Feedback</item>
-        <item>Settings</item>
-    </string-array>
-
-    <string name="title_activity_user_setup">UserSetup</string>
-    <string name="title_activity_main_menu">MainMenu</string>
     <string name="title_activity_main">Axelerate</string>
     <string name="timingserveraddresshint">Timing Server Adress</string>
     <string name="text_connection">Test Connection</string>
@@ -33,8 +12,13 @@
     <string name="action_settings">Settings</string>
     <!-- Put your own APP ID here -->
     <string name="open_weather_maps_app_id">11111</string>
-
     <string name="place_not_found">Sorry, no weather data found.</string>
-    <string name="action_refresh">Refresh</string>
-    <string name="action_show_profile">Profile...</string>
+    <string name="action_show_profile">Profile…</string>
+    <string name="invalid_address_error">Please enter a valid address</string>
+    <string name="could_not_connect_error">Could not connect</string>
+    <string name="username">Your Name</string>
+    <string name="drivernamedialogsubmit">Submit</string>
+    <string name="please_enter_your_full_name">Please enter you Name</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

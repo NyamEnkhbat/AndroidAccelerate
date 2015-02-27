@@ -41,24 +41,19 @@ import eu.isawsm.accelerate.ax.Util.AxPreferences;
  * Created by ofade_000 on 21.02.2015.
  */
 public class CarSettingsViewHolder extends AxViewHolder {
-    private AutoCompleteTextView tvManufacturer;
-    private AutoCompleteTextView tvModel;
-    private AutoCompleteTextView tvClass;
-    private EditText etTransponder;
-    private Button bSubmit;
+     AutoCompleteTextView tvManufacturer;
+     AutoCompleteTextView tvModel;
+     AutoCompleteTextView tvClass;
+     EditText etTransponder;
+     Button bSubmit;
 
     public CarSettingsViewHolder(View v, AxAdapter axAdapter, Activity context) {
         super(v, axAdapter, context);
-    }
-
-    @Override
-    public void onBindViewHolder(AxAdapter.ViewHolder holder, int position) {
-        tvManufacturer = (AutoCompleteTextView) holder.mView.findViewById(R.id.acTvManufacturer);
-        tvModel = (AutoCompleteTextView) holder.mView.findViewById(R.id.acTvModel);
-        tvClass = (AutoCompleteTextView) holder.mView.findViewById(R.id.acTvClass);
-        etTransponder = (EditText) holder.mView.findViewById(R.id.etTransponder);
-        bSubmit = (Button) holder.mView.findViewById(R.id.bSubmit);
-
+        tvManufacturer = (AutoCompleteTextView) v.findViewById(R.id.acTvManufacturer);
+        tvModel = (AutoCompleteTextView) v.findViewById(R.id.acTvModel);
+        tvClass = (AutoCompleteTextView) v.findViewById(R.id.acTvClass);
+        etTransponder = (EditText)v.findViewById(R.id.etTransponder);
+        bSubmit = (Button) v.findViewById(R.id.bSubmit);
         etTransponder.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -68,15 +63,18 @@ public class CarSettingsViewHolder extends AxViewHolder {
                 return false;
             }
         });
-
-        startUserInput();
-
         bSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onSubmit();
             }
         });
+    }
+
+    @Override
+    public void onBindViewHolder(AxAdapter.ViewHolder holder, int position) {
+
+        startUserInput();
     }
 
 
@@ -122,11 +120,6 @@ public class CarSettingsViewHolder extends AxViewHolder {
 
         AxPreferences.putSharedPreferencesCar(context, car);
 
-        axAdapter.removeCard(getPosition());
-        axAdapter.getDataset().add(getPosition(),new AxCardItem<>(car));
-
-        axAdapter.notifyItemChanged(getPosition());
-
         try {
             //Send to Server
             if(socket == null || !socket.connected()) return;
@@ -137,6 +130,8 @@ public class CarSettingsViewHolder extends AxViewHolder {
             e.printStackTrace();
             showToast("Transponder already in use.");
         }
+        axAdapter.getDataset().add(0,new AxCardItem<>(car));
+        axAdapter.getDataset().remove(getPosition());
     }
 
     public void startUserInput() {

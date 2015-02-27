@@ -17,6 +17,7 @@ import eu.isawsm.accelerate.Model.Car;
 public class AxPreferences {
 
     private static final String CARS = "cars";
+    public static final String DRIVER_NAME = "DriverName";
     public static Gson gson;
     public static final String AX_SERVER_ADDRESS="AxServerAddress";
     public static final String key2="key2";
@@ -103,5 +104,17 @@ public class AxPreferences {
         return new ArrayList<>(Arrays.asList(gson.fromJson(preferences.getString(CARS, ""), Car[].class)));
 
 
+    }
+
+    public static void setDriverName(Context context, String trim) {
+        SharedPreferences preferences=PreferenceManager.getDefaultSharedPreferences(context);
+        Editor edit=preferences.edit();
+        edit.putString(DRIVER_NAME, trim);
+        edit.apply();
+    }
+
+    public static String getDriverName(Context context) {
+        SharedPreferences preferences=PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getString(DRIVER_NAME, null);
     }
 }

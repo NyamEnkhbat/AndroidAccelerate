@@ -29,19 +29,23 @@
                 android:linksClickable="false"
                 android:gravity="center_vertical"
                 android:layout_marginLeft="15dp"
-                android:textColor="@android:color/tertiary_text_dark" />
+                android:textColor="@android:color/tertiary_text_dark"
+                android:text="Location" />
 
             <TextView
                 android:layout_width="170dp"
-                android:layout_height="92dp"
+                android:layout_height="75dp"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:text="N/A"
                 android:id="@+id/tfTemperature"
                 android:textColor="@android:color/tertiary_text_dark"
-                android:textSize="80dp"
+                android:textSize="65dp"
+                android:gravity="center"
                 android:layout_alignTop="@+id/ivCondition"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
                 android:layout_toRightOf="@+id/ivCondition"
-                android:gravity="center" />
+                android:layout_toEndOf="@+id/ivCondition" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -50,7 +54,8 @@
                 android:textColor="@android:color/primary_text_light"
                 android:layout_below="@+id/tfClubName"
                 android:layout_alignLeft="@+id/tfClubName"
-                android:layout_alignStart="@+id/tfClubName" />
+                android:layout_alignStart="@+id/tfClubName"
+                android:text="No wheater data" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -58,8 +63,8 @@
                 android:id="@+id/tfAditionalInfo"
                 android:textColor="@android:color/darker_gray"
                 android:layout_below="@+id/tfClubName"
-                android:layout_alignRight="@+id/tfTemperature"
-                android:layout_alignEnd="@+id/tfTemperature" />
+                android:layout_toRightOf="@+id/tfCondition"
+                android:layout_marginLeft="5dp" />
 
             <ImageView
                 android:layout_width="92dp"
@@ -67,7 +72,8 @@
                 android:id="@+id/ivCondition"
                 android:layout_below="@+id/tfCondition"
                 android:layout_alignLeft="@+id/tfCondition"
-                android:layout_alignStart="@+id/tfCondition" />
+                android:layout_alignStart="@+id/tfCondition"
+                android:src="@drawable/ic_tornado" />
         </RelativeLayout>
 
     </android.support.v7.widget.CardView>

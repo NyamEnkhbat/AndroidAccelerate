@@ -3,6 +3,10 @@ package eu.isawsm.accelerate.ax;
 
 
 import android.annotation.TargetApi;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.Fragment;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.os.Build;
@@ -37,9 +41,11 @@ import eu.isawsm.accelerate.Model.Driver;
 import eu.isawsm.accelerate.Model.Manufacturer;
 import eu.isawsm.accelerate.Model.Model;
 import eu.isawsm.accelerate.R;
+import eu.isawsm.accelerate.UserSetupDialogFragment;
 import eu.isawsm.accelerate.ax.Util.AxPreferences;
 import eu.isawsm.accelerate.ax.Util.AxSocket;
 import eu.isawsm.accelerate.ax.viewholders.AxViewHolder;
+import eu.isawsm.accelerate.ax.viewmodel.AxDataset;
 import eu.isawsm.accelerate.ax.viewmodel.CarSetup;
 import eu.isawsm.accelerate.ax.viewmodel.ConnectionSetup;
 import eu.isawsm.accelerate.ax.viewmodel.Friends;
@@ -49,9 +55,9 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     private Toolbar toolbar;
     private RecyclerView mRecyclerView;
     private StaggeredGridLayoutManager mLayoutManager;
-    private CardView carCardView;
     private AxAdapter axAdapter;
     private SwipeRefreshLayout swipeLayout;
+
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +73,18 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         TextView tvStatus = (TextView) findViewById(R.id.tfStatus);
         tvStatus.setText(c.getString(c.getColumnIndex("display_name")));
         c.close();
+        String Username = AxPreferences.getDriverName(this);
+        if(Username == null){
+
+            UserSetupDialogFragment nstantiate = (UserSetupDialogFragment) DialogFragment.instantiate(this, UserSetupDialogFragment.class.getName(), new Bundle());
+            nstantiate.show(getFragmentManager(),"");
+            nstantiate.setCancelable(false);
+            Username = AxPreferences.getDriverName(this);
+
+        }
+
+        Driver driver = new Driver(Username,"","",null,null);
+        tvStatus.setText(driver.getFirstname());
 
         if(!AxSocket.isConnected()) {
             String address = AxPreferences.getSharedPreferencesString(this, AxPreferences.AX_SERVER_ADDRESS,"");
@@ -79,11 +97,14 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         mRecyclerView.setHasFixedSize(true);
 
         mLayoutManager = new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL);
+        mLayoutManager.setReverseLayout(true);
 
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        axAdapter = new AxAdapter(getCarsFromPreferences(), this);
+        axAdapter = new AxAdapter(this);
+        axAdapter.setDataset(getCarsFromPreferences(axAdapter));
+
 
         mRecyclerView.setAdapter(axAdapter);
 
@@ -127,10 +148,9 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         new Handler().post(new Runnable() {
             @Override
             public void run() {
+                AxAdapter.refresh();
                 swipeLayout.setRefreshing(false);
-                for (AxViewHolder viewHolder : AxViewHolder.viewHolders) {
-                    viewHolder.refresh();
-                }
+
             }
         });
     }
@@ -154,26 +174,25 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         @Override
         public void call(Object... args) {
             //Todo Test Club Card
-            AxPreferences.putSharedPreferencesString(getApplicationContext(), AxPreferences.AX_SERVER_ADDRESS, AxSocket.getLastAddress());
+            if (Looper.myLooper() == null) Looper.prepare();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    AxPreferences.putSharedPreferencesString(getApplicationContext(), AxPreferences.AX_SERVER_ADDRESS, AxSocket.getLastAddress());
+                    AxCardItem clubCard = new AxCardItem<>(new Club("RCC Graphenwörth", URI.create("rcc.com"), null));
+                    axAdapter.getDataset().add(0,clubCard);
+                    mRecyclerView.scrollToPosition(0);
+                }
+            });
 
-            AxCardItem clubCard = new AxCardItem<>(new Club("RCC Graphenwörth", URI.create("rcc.com"), null));
-            axAdapter.getDataset().add(clubCard);
         }
     };
-    private void showConnectionSetup(){
-//        Handler handler = new Handler();
-//        if(Looper.myLooper() == null) Looper.prepare();
-//        handler.post(new Runnable() {
-//            @Override
-//            public void run() {
-                axAdapter.getDataset().add(0, new AxCardItem<>(new ConnectionSetup()));
-                axAdapter.notifyDataSetChanged();
-//          }
-//        });
+    private void showConnectionSetup() {
+        axAdapter.getDataset().add(0, new AxCardItem<>(new ConnectionSetup()));
     }
 
-    private ArrayList<AxCardItem> getCarsFromPreferences(){
-        ArrayList<AxCardItem> retVal = new ArrayList<>();
+    private AxDataset<AxCardItem> getCarsFromPreferences(AxAdapter adapter){
+        AxDataset<AxCardItem> retVal = new AxDataset<>(adapter);
 
         for(Car car : AxPreferences.getSharedPreferencesCars(this)){
             retVal.add(new AxCardItem<>(car));
@@ -191,20 +210,12 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add_car:
-                if(AxViewHolder.getCarSetupViewHolder() == null) {
-                    axAdapter.getDataset().add(0,new AxCardItem<>(new CarSetup()));
-                    axAdapter.notifyDataSetChanged();
-                } else AxViewHolder.getCarSetupViewHolder().startUserInput();
-                return true;
-            case R.id.action_add_firend:
-                axAdapter.getDataset().add(new AxCardItem<>(new Friends()));
+                axAdapter.addCarSetup();
                 return true;
             case R.id.action_show_profile:
-                axAdapter.getDataset().get(0).toCar().getClazz().setName("Test");
-                axAdapter.notifyDataSetChanged();
+                axAdapter.showProfile();
                 return true;
             case R.id.action_settings:
-
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

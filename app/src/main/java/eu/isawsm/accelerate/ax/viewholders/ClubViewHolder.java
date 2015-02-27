@@ -44,22 +44,21 @@ public class ClubViewHolder extends  AxViewHolder implements GoogleApiClient.Con
 
     public ClubViewHolder(View v, AxAdapter mDataset, Activity context) {
         super(v, mDataset, context);
+        tfClubName = (TextView) v.findViewById(R.id.tfClubName);
+        tfCondition = (TextView) v.findViewById(R.id.tfCondition);
+        tfAditionalInfo = (TextView) v.findViewById(R.id.tfAditionalInfo);
+        tfTemperature = (TextView) v.findViewById(R.id.tfTemperature);
+        ivCondition = (ImageView) v.findViewById(R.id.ivCondition);
+        buildGoogleApiClient();
     }
 
     @Override
     public void onBindViewHolder(AxAdapter.ViewHolder holder, int position) {
-        TextView tfClubName = (TextView) holder.mView.findViewById(R.id.tfClubName);
-        TextView tfCondition = (TextView) holder.mView.findViewById(R.id.tfCondition);
-        TextView tfAditionalInfo = (TextView) holder.mView.findViewById(R.id.tfAditionalInfo);
-        TextView tfTemperature = (TextView) holder.mView.findViewById(R.id.tfTemperature);
-        ImageView ivCondition = (ImageView) holder.mView.findViewById(R.id.ivCondition);
-
-
         Club club = axAdapter.getDataset().get(position).toClub();
 
         //TODO: Replace Test Data:
-        buildGoogleApiClient();
-//            tfClubName.setText(club.getName());
+
+            tfClubName.setText(club.getName());
 //            tfCondition.setText("Sunny");
 //            tfAditionalInfo.setText("Wind 11km/h Precip 0%");
 //            tfTemperature.setText("9°");
@@ -72,6 +71,7 @@ public class ClubViewHolder extends  AxViewHolder implements GoogleApiClient.Con
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
+        mGoogleApiClient.connect();
     }
 
     @Override
@@ -80,6 +80,7 @@ public class ClubViewHolder extends  AxViewHolder implements GoogleApiClient.Con
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (mLastLocation != null)
             updateWeatherData(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+        axAdapter.notifyItemChanged(getPosition());
     }
 
     @Override
@@ -117,20 +118,15 @@ public class ClubViewHolder extends  AxViewHolder implements GoogleApiClient.Con
     }
     private void renderWeather(JSONObject json){
         try {
-            tfClubName.setText(json.getString("name").toUpperCase(Locale.US) +
-                    ", " +
-                    json.getJSONObject("sys").getString("country"));
+            tfClubName.setText(json.getString("name"));
 
 
             JSONObject details = json.getJSONArray("weather").getJSONObject(0);
             JSONObject main = json.getJSONObject("main");
-            tfAditionalInfo.setText(
-                    details.getString("description").toUpperCase(Locale.US) +
-                            "\n" + "Humidity: " + main.getString("humidity") + "%" +
-                            "\n" + "Pressure: " + main.getString("pressure") + " hPa");
+            tfCondition.setText(details.getString("description"));
+            tfAditionalInfo.setText("Humidity: " + main.getString("humidity"));
 
-            tfTemperature.setText(
-                    String.format("%.2f", main.getDouble("temp"))+ " ℃");
+            tfTemperature.setText(Math.round(main.getDouble("temp") - 273.15)+ "℃");
 
             DateFormat df = DateFormat.getDateTimeInstance();
             String updatedOn = df.format(new Date(json.getLong("dt")*1000));
@@ -140,6 +136,7 @@ public class ClubViewHolder extends  AxViewHolder implements GoogleApiClient.Con
 
         }catch(Exception e){
             Log.e("SimpleWeather", "One or more fields not found in the JSON data");
+            e.printStackTrace();
         }
     }
     private void setWeatherIcon(int actualId){

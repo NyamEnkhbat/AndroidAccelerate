@@ -20,16 +20,33 @@ import eu.isawsm.accelerate.ax.viewholders.ClubViewHolder;
 import eu.isawsm.accelerate.ax.viewholders.ConnectionViewHolder;
 import eu.isawsm.accelerate.ax.viewholders.FriendsViewHolder;
 import eu.isawsm.accelerate.ax.viewholders.RecentLapsViewHolder;
+import eu.isawsm.accelerate.ax.viewmodel.AxDataset;
 import eu.isawsm.accelerate.ax.viewmodel.CarSetup;
 import eu.isawsm.accelerate.ax.viewmodel.ConnectionSetup;
 import eu.isawsm.accelerate.ax.viewmodel.Friends;
 import eu.isawsm.accelerate.ax.viewmodel.RecentLaps;
 
 public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
-    private ArrayList<AxCardItem> mDataset;
+    private AxDataset<AxCardItem> mDataset;
 
     private Activity context;
     private int lastPosition = -1;
+
+    public static void refresh() {
+
+    }
+
+    public void addCarSetup() {
+        mDataset.add(0, new AxCardItem<>(new CarSetup()));
+    }
+
+    public void addFriend() {
+        //TODO
+    }
+
+    public void showProfile() {
+        //TODO
+    }
 
 
     // Provide a reference to the views for each data item
@@ -46,11 +63,17 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public AxAdapter(ArrayList<AxCardItem> myDataset, Activity context) {
-        mDataset = myDataset;
+//    public AxAdapter(AxDataset<AxCardItem> myDataset, Activity context) {
+//        mDataset = myDataset;
+//        this.context = context;
+//    }
+
+    public AxAdapter(Activity context){
         this.context = context;
+    }
 
-
+    public void setDataset(AxDataset<AxCardItem> myDataset){
+        mDataset = myDataset;
     }
 
     @Override
@@ -117,17 +140,10 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
         return mDataset.size();
     }
 
-    public ArrayList<AxCardItem> getDataset(){
+    public AxDataset<AxCardItem> getDataset(){
         return mDataset;
     }
 
-    public void removeCard(final int position) {
-        if(position == -1) return; //Card is not already removed
-        AxViewHolder.viewHolders.remove(position);
-        mDataset.remove(position);
-        notifyItemRemoved(position);
-        notifyItemRangeChanged(position, mDataset.size());
-    }
     private void setAnimation(View viewToAnimate, int position)
     {
         // If the bound view wasn't previously displayed on screen, it's animated
@@ -136,9 +152,9 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
             viewToAnimate.startAnimation(animation);
             lastPosition = position;
         } else if (position > lastPosition){
-//            Animation animation = AnimationUtils.loadAnimation(context, R.anim.slide_in_up);
-//            viewToAnimate.startAnimation(animation);
-//            lastPosition = position;
+            Animation animation = AnimationUtils.loadAnimation(context, R.anim.slide_in_up);
+            viewToAnimate.startAnimation(animation);
+            lastPosition = position;
         }
 
     }

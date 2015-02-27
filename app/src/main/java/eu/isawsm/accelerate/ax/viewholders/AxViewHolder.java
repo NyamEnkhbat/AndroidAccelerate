@@ -35,20 +35,13 @@ public abstract class AxViewHolder extends AxAdapter.ViewHolder {
     public static AxAdapter axAdapter;
     public static Activity context;
     public static Socket socket;
-    public static ArrayList<AxViewHolder> viewHolders;
+    public View view;
 
     private SwipeRefreshLayout swipeLayout;
 
-    static {
-        viewHolders = new ArrayList<>();
-
-    }
-
     public AxViewHolder(View v, AxAdapter axAdapter, Activity context) {
         super(v);
-        viewHolders.add(this);
-
-
+        view = v;
         if(AxViewHolder.axAdapter == null) AxViewHolder.axAdapter = axAdapter;
         if(AxViewHolder.context == null) AxViewHolder.context = context;
 
@@ -57,12 +50,6 @@ public abstract class AxViewHolder extends AxAdapter.ViewHolder {
 //        socket.off();
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-
-        super.finalize();
-        viewHolders.remove(this);
-    }
 
     public static void showToast(final String s) {
         context.runOnUiThread(new Runnable() {
@@ -80,13 +67,5 @@ public abstract class AxViewHolder extends AxAdapter.ViewHolder {
      */
     public void refresh(){
 
-    }
-
-    public static CarSettingsViewHolder getCarSetupViewHolder() {
-        for(AxViewHolder viewHolder : viewHolders){
-            if(viewHolder instanceof  CarSettingsViewHolder)
-                return (CarSettingsViewHolder) viewHolder;
-        }
-        return null;
     }
 }

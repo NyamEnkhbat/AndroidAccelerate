@@ -29,14 +29,13 @@ public class ConnectionViewHolder extends AxViewHolder {
 
     public ConnectionViewHolder(View v, AxAdapter axAdapter, Activity context) {
         super(v, axAdapter, context);
-
+        bTestConnection = (Button) v.findViewById(R.id.bTestConnection);
+        mAcTVServerAdress = (MultiAutoCompleteTextView) v.findViewById(R.id.etServer);
     }
 
 
     @Override
     public void onBindViewHolder(AxAdapter.ViewHolder holder, int position) {
-        bTestConnection = (Button) holder.mView.findViewById(R.id.bTestConnection);
-        mAcTVServerAdress = (MultiAutoCompleteTextView) holder.mView.findViewById(R.id.etServer);
         bTestConnection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -48,12 +47,13 @@ public class ConnectionViewHolder extends AxViewHolder {
     public void onTestConnectionClick(View view) {
         String address = mAcTVServerAdress.getText().toString().trim();
         if (TextUtils.isEmpty(address)) {
-            mAcTVServerAdress.setText("Please enter a Valid address");
+            mAcTVServerAdress.setError(context.getResources().getString(R.string.invalid_address_error));
+            mAcTVServerAdress.requestFocus();
             return;
         }
 
         AxSocket.tryConnect(address, onConnectionSuccess, onConnectionError, onConnectionError);
-        axAdapter.removeCard(getPosition());
+
     }
 
     private Emitter.Listener onConnectionError = new Emitter.Listener() {
@@ -63,7 +63,7 @@ public class ConnectionViewHolder extends AxViewHolder {
             context.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mAcTVServerAdress.setError("Could not connect");
+                    mAcTVServerAdress.setError(context.getResources().getString(R.string.could_not_connect_error));
                     mAcTVServerAdress.requestFocus();
                 }
             });
@@ -74,15 +74,12 @@ public class ConnectionViewHolder extends AxViewHolder {
         @Override
         public void call(Object... args) {
             showToast(context.getString(R.string.connectionsuccessful));
-
             //Todo Test Club Card
             AxPreferences.putSharedPreferencesString(context, AxPreferences.AX_SERVER_ADDRESS, AxSocket.getLastAddress());
-
             AxCardItem clubCard = new AxCardItem<>(new Club("RCC Graphenwörth", URI.create("rcc.com"), null));
-            axAdapter.getDataset().add(clubCard);
 
-            axAdapter.removeCard(getPosition());
-
+            axAdapter.getDataset().add(0, clubCard);
+            axAdapter.getDataset().remove(getPosition());
         }
     };
 
