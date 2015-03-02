@@ -15,7 +15,6 @@ public class FriendsViewHolder extends AxViewHolder {
         super(v, axAdapter, context);
     }
 
-    @Override
     public void onBindViewHolder(AxAdapter.ViewHolder holder, int position) {
 
     }

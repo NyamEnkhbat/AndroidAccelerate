@@ -15,7 +15,6 @@ public class RecentLapsViewHolder extends AxViewHolder {
         super(v, axAdapter, context);
     }
 
-    @Override
     public void onBindViewHolder(AxAdapter.ViewHolder holder, int position) {
         //FindbyID Stuff
     }

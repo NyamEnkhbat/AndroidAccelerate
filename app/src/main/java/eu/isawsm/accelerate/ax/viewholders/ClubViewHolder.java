@@ -53,7 +53,6 @@ public class ClubViewHolder extends  AxViewHolder implements GoogleApiClient.Con
         buildGoogleApiClient();
     }
 
-    @Override
     public void onBindViewHolder(AxAdapter.ViewHolder holder, int position) {
         Club club = axAdapter.getDataset().get(position).toClub();
 

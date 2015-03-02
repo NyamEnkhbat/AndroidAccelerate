@@ -42,7 +42,7 @@ import eu.isawsm.accelerate.ax.Util.AxPreferences;
  * Created by ofade_000 on 21.02.2015.
  */
 public class CarSettingsViewHolder extends AxViewHolder {
-     AutoCompleteTextView tvManufacturer;
+     public AutoCompleteTextView tvManufacturer;
      AutoCompleteTextView tvModel;
      AutoCompleteTextView tvClass;
      EditText etTransponder;
@@ -72,7 +72,6 @@ public class CarSettingsViewHolder extends AxViewHolder {
         });
     }
 
-    @Override
     public void onBindViewHolder(AxAdapter.ViewHolder holder, int position) {
         EditText[] inputs = {tvManufacturer,tvModel,tvClass,etTransponder};
         for(EditText et : inputs){

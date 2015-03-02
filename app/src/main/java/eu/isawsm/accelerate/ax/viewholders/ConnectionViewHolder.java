@@ -25,8 +25,8 @@ import eu.isawsm.accelerate.ax.Util.AxSocket;
 public class ConnectionViewHolder extends AxViewHolder {
 
 
-    private Button bTestConnection;
-    private MultiAutoCompleteTextView mAcTVServerAdress;
+    Button bTestConnection;
+    public MultiAutoCompleteTextView mAcTVServerAdress;
 
     public ConnectionViewHolder(View v, AxAdapter axAdapter, MainActivity context) {
         super(v, axAdapter, context);
@@ -35,7 +35,6 @@ public class ConnectionViewHolder extends AxViewHolder {
     }
 
 
-    @Override
     public void onBindViewHolder(AxAdapter.ViewHolder holder, int position) {
         bTestConnection.setOnClickListener(new View.OnClickListener() {
             @Override

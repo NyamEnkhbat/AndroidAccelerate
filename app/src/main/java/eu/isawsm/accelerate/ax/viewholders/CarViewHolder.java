@@ -1,6 +1,7 @@
 package eu.isawsm.accelerate.ax.viewholders;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -44,8 +45,10 @@ public class CarViewHolder extends AxViewHolder {
 
     }
 
-    @Override
     public void onBindViewHolder(AxAdapter.ViewHolder holder, int position) {
+        if(!(axAdapter.getDataset().get(getPosition()).get() instanceof Car)){
+            Log.e("AxError", axAdapter.getDataset().get(position).get() + " is not of type Car");
+        }
         Car car = axAdapter.getDataset().get(position).toCar();
 
         tfCarName.setText(car.getFullName());

@@ -70,19 +70,16 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         initSwipeRefrehLayout();
         initRecyclerView();
         initSocket();
+        setupDriver();
+    }
 
-        TextView tvStatus = (TextView) findViewById(R.id.tfStatus);
-
+    private void setupDriver() {
         String Username = AxPreferences.getDriverName(this);
         if(Username == null){
-            UserSetupDialogFragment nstantiate = (UserSetupDialogFragment) DialogFragment.instantiate(this, UserSetupDialogFragment.class.getName(), new Bundle());
-            nstantiate.show(getFragmentManager(),"");
-            nstantiate.setCancelable(false);
-            Username = AxPreferences.getDriverName(this);
+            UserSetupDialogFragment dialog = (UserSetupDialogFragment) DialogFragment.instantiate(this, UserSetupDialogFragment.class.getName(), new Bundle());
+            dialog.show(getFragmentManager(),"");
+            dialog.setCancelable(false);
         }
-
-        Driver driver = new Driver(Username,"","",null,null);
-        tvStatus.setText(driver.getFirstname());
     }
 
     public void initSocket(){
@@ -184,7 +181,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     private Emitter.Listener onConnectionSuccess = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
-            Club club = gson.fromJson(args[0].toString(), Club.class);
+//            Club club = gson.fromJson(args[0].toString(), Club.class);
             //Todo Test Club Card
 
             //Do i realy need to run this on UI thread?
@@ -205,7 +202,9 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         }
     };
     private void showConnectionSetup() {
-        axAdapter.getDataset().add(new AxCardItem<>(new ConnectionSetup()));
+        if(!axAdapter.getDataset().add(new AxCardItem<>(new ConnectionSetup()))) {
+            axAdapter.getConnectionViewHolder().mAcTVServerAdress.setError("Incorrect Address");
+        }
         mRecyclerView.scrollToPosition(0);
     }
 
@@ -233,7 +232,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
                 mRecyclerView.scrollToPosition(0);
                 return true;
             case R.id.action_show_profile:
-                axAdapter.showProfile();
+
                 return true;
             case R.id.action_settings:
                 return true;

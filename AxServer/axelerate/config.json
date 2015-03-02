@@ -1,0 +1,17 @@
+{
+	"Club" : {
+		"Name":"Axelerate Test",
+		"URL":"http://isawsm.eu",
+		"Image":null,
+		"Track":{
+			"Type":"Asphalt",
+			"Course": {
+				"Condition":"Mixed",
+				"Name":"2015",
+				"Reverse":false,
+				"Maxtime":300,
+				"Mintime":10
+			}
+		}
+	}
+}

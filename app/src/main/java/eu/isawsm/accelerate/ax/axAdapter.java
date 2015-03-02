@@ -31,23 +31,17 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
 
     private MainActivity context;
     private int lastPosition = -1;
+    private ArrayList<AxViewHolder> viewHolders;
 
     public static void refresh() {
 
     }
 
     public void addCarSetup() {
-        mDataset.add(new AxCardItem<>(new CarSetup()));
+        if(!mDataset.add(new AxCardItem<>(new CarSetup()))){
+            getCarSettingsViewHolder().tvManufacturer.requestFocus();
+        }
     }
-
-    public void addFriend() {
-        //TODO
-    }
-
-    public void showProfile() {
-        //TODO
-    }
-
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -62,14 +56,23 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
         }
     }
 
-    // Provide a suitable constructor (depends on the kind of dataset)
-//    public AxAdapter(AxDataset<AxCardItem> myDataset, Activity context) {
-//        mDataset = myDataset;
-//        this.context = context;
-//    }
-
     public AxAdapter(MainActivity context){
         this.context = context;
+        viewHolders = new ArrayList<>();
+        setHasStableIds(true);
+    }
+
+    /**
+     * Return the stable ID for the item at <code>position</code>. If {@link #hasStableIds()}
+     * would return false this method should return {@link #NO_ID}. The default implementation
+     * of this method returns {@link #NO_ID}.
+     *
+     * @param position Adapter position to query
+     * @return the stable ID of the item at position
+     */
+    @Override
+    public long getItemId(int position) {
+        return mDataset.get(position).hashCode();
     }
 
     public void setDataset(AxDataset<AxCardItem> myDataset){
@@ -105,23 +108,33 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
 
         } else if(viewType == R.layout.ax_connection_cardview) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.ax_connection_cardview, parent, false);
-            return new ConnectionViewHolder(v, this, context);
+            ConnectionViewHolder connectionViewHolder = new ConnectionViewHolder(v, this, context);
+            viewHolders.add(connectionViewHolder);
+            return connectionViewHolder;
 
         } else if(viewType == R.layout.ax_club_cardview) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.ax_club_cardview, parent, false);
-            return new ClubViewHolder(v, this, context);
+            ClubViewHolder clubViewHolder = new ClubViewHolder(v, this, context);
+            viewHolders.add(clubViewHolder);
+            return clubViewHolder;
 
         } else if(viewType == R.layout.ax_car_settings_cardview){
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.ax_car_settings_cardview, parent, false);
-            return new CarSettingsViewHolder(v, this, context);
+            CarSettingsViewHolder carSettingsViewHolder = new CarSettingsViewHolder(v, this, context);
+            viewHolders.add(carSettingsViewHolder);
+            return carSettingsViewHolder;
 
         } else if(viewType == R.layout.ax_recent_laps_cardview){
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.ax_recent_laps_cardview, parent, false);
-            return new RecentLapsViewHolder(v, this, context);
+            RecentLapsViewHolder recentLapsViewHolder = new RecentLapsViewHolder(v, this, context);
+            viewHolders.add(recentLapsViewHolder);
+            return recentLapsViewHolder;
 
         } else if(viewType == R.layout.ax_friends_cardview){
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.ax_friends_cardview, parent, false);
-            return new FriendsViewHolder(v, this, context);
+            FriendsViewHolder friendsViewHolder = new FriendsViewHolder(v, this, context);
+            viewHolders.add(friendsViewHolder);
+            return friendsViewHolder;
 
         } else {
             throw new RuntimeException("Cardview not supported");
@@ -132,7 +145,27 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
     @Override
     public void onBindViewHolder(AxViewHolder holder, int position) {
         setAnimation(holder.mView, position);
+;
+
         holder.onBindViewHolder(holder, position);
+    }
+
+    public ConnectionViewHolder getConnectionViewHolder(){
+        for(ViewHolder v : viewHolders){
+            if(v instanceof ConnectionViewHolder){
+                return (ConnectionViewHolder) v;
+            }
+        }
+        return null;
+    }
+
+    public CarSettingsViewHolder getCarSettingsViewHolder(){
+        for (ViewHolder v : viewHolders){
+            if(v instanceof CarSettingsViewHolder){
+                return (CarSettingsViewHolder) v;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -152,9 +185,9 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
             viewToAnimate.startAnimation(animation);
             lastPosition = position;
         } else if (position > lastPosition){
-            Animation animation = AnimationUtils.loadAnimation(context, R.anim.slide_in_up);
-            viewToAnimate.startAnimation(animation);
-            lastPosition = position;
+//            Animation animation = AnimationUtils.loadAnimation(context, R.anim.slide_in_up);
+//            viewToAnimate.startAnimation(animation);
+//            lastPosition = position;
         }
 
     }
