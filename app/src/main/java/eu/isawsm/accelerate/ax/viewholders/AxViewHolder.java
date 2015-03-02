@@ -22,6 +22,7 @@ import eu.isawsm.accelerate.Model.Club;
 import eu.isawsm.accelerate.R;
 import eu.isawsm.accelerate.ax.AxAdapter;
 import eu.isawsm.accelerate.ax.AxCardItem;
+import eu.isawsm.accelerate.ax.MainActivity;
 import eu.isawsm.accelerate.ax.Util.AxPreferences;
 import eu.isawsm.accelerate.ax.Util.AxSocket;
 import eu.isawsm.accelerate.ax.viewmodel.ConnectionSetup;
@@ -33,13 +34,13 @@ import eu.isawsm.accelerate.ax.viewmodel.ConnectionSetup;
 public abstract class AxViewHolder extends AxAdapter.ViewHolder {
 
     public static AxAdapter axAdapter;
-    public static Activity context;
+    public static MainActivity context;
     public static Socket socket;
     public View view;
 
     private SwipeRefreshLayout swipeLayout;
 
-    public AxViewHolder(View v, AxAdapter axAdapter, Activity context) {
+    public AxViewHolder(View v, AxAdapter axAdapter, MainActivity context) {
         super(v);
         view = v;
         if(AxViewHolder.axAdapter == null) AxViewHolder.axAdapter = axAdapter;

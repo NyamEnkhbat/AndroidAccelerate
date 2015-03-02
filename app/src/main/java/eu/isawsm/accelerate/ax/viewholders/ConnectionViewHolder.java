@@ -15,6 +15,7 @@ import eu.isawsm.accelerate.Model.Club;
 import eu.isawsm.accelerate.R;
 import eu.isawsm.accelerate.ax.AxAdapter;
 import eu.isawsm.accelerate.ax.AxCardItem;
+import eu.isawsm.accelerate.ax.MainActivity;
 import eu.isawsm.accelerate.ax.Util.AxPreferences;
 import eu.isawsm.accelerate.ax.Util.AxSocket;
 
@@ -27,7 +28,7 @@ public class ConnectionViewHolder extends AxViewHolder {
     private Button bTestConnection;
     private MultiAutoCompleteTextView mAcTVServerAdress;
 
-    public ConnectionViewHolder(View v, AxAdapter axAdapter, Activity context) {
+    public ConnectionViewHolder(View v, AxAdapter axAdapter, MainActivity context) {
         super(v, axAdapter, context);
         bTestConnection = (Button) v.findViewById(R.id.bTestConnection);
         mAcTVServerAdress = (MultiAutoCompleteTextView) v.findViewById(R.id.etServer);
@@ -51,36 +52,36 @@ public class ConnectionViewHolder extends AxViewHolder {
             mAcTVServerAdress.requestFocus();
             return;
         }
+        context.initSocket(address);
 
-        AxSocket.tryConnect(address, onConnectionSuccess, onConnectionError, onConnectionError);
 
     }
 
-    private Emitter.Listener onConnectionError = new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-            if (Looper.myLooper() == null) Looper.prepare();
-            context.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mAcTVServerAdress.setError(context.getResources().getString(R.string.could_not_connect_error));
-                    mAcTVServerAdress.requestFocus();
-                }
-            });
-        }
-    };
-
-    private Emitter.Listener onConnectionSuccess = new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-            showToast(context.getString(R.string.connectionsuccessful));
-            //Todo Test Club Card
-            AxPreferences.putSharedPreferencesString(context, AxPreferences.AX_SERVER_ADDRESS, AxSocket.getLastAddress());
-            AxCardItem clubCard = new AxCardItem<>(new Club("RCC Graphenwörth", URI.create("rcc.com"), null));
-
-            axAdapter.getDataset().add(0, clubCard);
-            axAdapter.getDataset().remove(getPosition());
-        }
-    };
+//    private Emitter.Listener onConnectionError = new Emitter.Listener() {
+//        @Override
+//        public void call(Object... args) {
+//            if (Looper.myLooper() == null) Looper.prepare();
+//            context.runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    mAcTVServerAdress.setError(context.getResources().getString(R.string.could_not_connect_error));
+//                    mAcTVServerAdress.requestFocus();
+//                }
+//            });
+//        }
+//    };
+//
+//    private Emitter.Listener onConnectionSuccess = new Emitter.Listener() {
+//        @Override
+//        public void call(Object... args) {
+//            showToast(context.getString(R.string.connectionsuccessful));
+//            //Todo Test Club Card
+//            AxPreferences.putServerAddress(context, AxSocket.getLastAddress());
+//            AxCardItem clubCard = new AxCardItem<>(new Club("RCC Graphenwörth", URI.create("rcc.com"), null));
+//
+//            axAdapter.getDataset().add(0, clubCard);
+//            axAdapter.getDataset().remove(getPosition());
+//        }
+//    };
 
 }

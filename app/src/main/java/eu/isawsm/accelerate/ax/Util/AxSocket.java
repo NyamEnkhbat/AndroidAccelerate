@@ -9,29 +9,26 @@ import java.net.URISyntaxException;
  * Created by ofade_000 on 22.02.2015.
  */
 public class AxSocket {
-    private static Socket socket;
+    private  Socket socket;
 
-    public static String getLastAddress() {
+    public  String getLastAddress() {
         return lastAddress;
     }
 
-    public static void setLastAddress(String lastAddress) {
-        AxSocket.lastAddress = lastAddress;
+    public  void setLastAddress(String lastAddress) {
+        this.lastAddress = lastAddress;
     }
 
-    private static String lastAddress;
+    private  String lastAddress;
 
-    public static boolean isConnected(){
+    public  boolean isConnected(){
         return socket != null && socket.connected();
     }
 
-    public static boolean tryConnect(String address, Emitter.Listener onConnectionSuccess, Emitter.Listener onConnectionError, Emitter.Listener onConnectionTimeout) {
+    public  boolean tryConnect(String address, Emitter.Listener onConnectionSuccess, Emitter.Listener onConnectionError, Emitter.Listener onConnectionTimeout) {
 
         if(!address.startsWith("http"))
             address = "http://"+ address;
-
-        //TODO put that outside this Class
-        //AxPreferences.putSharedPreferencesString(context, AxPreferences.AX_SERVER_ADDRESS, address);
 
         try {
             setLastAddress(address);
@@ -54,7 +51,7 @@ public class AxSocket {
     }
 
 
-    public static void off() {
+    public  void off() {
         if(socket != null)socket.off();
     }
 }

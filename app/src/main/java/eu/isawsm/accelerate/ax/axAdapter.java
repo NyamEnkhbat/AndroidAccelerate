@@ -29,7 +29,7 @@ import eu.isawsm.accelerate.ax.viewmodel.RecentLaps;
 public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
     private AxDataset<AxCardItem> mDataset;
 
-    private Activity context;
+    private MainActivity context;
     private int lastPosition = -1;
 
     public static void refresh() {
@@ -37,7 +37,7 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
     }
 
     public void addCarSetup() {
-        mDataset.add(0, new AxCardItem<>(new CarSetup()));
+        mDataset.add(new AxCardItem<>(new CarSetup()));
     }
 
     public void addFriend() {
@@ -68,7 +68,7 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
 //        this.context = context;
 //    }
 
-    public AxAdapter(Activity context){
+    public AxAdapter(MainActivity context){
         this.context = context;
     }
 

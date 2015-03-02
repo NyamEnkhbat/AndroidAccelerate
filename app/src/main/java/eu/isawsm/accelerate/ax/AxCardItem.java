@@ -29,4 +29,19 @@ public class AxCardItem<T> {
     public AxCardItem(T t){
         this.t = t;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o instanceof  AxCardItem){
+            AxCardItem<T> cardItem = (AxCardItem<T>) o;
+            return this.get().equals(cardItem.get());
+        }
+        else
+            return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return t.hashCode();
+    }
 }

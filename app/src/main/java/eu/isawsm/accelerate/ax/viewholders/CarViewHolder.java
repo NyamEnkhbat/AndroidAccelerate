@@ -11,6 +11,7 @@ import com.echo.holographlibrary.LinePoint;
 import eu.isawsm.accelerate.Model.Car;
 import eu.isawsm.accelerate.R;
 import eu.isawsm.accelerate.ax.AxAdapter;
+import eu.isawsm.accelerate.ax.MainActivity;
 
 
 /**
@@ -27,7 +28,7 @@ public class CarViewHolder extends AxViewHolder {
     TextView tfClass;
     LineGraph lgGraph;
 
-    public CarViewHolder(View v, AxAdapter mDataset, Activity context) {
+    public CarViewHolder(View v, AxAdapter mDataset, MainActivity context) {
         super(v, mDataset, context);
         v.setTag(this);
         tfCarName = (TextView) v.findViewById(R.id.tfCarName);

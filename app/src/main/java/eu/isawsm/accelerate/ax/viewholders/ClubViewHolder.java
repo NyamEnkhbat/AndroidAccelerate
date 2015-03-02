@@ -26,6 +26,7 @@ import eu.isawsm.accelerate.Model.Club;
 import eu.isawsm.accelerate.R;
 import eu.isawsm.accelerate.ax.AxAdapter;
 import eu.isawsm.accelerate.ax.AxCardItem;
+import eu.isawsm.accelerate.ax.MainActivity;
 import eu.isawsm.accelerate.ax.Util.RemoteFetch;
 
 /**
@@ -42,7 +43,7 @@ public class ClubViewHolder extends  AxViewHolder implements GoogleApiClient.Con
     private ImageView ivCondition;
 
 
-    public ClubViewHolder(View v, AxAdapter mDataset, Activity context) {
+    public ClubViewHolder(View v, AxAdapter mDataset, MainActivity context) {
         super(v, mDataset, context);
         tfClubName = (TextView) v.findViewById(R.id.tfClubName);
         tfCondition = (TextView) v.findViewById(R.id.tfCondition);

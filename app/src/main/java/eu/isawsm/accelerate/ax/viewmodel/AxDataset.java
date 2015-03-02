@@ -1,66 +1,57 @@
 package eu.isawsm.accelerate.ax.viewmodel;
 
-import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import java.util.ArrayList;
+
+import java.util.LinkedHashSet;
+
 
 import eu.isawsm.accelerate.ax.AxAdapter;
 
 /**
  * Created by olfad on 24.02.2015.
  */
-public class AxDataset<T> extends ArrayList<T> {
+public class AxDataset<T> {
 
     private AxAdapter adapter;
+    private LinkedHashSet<T> linkedHashSet;
 
     public AxDataset(AxAdapter adapter){
-        super();
+        linkedHashSet = new LinkedHashSet<>();
         this.adapter = adapter;
     }
 
-    @Override
-    public void add(int index, T t) {
-       super.add(index, t);
-       adapter.notifyItemInserted(index);
-    }
-
-    @Override
     public boolean add(T t) {
-        super.add(t);
-        adapter.notifyItemInserted(size());
-        return true;
+        if(linkedHashSet.add(t)) {
+            adapter.notifyItemInserted(size());
+            return true;
+        } else {
+            Log.d(this.getClass().getName(), t.toString() + " is already in DataSet => skipping");
+            return false;
+        }
     }
 
-    @Override
+    public int size(){
+        return new ArrayList<>(linkedHashSet).size();
+    }
+
     public void clear() {
-        super.clear();
+        linkedHashSet.clear();
         adapter.notifyItemRangeRemoved(0, size());
     }
 
-    @Override
-    public T set(int index, T t) {
-        T prevItem = super.set(index, t);
-            adapter.notifyItemChanged(index);
-        return prevItem;
-    }
-
-    @Override
-    public boolean remove(Object object) {
-        boolean listModified = super.remove(object);
-        adapter.notifyItemRemoved(indexOf(object));
-        adapter.notifyDataSetChanged();
-        return listModified;
-    }
-
-    @Override
     public T remove(int index) {
-        T removedObject = super.remove(index);
-        adapter.notifyItemRemoved(index);
-        return removedObject;
+        int reverseIndex = Math.abs(index -(size()-1));
+        ArrayList<T> tmp = new ArrayList<>(linkedHashSet);
+        T t = tmp.remove(reverseIndex);
+        linkedHashSet = new LinkedHashSet<>(tmp);
+        adapter.notifyItemRemoved(reverseIndex);
+        return t;
     }
 
-    @Override
     public T get(int index) {
-        return super.get(index);
+        int reverseIndex = Math.abs(index -(size()-1));
+        return new ArrayList<>(linkedHashSet).get(reverseIndex);
     }
 }

@@ -35,6 +35,7 @@ import eu.isawsm.accelerate.Model.Model;
 import eu.isawsm.accelerate.R;
 import eu.isawsm.accelerate.ax.AxAdapter;
 import eu.isawsm.accelerate.ax.AxCardItem;
+import eu.isawsm.accelerate.ax.MainActivity;
 import eu.isawsm.accelerate.ax.Util.AxPreferences;
 
 /**
@@ -47,7 +48,7 @@ public class CarSettingsViewHolder extends AxViewHolder {
      EditText etTransponder;
      Button bSubmit;
 
-    public CarSettingsViewHolder(View v, AxAdapter axAdapter, Activity context) {
+    public CarSettingsViewHolder(View v, AxAdapter axAdapter, MainActivity context) {
         super(v, axAdapter, context);
         tvManufacturer = (AutoCompleteTextView) v.findViewById(R.id.acTvManufacturer);
         tvModel = (AutoCompleteTextView) v.findViewById(R.id.acTvModel);
@@ -73,7 +74,10 @@ public class CarSettingsViewHolder extends AxViewHolder {
 
     @Override
     public void onBindViewHolder(AxAdapter.ViewHolder holder, int position) {
-
+        EditText[] inputs = {tvManufacturer,tvModel,tvClass,etTransponder};
+        for(EditText et : inputs){
+            et.setText("");
+        }
         startUserInput();
     }
 
@@ -120,6 +124,11 @@ public class CarSettingsViewHolder extends AxViewHolder {
 
         AxPreferences.putSharedPreferencesCar(context, car);
 
+
+        //TODO Notify Main Activity to do this
+        axAdapter.getDataset().add(new AxCardItem<>(car));
+        axAdapter.getDataset().remove(getPosition());
+
         try {
             //Send to Server
             if(socket == null || !socket.connected()) return;
@@ -130,8 +139,7 @@ public class CarSettingsViewHolder extends AxViewHolder {
             e.printStackTrace();
             showToast("Transponder already in use.");
         }
-        axAdapter.getDataset().add(0,new AxCardItem<>(car));
-        axAdapter.getDataset().remove(getPosition());
+
     }
 
     public void startUserInput() {

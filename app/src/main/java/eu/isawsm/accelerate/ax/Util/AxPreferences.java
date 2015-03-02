@@ -16,11 +16,10 @@ import eu.isawsm.accelerate.Model.Car;
 
 public class AxPreferences {
 
-    private static final String CARS = "cars";
-    public static final String DRIVER_NAME = "DriverName";
     public static Gson gson;
-    public static final String AX_SERVER_ADDRESS="AxServerAddress";
-    public static final String key2="key2";
+    private static final String AX_SERVER_ADDRESS="AxServerAddress";
+    private static final String DRIVER_NAME = "DriverName";
+    private static final String CARS = "cars";
 
     static {
         gson = new Gson();
@@ -116,5 +115,13 @@ public class AxPreferences {
     public static String getDriverName(Context context) {
         SharedPreferences preferences=PreferenceManager.getDefaultSharedPreferences(context);
         return preferences.getString(DRIVER_NAME, null);
+    }
+
+    public static void putServerAddress(Context context, String address){
+        putSharedPreferencesString(context, AxPreferences.AX_SERVER_ADDRESS, address);
+    }
+
+    public static String getServerAddress(Context context) {
+        return getSharedPreferencesString(context, AxPreferences.AX_SERVER_ADDRESS, "");
     }
 }

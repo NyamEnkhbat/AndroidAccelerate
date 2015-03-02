@@ -21,6 +21,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewTreeObserver;
@@ -30,6 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.nkzawa.emitter.Emitter;
+import com.google.gson.Gson;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -57,38 +59,48 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     private StaggeredGridLayoutManager mLayoutManager;
     private AxAdapter axAdapter;
     private SwipeRefreshLayout swipeLayout;
-
+    private AxSocket socket;
+    private Gson gson = new Gson();
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ax_recycler);
-
         setSystemBarColor();
         setToolBar();
         initSwipeRefrehLayout();
         initRecyclerView();
+        initSocket();
 
-        Cursor c = getApplication().getContentResolver().query(ContactsContract.Profile.CONTENT_URI, null, null, null, null);
-        c.moveToFirst();
         TextView tvStatus = (TextView) findViewById(R.id.tfStatus);
-        tvStatus.setText(c.getString(c.getColumnIndex("display_name")));
-        c.close();
+
         String Username = AxPreferences.getDriverName(this);
         if(Username == null){
-
             UserSetupDialogFragment nstantiate = (UserSetupDialogFragment) DialogFragment.instantiate(this, UserSetupDialogFragment.class.getName(), new Bundle());
             nstantiate.show(getFragmentManager(),"");
             nstantiate.setCancelable(false);
             Username = AxPreferences.getDriverName(this);
-
         }
 
         Driver driver = new Driver(Username,"","",null,null);
         tvStatus.setText(driver.getFirstname());
+    }
 
-        if(!AxSocket.isConnected()) {
-            String address = AxPreferences.getSharedPreferencesString(this, AxPreferences.AX_SERVER_ADDRESS,"");
-            AxSocket.tryConnect(address, onConnectionSuccess, onConnectionError, onConnectionError);
+    public void initSocket(){
+        initSocket(AxPreferences.getServerAddress(this));
+    }
+
+    public void initSocket(String address) {
+        socket = new AxSocket();
+        if(!socket.isConnected()) {
+
+            //Workaround to show the refreshing indicator
+            TypedValue typed_value = new TypedValue();
+            getTheme().resolveAttribute(android.support.v7.appcompat.R.attr.actionBarSize, typed_value, true);
+            swipeLayout.setProgressViewOffset(false, 0, getResources().getDimensionPixelSize(typed_value.resourceId));
+
+            swipeLayout.setRefreshing(true);
+
+            socket.tryConnect(address, onConnectionSuccess, onConnectionError, onConnectionError);
         }
     }
 
@@ -97,7 +109,6 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         mRecyclerView.setHasFixedSize(true);
 
         mLayoutManager = new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL);
-        mLayoutManager.setReverseLayout(true);
 
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -105,9 +116,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         axAdapter = new AxAdapter(this);
         axAdapter.setDataset(getCarsFromPreferences(axAdapter));
 
-
         mRecyclerView.setAdapter(axAdapter);
-
 
         mRecyclerView.setAdapter(axAdapter);
         mRecyclerView.getViewTreeObserver().addOnGlobalLayoutListener(
@@ -128,7 +137,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     private void setToolBar() {
         toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
-    }
+   }
 
     private void initSwipeRefrehLayout() {
         swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
@@ -158,37 +167,46 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     private Emitter.Listener onConnectionError = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
-            AxSocket.off();
+            socket.off();
             if (Looper.myLooper() == null) Looper.prepare();
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     showConnectionSetup();
+                    swipeLayout.setRefreshing(false);
                 }
             });
 
         }
     };
 
+
     private Emitter.Listener onConnectionSuccess = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
+            Club club = gson.fromJson(args[0].toString(), Club.class);
             //Todo Test Club Card
+
+            //Do i realy need to run this on UI thread?
             if (Looper.myLooper() == null) Looper.prepare();
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    AxPreferences.putSharedPreferencesString(getApplicationContext(), AxPreferences.AX_SERVER_ADDRESS, AxSocket.getLastAddress());
-                    AxCardItem clubCard = new AxCardItem<>(new Club("RCC Graphenwörth", URI.create("rcc.com"), null));
-                    axAdapter.getDataset().add(0,clubCard);
+                    AxPreferences.putServerAddress(getApplicationContext(), socket.getLastAddress());
+                    AxCardItem clubCard = new AxCardItem<>(new Club("RCC Graphenwörth", URI.create("rcc.com"), null)); //TODO = newAxCardItem<>(club);
+                    axAdapter.getDataset().add(clubCard);
                     mRecyclerView.scrollToPosition(0);
+                    //TODO Remove Connection Card
+                    mRecyclerView.scrollToPosition(0);
+                    swipeLayout.setRefreshing(false);
                 }
             });
 
         }
     };
     private void showConnectionSetup() {
-        axAdapter.getDataset().add(0, new AxCardItem<>(new ConnectionSetup()));
+        axAdapter.getDataset().add(new AxCardItem<>(new ConnectionSetup()));
+        mRecyclerView.scrollToPosition(0);
     }
 
     private AxDataset<AxCardItem> getCarsFromPreferences(AxAdapter adapter){
@@ -196,6 +214,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
 
         for(Car car : AxPreferences.getSharedPreferencesCars(this)){
             retVal.add(new AxCardItem<>(car));
+            mRecyclerView.scrollToPosition(0);
         }
         return retVal;
     }
@@ -211,6 +230,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         switch (item.getItemId()) {
             case R.id.action_add_car:
                 axAdapter.addCarSetup();
+                mRecyclerView.scrollToPosition(0);
                 return true;
             case R.id.action_show_profile:
                 axAdapter.showProfile();
