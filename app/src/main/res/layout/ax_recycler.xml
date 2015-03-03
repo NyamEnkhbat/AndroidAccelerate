@@ -23,7 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#ffd9d9d9"
-            android:padding="5dp" />
+            android:padding="1dp" />
     </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>
