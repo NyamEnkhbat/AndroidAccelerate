@@ -18,13 +18,14 @@ import eu.isawsm.accelerate.ax.AxCardItem;
 import eu.isawsm.accelerate.ax.MainActivity;
 import eu.isawsm.accelerate.ax.Util.AxPreferences;
 import eu.isawsm.accelerate.ax.Util.AxSocket;
+import eu.isawsm.accelerate.ax.viewmodel.ConnectionSetup;
 
 /**
  * Created by ofade_000 on 21.02.2015.
  */
 public class ConnectionViewHolder extends AxViewHolder {
 
-
+    public static ConnectionSetup connectionSetup;
     Button bTestConnection;
     public MultiAutoCompleteTextView mAcTVServerAdress;
 
@@ -42,6 +43,7 @@ public class ConnectionViewHolder extends AxViewHolder {
                 onTestConnectionClick(v);
             }
         });
+        connectionSetup = (ConnectionSetup) axAdapter.getDataset().get(position).get();
     }
 
     public void onTestConnectionClick(View view) {

@@ -43,13 +43,13 @@ import eu.isawsm.accelerate.ax.Util.AxPreferences;
  * Created by ofade_000 on 21.02.2015.
  */
 public class CarSettingsViewHolder extends AxViewHolder {
-     public AutoCompleteTextView tvManufacturer;
-     AutoCompleteTextView tvModel;
-     AutoCompleteTextView tvClass;
-     EditText etTransponder;
-     Button bSubmit;
+    public AutoCompleteTextView tvManufacturer;
+    public AutoCompleteTextView tvModel;
+    public AutoCompleteTextView tvClass;
+    public EditText etTransponder;
+    public Button bSubmit;
 
-    public CarSettingsViewHolder(View v, AxAdapter axAdapter, MainActivity context, Runnable callbackOnSubmit, Runnable callbackOnClose) {
+    public CarSettingsViewHolder(View v, AxAdapter axAdapter, MainActivity context) {
         super(v, axAdapter, context);
         tvManufacturer = (AutoCompleteTextView) v.findViewById(R.id.acTvManufacturer);
         tvModel = (AutoCompleteTextView) v.findViewById(R.id.acTvModel);
@@ -94,8 +94,6 @@ public class CarSettingsViewHolder extends AxViewHolder {
     }
 
     private void addCar(){
-        ArrayList<AxCardItem> retVal = new ArrayList<>();
-
         Driver driver = new Driver("DriverName", "", "", null, null);
         Manufacturer manufacturer = new Manufacturer(tvManufacturer.getText().toString(), null);
         Model model = new Model(manufacturer,tvModel.getText().toString(), "4WD", "17.5", "Touring Car", "1:10");
@@ -105,11 +103,9 @@ public class CarSettingsViewHolder extends AxViewHolder {
 
         Car car = new Car(driver, model, clazz, transponderID, picture);
 
-
         String carJson =  new Gson().toJson(car);
 
         AxPreferences.putSharedPreferencesCar(context, car);
-
 
         //TODO Notify Main Activity to do this
         axAdapter.getDataset().add(new AxCardItem<>(car));

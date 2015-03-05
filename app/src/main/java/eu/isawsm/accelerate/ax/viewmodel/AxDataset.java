@@ -17,6 +17,7 @@ public class AxDataset<T> {
     private AxAdapter adapter;
     private LinkedHashSet<T> linkedHashSet;
 
+
     public AxDataset(AxAdapter adapter){
         linkedHashSet = new LinkedHashSet<>();
         this.adapter = adapter;
@@ -53,5 +54,14 @@ public class AxDataset<T> {
     public T get(int index) {
         int reverseIndex = Math.abs(index -(size()-1));
         return new ArrayList<>(linkedHashSet).get(reverseIndex);
+    }
+
+    public void removeConnectionSetup(){
+        ArrayList<T> tmp = new ArrayList<>(linkedHashSet);
+        for(T t : tmp){
+            if(t instanceof ConnectionSetup){
+                remove(Math.abs(tmp.indexOf(t) -(size()-1)));
+            }
+        }
     }
 }

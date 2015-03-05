@@ -71,6 +71,8 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         initRecyclerView();
         initSocket();
         setupDriver();
+
+
     }
 
     private void setupDriver() {
@@ -181,8 +183,8 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     private Emitter.Listener onConnectionSuccess = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
-//            Club club = gson.fromJson(args[0].toString(), Club.class);
-            //Todo Test Club Card
+            //TODO Club club = socket.getClub;
+            //TODO socket.registerDriver;
 
             //Do i realy need to run this on UI thread?
             if (Looper.myLooper() == null) Looper.prepare();
@@ -193,7 +195,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
                     AxCardItem clubCard = new AxCardItem<>(new Club("RCC Graphenwörth", URI.create("rcc.com"), null)); //TODO = newAxCardItem<>(club);
                     axAdapter.getDataset().add(clubCard);
                     mRecyclerView.scrollToPosition(0);
-                    //TODO Remove Connection Card
+                    axAdapter.getDataset().removeConnectionSetup();
                     mRecyclerView.scrollToPosition(0);
                     swipeLayout.setRefreshing(false);
                 }
