@@ -59,20 +59,6 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
     public AxAdapter(MainActivity context){
         this.context = context;
         viewHolders = new ArrayList<>();
-        setHasStableIds(true);
-    }
-
-    /**
-     * Return the stable ID for the item at <code>position</code>. If {@link #hasStableIds()}
-     * would return false this method should return {@link #NO_ID}. The default implementation
-     * of this method returns {@link #NO_ID}.
-     *
-     * @param position Adapter position to query
-     * @return the stable ID of the item at position
-     */
-    @Override
-    public long getItemId(int position) {
-        return mDataset.get(position).hashCode();
     }
 
     public void setDataset(AxDataset<AxCardItem> myDataset){
@@ -145,8 +131,6 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
     @Override
     public void onBindViewHolder(AxViewHolder holder, int position) {
         setAnimation(holder.mView, position);
-;
-
         holder.onBindViewHolder(holder, position);
     }
 

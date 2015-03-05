@@ -1,6 +1,7 @@
 package eu.isawsm.accelerate.ax.viewholders;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -48,28 +49,14 @@ public class CarSettingsViewHolder extends AxViewHolder {
      EditText etTransponder;
      Button bSubmit;
 
-    public CarSettingsViewHolder(View v, AxAdapter axAdapter, MainActivity context) {
+    public CarSettingsViewHolder(View v, AxAdapter axAdapter, MainActivity context, Runnable callbackOnSubmit, Runnable callbackOnClose) {
         super(v, axAdapter, context);
         tvManufacturer = (AutoCompleteTextView) v.findViewById(R.id.acTvManufacturer);
         tvModel = (AutoCompleteTextView) v.findViewById(R.id.acTvModel);
         tvClass = (AutoCompleteTextView) v.findViewById(R.id.acTvClass);
         etTransponder = (EditText)v.findViewById(R.id.etTransponder);
         bSubmit = (Button) v.findViewById(R.id.bSubmit);
-        etTransponder.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    onSubmit();
-                }
-                return false;
-            }
-        });
-        bSubmit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onSubmit();
-            }
-        });
+
     }
 
     public void onBindViewHolder(AxAdapter.ViewHolder holder, int position) {
