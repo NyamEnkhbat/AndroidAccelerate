@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
 
+import eu.isawsm.accelerate.Model.Car;
 import eu.isawsm.accelerate.ax.AxAdapter;
+import eu.isawsm.accelerate.ax.AxCardItem;
 
 /**
  * Created by olfad on 24.02.2015.
@@ -54,14 +56,5 @@ public class AxDataset<T> {
     public T get(int index) {
         int reverseIndex = Math.abs(index -(size()-1));
         return new ArrayList<>(linkedHashSet).get(reverseIndex);
-    }
-
-    public void removeConnectionSetup(){
-        ArrayList<T> tmp = new ArrayList<>(linkedHashSet);
-        for(T t : tmp){
-            if(t instanceof ConnectionSetup){
-                remove(Math.abs(tmp.indexOf(t) -(size()-1)));
-            }
-        }
     }
 }

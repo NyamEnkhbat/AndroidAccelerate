@@ -18,14 +18,6 @@ public class AxCardItem<T> {
         this.t = object;
     }
 
-    public Car toCar() {
-        return (Car) t;
-    }
-
-    public Club toClub(){
-        return (Club) t;
-    }
-
     public AxCardItem(T t){
         this.t = t;
     }

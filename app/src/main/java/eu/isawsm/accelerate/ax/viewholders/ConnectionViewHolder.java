@@ -1,23 +1,14 @@
 package eu.isawsm.accelerate.ax.viewholders;
 
-import android.app.Activity;
-import android.os.Looper;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.MultiAutoCompleteTextView;
 
-import com.github.nkzawa.emitter.Emitter;
-
-import java.net.URI;
-
-import eu.isawsm.accelerate.Model.Club;
 import eu.isawsm.accelerate.R;
 import eu.isawsm.accelerate.ax.AxAdapter;
 import eu.isawsm.accelerate.ax.AxCardItem;
 import eu.isawsm.accelerate.ax.MainActivity;
-import eu.isawsm.accelerate.ax.Util.AxPreferences;
-import eu.isawsm.accelerate.ax.Util.AxSocket;
 import eu.isawsm.accelerate.ax.viewmodel.ConnectionSetup;
 
 /**
@@ -25,37 +16,27 @@ import eu.isawsm.accelerate.ax.viewmodel.ConnectionSetup;
  */
 public class ConnectionViewHolder extends AxViewHolder {
 
-    public static ConnectionSetup connectionSetup;
-    Button bTestConnection;
     public MultiAutoCompleteTextView mAcTVServerAdress;
 
     public ConnectionViewHolder(View v, AxAdapter axAdapter, MainActivity context) {
         super(v, axAdapter, context);
-        bTestConnection = (Button) v.findViewById(R.id.bTestConnection);
         mAcTVServerAdress = (MultiAutoCompleteTextView) v.findViewById(R.id.etServer);
     }
 
 
-    public void onBindViewHolder(AxAdapter.ViewHolder holder, int position) {
-        bTestConnection.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onTestConnectionClick(v);
-            }
-        });
-        connectionSetup = (ConnectionSetup) axAdapter.getDataset().get(position).get();
+    public void onBindViewHolder(AxAdapter.ViewHolder holder, int position, AxCardItem axCardItem) {
+
     }
 
-    public void onTestConnectionClick(View view) {
+
+    public String tryGetAddress() {
         String address = mAcTVServerAdress.getText().toString().trim();
         if (TextUtils.isEmpty(address)) {
             mAcTVServerAdress.setError(context.getResources().getString(R.string.invalid_address_error));
             mAcTVServerAdress.requestFocus();
-            return;
+            return null;
         }
-        context.initSocket(address);
-
-
+        return address;
     }
 
 //    private Emitter.Listener onConnectionError = new Emitter.Listener() {

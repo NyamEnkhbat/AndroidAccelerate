@@ -1,9 +1,9 @@
 package eu.isawsm.accelerate.ax.viewholders;
 
-import android.app.Activity;
 import android.view.View;
 
 import eu.isawsm.accelerate.ax.AxAdapter;
+import eu.isawsm.accelerate.ax.AxCardItem;
 import eu.isawsm.accelerate.ax.MainActivity;
 
 /**
@@ -15,7 +15,7 @@ public class RecentLapsViewHolder extends AxViewHolder {
         super(v, axAdapter, context);
     }
 
-    public void onBindViewHolder(AxAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(AxAdapter.ViewHolder holder, int position, AxCardItem axCardItem) {
         //FindbyID Stuff
     }
 }

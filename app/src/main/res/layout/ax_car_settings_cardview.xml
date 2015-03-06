@@ -32,8 +32,9 @@
                 android:imeOptions="actionNext"
                 android:textColorHint="@android:color/darker_gray"
                 android:textColor="@android:color/tertiary_text_light"
-                android:layout_marginLeft="15dp"
-                android:layout_marginTop="15dp" />
+                android:layout_marginTop="15dp"
+                android:nextFocusDown="@+id/acTvClass"
+                android:layout_marginStart="15dp" />
 
             <AutoCompleteTextView
                 android:layout_width="match_parent"
@@ -45,8 +46,9 @@
                 android:imeOptions="actionNext"
                 android:textColorHint="@android:color/darker_gray"
                 android:textColor="@android:color/tertiary_text_light"
-                android:layout_marginRight="15dp"
-                android:layout_marginTop="15dp" />
+                android:layout_marginEnd="15dp"
+                android:layout_marginTop="15dp"
+                android:nextFocusDown="@+id/acTvClass"/>
         </LinearLayout>
 
         <AutoCompleteTextView
@@ -60,7 +62,8 @@
             android:textColorHint="@android:color/darker_gray"
             android:textColor="@android:color/tertiary_text_light"
             android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp" />
+            android:layout_marginRight="15dp"
+            android:nextFocusDown="@+id/etTransponder"/>
 
         <EditText
             android:layout_width="match_parent"
@@ -68,14 +71,14 @@
             android:inputType="number"
             android:ems="10"
             android:id="@+id/etTransponder"
-            android:numeric="integer"
             android:hint="Transponder Number"
             android:singleLine="true"
             android:imeOptions="actionDone|actionGo"
             android:textColorHint="@android:color/darker_gray"
             android:textColor="@android:color/tertiary_text_light"
             android:layout_marginRight="15dp"
-            android:layout_marginLeft="15dp" />
+            android:layout_marginLeft="15dp"
+            android:nextFocusDown="@id/acTvManufacturer"/>
 
     <Button
             android:layout_width="match_parent"
@@ -83,7 +86,8 @@
             android:text="Add Car"
             android:id="@+id/bSubmit"
             style="@style/defaultButton"
-            android:nestedScrollingEnabled="false" />
+            android:onClick="onCarSetupSubmit"
+            />
 </LinearLayout>
     </android.support.v7.widget.CardView>
 </LinearLayout>

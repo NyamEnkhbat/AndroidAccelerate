@@ -15,20 +15,21 @@ import eu.isawsm.accelerate.Model.Car;
 import eu.isawsm.accelerate.Model.Lap;
 import eu.isawsm.accelerate.R;
 import eu.isawsm.accelerate.ax.AxAdapter;
+import eu.isawsm.accelerate.ax.AxCardItem;
 import eu.isawsm.accelerate.ax.MainActivity;
 
 
 public class CarViewHolder extends AxViewHolder {
 
-    TextView tfCarName;
-    TextView tfConsistencyValue;
+    public TextView tfCarName;
+    public TextView tfConsistencyValue;
 
-    TextView tfAvg;
-    TextView tfBest;
-    TextView tfLaps;
-    TextView tfClass;
-    ListView listView;
-    ImageButton detailsButton;
+    public TextView tfAvg;
+    public TextView tfBest;
+    public TextView tfLaps;
+    public TextView tfClass;
+    public ListView listView;
+    public ImageButton detailsButton;
 
     public CarViewHolder(View v, AxAdapter mDataset, MainActivity context) {
         super(v, mDataset, context);
@@ -44,11 +45,8 @@ public class CarViewHolder extends AxViewHolder {
         detailsButton = (ImageButton) v.findViewById(R.id.detailsButton);
     }
 
-    public void onBindViewHolder(AxAdapter.ViewHolder holder, int position) {
-        if(!(axAdapter.getDataset().get(getPosition()).get() instanceof Car)){
-            Log.e("AxError", axAdapter.getDataset().get(position).get() + " is not of type Car");
-        }
-        Car car = axAdapter.getDataset().get(position).toCar();
+    public void onBindViewHolder(AxAdapter.ViewHolder holder, int position, AxCardItem axCardItem) {
+        Car car = (Car) axCardItem.get();
 
         tfCarName.setText(car.getFullName());
         tfClass.setText(car.getClazz().getName());

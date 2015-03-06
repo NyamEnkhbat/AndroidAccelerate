@@ -61,7 +61,7 @@ public abstract class AxViewHolder extends AxAdapter.ViewHolder {
         });
     }
 
-    public abstract void onBindViewHolder(AxAdapter.ViewHolder holder, int position);
+    public abstract void onBindViewHolder(AxAdapter.ViewHolder holder, int position, AxCardItem axCardItem);
 
     /**
      * Override this to get the RefreshEvent.

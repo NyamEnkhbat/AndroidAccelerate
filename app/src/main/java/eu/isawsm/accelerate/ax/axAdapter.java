@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import eu.isawsm.accelerate.Model.Car;
@@ -42,6 +43,7 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
             getCarSettingsViewHolder().tvManufacturer.requestFocus();
         }
     }
+
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -131,10 +133,10 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
     @Override
     public void onBindViewHolder(AxViewHolder holder, int position) {
         setAnimation(holder.mView, position);
-        holder.onBindViewHolder(holder, position);
+        holder.onBindViewHolder(holder, position, mDataset.get(position));
     }
 
-    public ConnectionViewHolder getConnectionViewHolder(){
+    public ConnectionViewHolder getConnectionViewHolder(){ //TODO this i kinda awful
         for(ViewHolder v : viewHolders){
             if(v instanceof ConnectionViewHolder){
                 return (ConnectionViewHolder) v;
@@ -143,7 +145,7 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
         return null;
     }
 
-    public CarSettingsViewHolder getCarSettingsViewHolder(){
+    public CarSettingsViewHolder getCarSettingsViewHolder(){ //TODO this i kinda awful
         for (ViewHolder v : viewHolders){
             if(v instanceof CarSettingsViewHolder){
                 return (CarSettingsViewHolder) v;
@@ -155,10 +157,6 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
     @Override
     public int getItemCount() {
         return mDataset.size();
-    }
-
-    public AxDataset<AxCardItem> getDataset(){
-        return mDataset;
     }
 
     private void setAnimation(View viewToAnimate, int position)

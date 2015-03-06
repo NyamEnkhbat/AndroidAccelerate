@@ -1,6 +1,5 @@
 package eu.isawsm.accelerate.ax.viewholders;
 
-import android.app.Activity;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
@@ -18,9 +17,7 @@ import com.google.android.gms.location.LocationServices;
 import org.json.JSONObject;
 
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
 
 import eu.isawsm.accelerate.Model.Club;
 import eu.isawsm.accelerate.R;
@@ -53,8 +50,8 @@ public class ClubViewHolder extends  AxViewHolder implements GoogleApiClient.Con
         buildGoogleApiClient();
     }
 
-    public void onBindViewHolder(AxAdapter.ViewHolder holder, int position) {
-        Club club = axAdapter.getDataset().get(position).toClub();
+    public void onBindViewHolder(AxAdapter.ViewHolder holder, int position, AxCardItem axCardItem) {
+        Club club = (Club) axCardItem.get();
 
         //TODO: Replace Test Data:
 
