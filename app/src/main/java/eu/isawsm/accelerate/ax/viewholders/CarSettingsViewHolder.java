@@ -11,6 +11,7 @@ import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -65,6 +66,12 @@ public class CarSettingsViewHolder extends AxViewHolder {
             et.setText("");
         }
         startUserInput();
+        bSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onSubmit();
+            }
+        });
     }
 
 
@@ -108,8 +115,9 @@ public class CarSettingsViewHolder extends AxViewHolder {
         AxPreferences.putSharedPreferencesCar(context, car);
 
         //TODO Notify Main Activity to do this
-        axAdapter.getDataset().add(new AxCardItem<>(car));
         axAdapter.getDataset().remove(getPosition());
+        axAdapter.getDataset().add(new AxCardItem<>(car));
+
 
         try {
             //Send to Server

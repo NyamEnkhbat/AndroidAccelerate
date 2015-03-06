@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:padding="5dp">
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="@android:drawable/btn_default"
+        android:scaleType="matrix" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+
+
+        <ImageView
+            android:id="@+id/downArrow"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/abc_ic_commit_search_api_mtrl_alpha"
+            android:layout_gravity="center_vertical"
+            android:rotation="180"
+            android:tint="@android:color/holo_red_light"
+            android:scaleType="center" />
+        <ImageView
+            android:id="@+id/upArrow"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/abc_ic_commit_search_api_mtrl_alpha"
+            android:layout_gravity="center_vertical"
+            android:tint="@android:color/holo_green_light"
+            android:scaleType="center" />
+
+        <ImageView
+            android:id="@+id/star"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/btn_rating_star_off_normal_holo_light"
+            android:tint="@android:color/holo_orange_light"/>
+
+        <ImageView
+            android:id="@+id/warn"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/stat_notify_error"
+            android:tint="@android:color/holo_orange_dark"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="17.457"
+            android:id="@+id/textView" />
+    </LinearLayout>
+</LinearLayout>

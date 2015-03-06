@@ -1,23 +1,23 @@
 package eu.isawsm.accelerate.ax.viewholders;
 
-import android.app.Activity;
+import android.content.Context;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
-import com.echo.holographlibrary.Line;
-import com.echo.holographlibrary.LineGraph;
-import com.echo.holographlibrary.LinePoint;
-
 import eu.isawsm.accelerate.Model.Car;
+import eu.isawsm.accelerate.Model.Lap;
 import eu.isawsm.accelerate.R;
 import eu.isawsm.accelerate.ax.AxAdapter;
 import eu.isawsm.accelerate.ax.MainActivity;
 
 
-/**
- * Created by ofade_000 on 21.02.2015.
- */
 public class CarViewHolder extends AxViewHolder {
 
     TextView tfCarName;
@@ -27,7 +27,8 @@ public class CarViewHolder extends AxViewHolder {
     TextView tfBest;
     TextView tfLaps;
     TextView tfClass;
-    LineGraph lgGraph;
+    ListView listView;
+    ImageButton detailsButton;
 
     public CarViewHolder(View v, AxAdapter mDataset, MainActivity context) {
         super(v, mDataset, context);
@@ -39,10 +40,8 @@ public class CarViewHolder extends AxViewHolder {
         tfBest = (TextView) v.findViewById(R.id.tfBest);
         tfLaps = (TextView) v.findViewById(R.id.tfLaps);
         tfClass = (TextView)v.findViewById(R.id.tfClass);
-        lgGraph = (LineGraph) v.findViewById(R.id.linegraph);
-
-        fillLineGraph(lgGraph);
-
+        listView = (ListView) v.findViewById(R.id.listView);
+        detailsButton = (ImageButton) v.findViewById(R.id.detailsButton);
     }
 
     public void onBindViewHolder(AxAdapter.ViewHolder holder, int position) {
@@ -53,32 +52,59 @@ public class CarViewHolder extends AxViewHolder {
 
         tfCarName.setText(car.getFullName());
         tfClass.setText(car.getClazz().getName());
+        LapAdapter lapAdapter = new LapAdapter(context, R.layout.laplistrow);
+        listView.setAdapter(lapAdapter);
+
+        lapAdapter.add(new Lap(car, 2990, null));
+        lapAdapter.add(new Lap(car, 1990, null));
+        lapAdapter.add(new Lap(car, 2990, null));
+        lapAdapter.add(new Lap(car, 2990, null));
+        lapAdapter.add(new Lap(car, 2990, null));
+        lapAdapter.add(new Lap(car, 2990, null));
+        lapAdapter.add(new Lap(car, 2990, null));
+        lapAdapter.add(new Lap(car, 2990, null));
+
     }
 
-    private void fillLineGraph(LineGraph lgGraph) {
-        Line l = new Line();
-        l.setUsingDips(true);
-        LinePoint p = new LinePoint();
-        p.setX(0);
-        p.setY(5);
-        p.setColor(context.getResources().getColor(R.color.colorPrimary));
-        l.addPoint(p);
-        p = new LinePoint();
-        p.setX(8);
-        p.setY(8);
-        p.setColor(context.getResources().getColor(R.color.colorPrimary));
-        l.addPoint(p);
-        p = new LinePoint();
-        p.setX(10);
-        p.setY(4);
-        p.setColor(context.getResources().getColor(R.color.colorPrimary));
-        l.addPoint(p);
 
-        l.setColor(context.getResources().getColor(R.color.colorPrimary));
+    public class LapAdapter extends ArrayAdapter<Lap> {
 
-        lgGraph.setUsingDips(true);
-        lgGraph.addLine(l);
-        lgGraph.setRangeY(0, 10);
-        lgGraph.setLineToFill(0);
+        public LapAdapter(Context context, int resource) {
+            super(context, resource);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            Lap lap = getItem(position);
+
+            if(convertView == null) {
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.laplistrow, parent,false);
+            }
+
+            TextView time = (TextView) convertView.findViewById(R.id.textView);
+            ImageView upArrow = (ImageView) convertView.findViewById(R.id.upArrow);
+            ImageView downArrow = (ImageView) convertView.findViewById(R.id.downArrow);
+            ImageView star = (ImageView) convertView.findViewById(R.id.star);
+            ImageView warn = (ImageView) convertView.findViewById(R.id.warn);
+
+            time.setText(lap.getTime() / 1000 + "");
+
+            if (lap.getTime() < lap.getCar().getBestTime()){
+                star.setVisibility(View.VISIBLE);
+                return convertView;
+            }
+            if(lap.getCar().getAvgTime() +5000 < lap.getTime()) {
+                warn.setVisibility(View.VISIBLE);
+                return convertView;
+            }
+
+            if(lap.getCar().getAvgTime() < lap.getTime()){
+                downArrow.setVisibility(View.VISIBLE);
+            } else {
+                upArrow.setVisibility(View.VISIBLE);
+            }
+
+            return convertView;
+        }
     }
 }
