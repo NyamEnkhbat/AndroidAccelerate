@@ -75,14 +75,13 @@ public class CarSettingsViewHolder extends AxViewHolder {
     }
 
     private Car createCar(){
-        Driver driver = new Driver(AxPreferences.getDriverName(context), "", "", null, null);
         Manufacturer manufacturer = new Manufacturer(tvManufacturer.getText().toString(), null);
         Model model = new Model(manufacturer,tvModel.getText().toString(), "", "", "", "");
         Clazz clazz = new Clazz(tvClass.getText().toString(), "");
         long transponderID = Long.parseLong(etTransponder.getText().toString());
         Bitmap picture = null;
 
-        return new Car(driver, model, clazz, transponderID, picture);
+        return new Car(model, clazz, transponderID, picture);
     }
 
     public Car tryGetCar() {

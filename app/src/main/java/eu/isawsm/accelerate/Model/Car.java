@@ -7,14 +7,14 @@ import android.media.Image;
  * Created by olfad on 29.01.2015.
  */
 public class Car {
+    private long id;
     private Driver driver;
     private Model model;
     private Clazz clazz;
     private long transponderID;
     private Bitmap picture;
 
-    public Car(Driver driver, Model model, Clazz clazz, long transponderID, Bitmap picture) {
-        this.driver = driver;
+    public Car(Model model, Clazz clazz, long transponderID, Bitmap picture) {
         this.model = model;
         this.clazz = clazz;
         this.transponderID = transponderID;

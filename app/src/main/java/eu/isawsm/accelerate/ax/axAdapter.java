@@ -44,6 +44,14 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
         }
     }
 
+    public void removeAllCars() {
+        for(AxViewHolder vh : viewHolders){
+            if(vh instanceof CarViewHolder) {
+                mDataset.remove(vh.getPosition());
+            }
+        }
+    }
+
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -136,24 +144,26 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
         holder.onBindViewHolder(holder, position, mDataset.get(position));
     }
 
-    public ConnectionViewHolder getConnectionViewHolder(){ //TODO this i kinda awful
-        for(ViewHolder v : viewHolders){
-            if(v instanceof ConnectionViewHolder){
-                return (ConnectionViewHolder) v;
-            }
-        }
-        return null;
+    public ConnectionViewHolder getConnectionViewHolder(){
+        return getViewHolder(ConnectionViewHolder.class);
     }
 
-    public CarSettingsViewHolder getCarSettingsViewHolder(){ //TODO this i kinda awful
+    public CarSettingsViewHolder getCarSettingsViewHolder(){
+        return getViewHolder(CarSettingsViewHolder.class);
+    }
+
+    public ClubViewHolder getClubVieHolder() {
+        return getViewHolder(ClubViewHolder.class);
+    }
+
+    private <T> T getViewHolder(Class<T> type){  //TODO this is kinda awful
         for (ViewHolder v : viewHolders){
-            if(v instanceof CarSettingsViewHolder){
-                return (CarSettingsViewHolder) v;
+            if(type.isInstance(v)){
+                return (T) v;
             }
         }
         return null;
     }
-
     @Override
     public int getItemCount() {
         return mDataset.size();

@@ -27,18 +27,15 @@ import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
-import java.net.URI;
-
 import eu.isawsm.accelerate.Model.Car;
-import eu.isawsm.accelerate.Model.Club;
 import eu.isawsm.accelerate.Model.Course;
 import eu.isawsm.accelerate.Model.Driver;
-import eu.isawsm.accelerate.Model.Track;
 import eu.isawsm.accelerate.R;
 import eu.isawsm.accelerate.UserSetupDialogFragment;
 import eu.isawsm.accelerate.ax.Util.AxPreferences;
 import eu.isawsm.accelerate.ax.Util.AxSocket;
 import eu.isawsm.accelerate.ax.viewholders.CarSettingsViewHolder;
+import eu.isawsm.accelerate.ax.viewholders.ClubViewHolder;
 import eu.isawsm.accelerate.ax.viewholders.ConnectionViewHolder;
 import eu.isawsm.accelerate.ax.viewmodel.AxDataset;
 import eu.isawsm.accelerate.ax.viewmodel.ConnectionSetup;
@@ -53,7 +50,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     private AxSocket mSocket;
     private AxDataset<AxCardItem> mDataset;
     private Gson mGson = new Gson();
-
+    private Driver mDriver;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,17 +61,17 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         initRecyclerView();
         initSocket();
         setupDriver();
-
-
     }
 
     private void setupDriver() {
-        String Username = AxPreferences.getDriverName(this);
-        if(Username == null){
+        Driver driver = Driver.get(this);
+        if(driver == null) {
             UserSetupDialogFragment dialog = (UserSetupDialogFragment) DialogFragment.instantiate(this, UserSetupDialogFragment.class.getName(), new Bundle());
-            dialog.show(getFragmentManager(),"");
+            dialog.show(getFragmentManager(), "");
             dialog.setCancelable(false);
+            return;
         }
+        setDriver(driver);
     }
 
     public void initSocket(){
@@ -105,7 +102,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         mAdapter = new AxAdapter(this);
-        mDataset = getCarsFromPreferences(mAdapter);
+        mDataset = new AxDataset<>(mAdapter);
         mAdapter.setDataset(mDataset);
 
         mRecyclerView.setAdapter(mAdapter);
@@ -165,6 +162,8 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
                 @Override
                 public void run() {
                     showConnectionSetup();
+                    ClubViewHolder clubVieHolder = mAdapter.getClubVieHolder();
+                    if(clubVieHolder != null) mDataset.remove(mAdapter.getClubVieHolder().getPosition());
                     mSwipeLayout.setRefreshing(false);
                 }
             });
@@ -178,8 +177,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
             JSONObject data = (JSONObject) args[0];
 
             final Course course = mGson.fromJson(data.toString(),Course.class);
-            mSocket.registerDriver(new Driver(AxPreferences.getDriverName(getApplicationContext()),"","",null,null),
-                    AxPreferences.getSharedPreferencesCars(getApplicationContext()));
+            mSocket.registerDriver(AxPreferences.getDriver(getApplicationContext()),onDriverRegistered);
 
             //Do i realy need to run this on UI thread?
             if (Looper.myLooper() == null) Looper.prepare();
@@ -195,6 +193,16 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
                 }
             });
 
+        }
+    };
+
+    private Emitter.Listener onDriverRegistered = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            //JSONObject data = (JSONObject) args[0];
+            Driver driverWithIDs = mGson.fromJson(args[0].toString(), Driver.class);
+
+            setDriver(driverWithIDs);
         }
     };
 
@@ -219,13 +227,13 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         if(car != null){
             mDataset.remove(carSettingsViewHolder.getPosition());
             mDataset.add(new AxCardItem<>(car));
-
-            String carJson = mGson.toJson(car);
-
-            AxPreferences.putSharedPreferencesCar(this, car);
+            mDriver.addCar(car, this);
 
             if(mSocket == null || !mSocket.isConnected()) return;
-            mSocket.emit("registerNewTransponder", carJson);
+
+
+            mSocket.registerDriver(AxPreferences.getDriver(this),onDriverRegistered);
+           // mSocket.registerCar(car);
         }
     }
 
@@ -233,16 +241,6 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         ConnectionViewHolder connectionViewHolder = mAdapter.getConnectionViewHolder();
         String address = connectionViewHolder.tryGetAddress();
         if(address != null) initSocket(address);
-    }
-
-    private AxDataset<AxCardItem> getCarsFromPreferences(AxAdapter adapter){
-        AxDataset<AxCardItem> retVal = new AxDataset<>(adapter);
-
-        for(Car car : AxPreferences.getSharedPreferencesCars(this)){
-            retVal.add(new AxCardItem<>(car));
-            mRecyclerView.scrollToPosition(0);
-        }
-        return retVal;
     }
 
     @Override
@@ -270,5 +268,19 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
 
     }
 
+    public void setDriver(final Driver driver) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mDriver = driver;
+                AxPreferences.setDriver(getApplicationContext(),driver);
+                mAdapter.removeAllCars();
+                for(Car c : driver.getCars()){
+                    mDataset.add(new AxCardItem<>(c));
+                }
+                mAdapter.notifyDataSetChanged();
+            }
+        });
 
+    }
 }

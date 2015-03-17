@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
+import eu.isawsm.accelerate.Model.Driver;
+import eu.isawsm.accelerate.ax.MainActivity;
 import eu.isawsm.accelerate.ax.Util.AxPreferences;
 
 /**
@@ -41,8 +43,8 @@ public class UserSetupDialogFragment extends DialogFragment {
                             etDrivername.setError(getActivity().getString(R.string.please_enter_your_full_name));
                             return;
                         }
-                        AxPreferences.setDriverName(getActivity(),etDrivername.getText().toString().trim());
-
+                        MainActivity mainActivity = (MainActivity) getActivity();
+                        mainActivity.setDriver(new Driver(etDrivername.getText().toString().trim(),"","",null,null, getActivity()));
                     }
                 });
 

@@ -4,6 +4,9 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 
+/**
+ * This Fixes some issues with the Recyclerview inside the SwipeRefreshView
+ */
 public class FixedRecyclerView extends RecyclerView {
     public FixedRecyclerView(Context context) {
         super(context);

@@ -4,6 +4,8 @@ import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Ack;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
+import com.google.gson.Gson;
+
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
@@ -41,10 +43,10 @@ public class AxSocket {
             socket = IO.socket(address);
             socket.connect();
 
-            socket.on("Welcome", onConnectionSuccess);
-            socket.on(Socket.EVENT_ERROR, onConnectionError);
-            socket.on(Socket.EVENT_CONNECT_ERROR, onConnectionError);
-            socket.on(Socket.EVENT_CONNECT_TIMEOUT, onConnectionTimeout);
+            socket.once("Welcome", onConnectionSuccess);
+            socket.once(Socket.EVENT_ERROR, onConnectionError);
+            socket.once(Socket.EVENT_CONNECT_ERROR, onConnectionError);
+            socket.once(Socket.EVENT_CONNECT_TIMEOUT, onConnectionTimeout);
 
             socket.emit("TestConnection", socket.id());
         } catch (URISyntaxException e) {
@@ -55,27 +57,20 @@ public class AxSocket {
 
     }
 
-    public Emitter emit(String event, Object... args){
-        return socket.emit(event, args);
-    }
-
-    public Emitter emit(String event, Object[] args, Ack ack){
-        return socket.emit(event,args,ack);
-    }
-
     public  void off() {
         if(socket != null)socket.off();
-    }
-
-    public Emitter on(String event, Emitter.Listener fn) {
-         return socket.on(event,fn);
     }
 
     public void disconnect() {
         socket.disconnect();
     }
 
-    public void registerDriver(Driver driver, ArrayList<Car> sharedPreferencesCars) {
-        socket.emit("TODO");
+    public void registerDriver(Driver driver, Emitter.Listener callback) {
+        socket.once("registerDriverSuccess", callback);
+        socket.emit("registerDriver",  new Gson().toJson(driver));
     }
+
+    //public void registerCar(Car car) {
+    //    socket.emit("registerNewTransponder", car);
+    //}
 }
