@@ -39,7 +39,7 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-public class UserAuthActivity extends ActionBarActivity implements OnClickListener,
+public class UserAuthActivity implements OnClickListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG  = "SignInActivity";
@@ -249,14 +249,6 @@ public class UserAuthActivity extends ActionBarActivity implements OnClickListen
                 mGoogleApiClient.connect();
                 Log.w(TAG, "Error sending the resolution Intent, connect() again.");
             }
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-           default:
-                return super.onOptionsItemSelected(item);
         }
     }
 }
