@@ -23,5 +23,11 @@
     <string name="title_activity_user_config">UserConfig</string>
 
     <string name="hello_world">Hello world!</string>
-
+    <string name="signing_in_status">Signing in with Google+.</string>
+    <string name="plus_generic_error">Sign in with Google is not available.</string>
+    <string name="signed_out_status">Signed out.</string>
+    <string name="sign_in_error_status">Error signing in.</string>
+    <string name="unknown_person">Unknown</string>
+    <string name="signed_in_status">Signed in as \"%s\".</string>
+    <string name="loading_status">Loading…</string>
 </resources>

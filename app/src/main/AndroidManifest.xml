@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".UserConfig"
+            android:name=".UserAuthActivity"
             android:label="@string/title_activity_user_config"
             android:parentActivityName=".ax.MainActivity" >
             <meta-data
