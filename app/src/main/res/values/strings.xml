@@ -30,4 +30,6 @@
     <string name="unknown_person">Unknown</string>
     <string name="signed_in_status">Signed in as \"%s\".</string>
     <string name="loading_status">Loading…</string>
+    <string name="or">OR</string>
+    <string name="login_text">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat</string>
 </resources>

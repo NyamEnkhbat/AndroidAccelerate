@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import eu.isawsm.accelerate.Model.Car;
 import eu.isawsm.accelerate.Model.Club;
 import eu.isawsm.accelerate.R;
+import eu.isawsm.accelerate.ax.viewholders.AuthentificationViewHolder;
 import eu.isawsm.accelerate.ax.viewholders.AxViewHolder;
 import eu.isawsm.accelerate.ax.viewholders.CarSettingsViewHolder;
 import eu.isawsm.accelerate.ax.viewholders.CarViewHolder;
@@ -21,6 +22,7 @@ import eu.isawsm.accelerate.ax.viewholders.ClubViewHolder;
 import eu.isawsm.accelerate.ax.viewholders.ConnectionViewHolder;
 import eu.isawsm.accelerate.ax.viewholders.FriendsViewHolder;
 import eu.isawsm.accelerate.ax.viewholders.RecentLapsViewHolder;
+import eu.isawsm.accelerate.ax.viewmodel.Autentification;
 import eu.isawsm.accelerate.ax.viewmodel.AxDataset;
 import eu.isawsm.accelerate.ax.viewmodel.CarSetup;
 import eu.isawsm.accelerate.ax.viewmodel.ConnectionSetup;
@@ -89,6 +91,8 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
             return R.layout.ax_recent_laps_cardview;
         } else if(mDataset.get(position).get() instanceof Friends) {
             return R.layout.ax_friends_cardview;
+        } else if(mDataset.get(position).get() instanceof Autentification) {
+            return R.layout.ax_welcome_cardview;
         } else {
             return -1;
         }
@@ -126,11 +130,17 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
             viewHolders.add(recentLapsViewHolder);
             return recentLapsViewHolder;
 
-        } else if(viewType == R.layout.ax_friends_cardview){
+        } else if(viewType == R.layout.ax_friends_cardview) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.ax_friends_cardview, parent, false);
             FriendsViewHolder friendsViewHolder = new FriendsViewHolder(v, this, context);
             viewHolders.add(friendsViewHolder);
             return friendsViewHolder;
+
+        } else if (viewType == R.layout.ax_welcome_cardview) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.ax_welcome_cardview, parent, false);
+            AuthentificationViewHolder authentificationViewHolder = new AuthentificationViewHolder(v, this, context);
+            viewHolders.add(authentificationViewHolder);
+            return authentificationViewHolder;
 
         } else {
             throw new RuntimeException("Cardview not supported");
