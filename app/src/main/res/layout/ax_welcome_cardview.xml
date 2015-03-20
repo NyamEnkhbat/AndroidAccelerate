@@ -2,17 +2,32 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:gravity="center_horizontal">
 
 <TextView
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:text="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."/>
+    android:text="@string/login_text"/>
 
-    <include
-        android:id="@+id/gplus"
-        layout="@layout/ax_auth_gplus_cardview" />
-    <include
-        android:id="@+id/fb"
-        layout="@layout/ax_auth_facebook_cardview" />
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/sign_in_button_g"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/common_signin_button_text_long"
+        android:layout_margin="5dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/or"
+        android:textSize="24sp"/>
+
+    <com.facebook.widget.LoginButton
+        xmlns:fb="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/sign_in_button_fb"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        fb:login_text="Sign in with Facebook"
+        android:layout_margin="5dp"/>
 </LinearLayout>
