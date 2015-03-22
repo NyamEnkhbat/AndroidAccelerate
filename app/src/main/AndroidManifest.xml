@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".GoogleAuthentificationUtil"
+            android:name=".GoogleAuthenticationUtil"
             android:label="@string/title_activity_user_config"
             android:parentActivityName=".ax.MainActivity" >
             <meta-data

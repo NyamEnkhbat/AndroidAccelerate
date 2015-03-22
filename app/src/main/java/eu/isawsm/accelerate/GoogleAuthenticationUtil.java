@@ -15,7 +15,6 @@ package eu.isawsm.accelerate;/*
  */
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
@@ -25,22 +24,14 @@ import com.google.android.gms.plus.model.people.Person;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.CompoundButton;
-import android.widget.TextView;
-import android.widget.ToggleButton;
 
-public class GoogleAuthentificationUtil implements OnClickListener,
+public class GoogleAuthenticationUtil implements OnClickListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG  = "SignInActivity";
@@ -58,9 +49,9 @@ public class GoogleAuthentificationUtil implements OnClickListener,
     public static final int STATUS_SIGNED_IN = 15;
     public static final int STATUS_LOADING = 16;
 
-    public static final int GOOGLE_PLUS_LOGIN_BUTTON_TAG = 21;
-    public static final int GOOGLE_PLUS_LOGOUT_BUTTON_TAG = 22;
-    public static final int GOOGLE_PLUS_REVOKE_BUTTON_TAG = 23;
+    public static final int GOOGLE_PLUS_LOGIN_BUTTON_TAG=21;
+    public static final int GOOGLE_PLUS_LOGOUT_BUTTON_TAG=22;
+    public static final int GOOGLE_PLUS_REVOKE_BUTTON_TAG=23;
 
     private GoogleApiClient mGoogleApiClient;
 
@@ -143,27 +134,26 @@ public class GoogleAuthentificationUtil implements OnClickListener,
         }
     }
 
-    @Override
+
     protected Dialog onCreateDialog(int id) {
         if (id != DIALOG_GET_GOOGLE_PLAY_SERVICES) {
-            return super.onCreateDialog(id);
+            return mContext.onCreateDialog(id);
         }
 
-        int available = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        int available = GooglePlayServicesUtil.isGooglePlayServicesAvailable(mContext);
         if (available == ConnectionResult.SUCCESS) {
             return null;
         }
         if (GooglePlayServicesUtil.isUserRecoverableError(available)) {
             return GooglePlayServicesUtil.getErrorDialog(
-                    available, this, REQUEST_CODE_GET_GOOGLE_PLAY_SERVICES);
+                    available, mContext, REQUEST_CODE_GET_GOOGLE_PLAY_SERVICES);
         }
-        return new AlertDialog.Builder(this)
+        return new AlertDialog.Builder(mContext)
                 .setMessage(R.string.plus_generic_error)
                 .setCancelable(true)
                 .create();
     }
 
-    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE_SIGN_IN
                 || requestCode == REQUEST_CODE_GET_GOOGLE_PLAY_SERVICES) {
