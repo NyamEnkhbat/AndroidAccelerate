@@ -45,10 +45,6 @@ public abstract class AxViewHolder extends AxAdapter.ViewHolder {
         view = v;
         if(AxViewHolder.axAdapter == null) AxViewHolder.axAdapter = axAdapter;
         if(AxViewHolder.context == null) AxViewHolder.context = context;
-
-        //TODO: figure out how to clean up Socket:
-//        socket.disconnect();
-//        socket.off();
     }
 
 

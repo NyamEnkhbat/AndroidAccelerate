@@ -21,9 +21,10 @@ import eu.isawsm.accelerate.ax.MainActivity;
 
 public class CarViewHolder extends AxViewHolder {
 
+
     public TextView tfCarName;
     public TextView tfConsistencyValue;
-
+    public TextView tfRank;
     public TextView tfAvg;
     public TextView tfBest;
     public TextView tfLaps;
@@ -35,12 +36,17 @@ public class CarViewHolder extends AxViewHolder {
         super(v, mDataset, context);
         v.setTag(this);
         tfCarName = (TextView) v.findViewById(R.id.tfCarName);
+
         tfConsistencyValue = (TextView) v.findViewById(R.id.tfConsistencyValue);
+        tfRank = (TextView) v.findViewById(R.id.tfRank);
 
         tfAvg = (TextView) v.findViewById(R.id.tfAvg);
         tfBest = (TextView) v.findViewById(R.id.tfBest);
         tfLaps = (TextView) v.findViewById(R.id.tfLaps);
         tfClass = (TextView)v.findViewById(R.id.tfClass);
+
+
+
         listView = (ListView) v.findViewById(R.id.listView);
         detailsButton = (ImageButton) v.findViewById(R.id.detailsButton);
     }
@@ -50,8 +56,18 @@ public class CarViewHolder extends AxViewHolder {
 
         tfCarName.setText(car.getFullName());
         tfClass.setText(car.getClazz().getName());
+
+        tfConsistencyValue.setText(car.getConsitancy()+"%");
+        tfRank.setText(car.getRank());
+
+        tfAvg.setText(car.getAvgTime() + " ms");
+        tfBest.setText(car.getBestTime() + " ms");
+        tfLaps.setText(car.getLapCount());
+
         LapAdapter lapAdapter = new LapAdapter(context, R.layout.laplistrow);
         listView.setAdapter(lapAdapter);
+
+
 
         lapAdapter.add(new Lap(car, 2990, null));
         lapAdapter.add(new Lap(car, 1990, null));

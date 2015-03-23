@@ -1,18 +1,5 @@
-package eu.isawsm.accelerate;/*
- * Copyright (C) 2013 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+package eu.isawsm.accelerate;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -49,9 +36,9 @@ public class GoogleAuthenticationUtil implements OnClickListener,
     public static final int STATUS_SIGNED_IN = 15;
     public static final int STATUS_LOADING = 16;
 
-    public static final int GOOGLE_PLUS_LOGIN_BUTTON_TAG=21;
-    public static final int GOOGLE_PLUS_LOGOUT_BUTTON_TAG=22;
-    public static final int GOOGLE_PLUS_REVOKE_BUTTON_TAG=23;
+    public static final int GOOGLE_PLUS_LOGIN_BUTTON_TAG = 21;
+    public static final int GOOGLE_PLUS_LOGOUT_BUTTON_TAG = 22;
+    public static final int GOOGLE_PLUS_REVOKE_BUTTON_TAG = 23;
 
     private GoogleApiClient mGoogleApiClient;
 
@@ -73,7 +60,7 @@ public class GoogleAuthenticationUtil implements OnClickListener,
     private boolean mIntentInProgress;
     private Activity mContext;
 
-    public void UserAuthActivity(Activity context) {
+    public GoogleAuthenticationUtil (Activity context) {
         mContext = context;
 
         mGoogleApiClient = new GoogleApiClient.Builder(mContext)
@@ -83,6 +70,8 @@ public class GoogleAuthenticationUtil implements OnClickListener,
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
+
+        connect();
     }
     public void connect() {
         mGoogleApiClient.connect();
@@ -94,12 +83,12 @@ public class GoogleAuthenticationUtil implements OnClickListener,
 
     @Override
     public void onClick(View view) {
-        switch(view.getTag()) {
+        switch((int)view.getTag()) {
             case GOOGLE_PLUS_LOGIN_BUTTON_TAG:
                 if (!mGoogleApiClient.isConnecting()) {
                     int available = GooglePlayServicesUtil.isGooglePlayServicesAvailable(mContext);
                     if (available != ConnectionResult.SUCCESS) {
-                        mContext.showDialog(DIALOG_GET_GOOGLE_PLAY_SERVICES);
+                        createGoogleDialog().show();
                         return;
                     }
 
@@ -135,10 +124,7 @@ public class GoogleAuthenticationUtil implements OnClickListener,
     }
 
 
-    protected Dialog onCreateDialog(int id) {
-        if (id != DIALOG_GET_GOOGLE_PLAY_SERVICES) {
-            return mContext.onCreateDialog(id);
-        }
+    protected Dialog createGoogleDialog() {
 
         int available = GooglePlayServicesUtil.isGooglePlayServicesAvailable(mContext);
         if (available == ConnectionResult.SUCCESS) {
@@ -154,12 +140,12 @@ public class GoogleAuthenticationUtil implements OnClickListener,
                 .create();
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode) {
         if (requestCode == REQUEST_CODE_SIGN_IN
                 || requestCode == REQUEST_CODE_GET_GOOGLE_PLAY_SERVICES) {
             mIntentInProgress = false; //Previous resolution intent no longer in progress.
 
-            if (resultCode == RESULT_OK) {
+            if (resultCode == Activity.RESULT_OK) {
                 if (!mGoogleApiClient.isConnected() && !mGoogleApiClient.isConnecting()) {
                     // Resolved a recoverable error, now try connect() again.
                     mGoogleApiClient.connect();
@@ -167,7 +153,7 @@ public class GoogleAuthenticationUtil implements OnClickListener,
             } else {
                 mSignInClicked = false; // No longer in the middle of resolving sign-in errors.
 
-                if (resultCode == RESULT_CANCELED) {
+                if (resultCode == Activity.RESULT_CANCELED) {
                     currentStatus = STATUS_SIGNED_OUT;
                 } else {
                     currentStatus = STATUS_SING_IN_ERROR;

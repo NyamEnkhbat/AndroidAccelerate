@@ -76,6 +76,14 @@ public class Car {
         return 0;
     }
 
+    public double getConsitancy(){
+        return 0;
+    }
+
+    public int getRank() {
+        return 0;
+    }
+
     public String getFullName() {
         String retVal = "";
         retVal += getModel().getManufacturer().getName();

@@ -39,31 +39,4 @@ public class ConnectionViewHolder extends AxViewHolder {
         return address;
     }
 
-//    private Emitter.Listener onConnectionError = new Emitter.Listener() {
-//        @Override
-//        public void call(Object... args) {
-//            if (Looper.myLooper() == null) Looper.prepare();
-//            context.runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    mAcTVServerAdress.setError(context.getResources().getString(R.string.could_not_connect_error));
-//                    mAcTVServerAdress.requestFocus();
-//                }
-//            });
-//        }
-//    };
-//
-//    private Emitter.Listener onConnectionSuccess = new Emitter.Listener() {
-//        @Override
-//        public void call(Object... args) {
-//            showToast(context.getString(R.string.connectionsuccessful));
-//            //Todo Test Club Card
-//            AxPreferences.putServerAddress(context, AxSocket.getLastAddress());
-//            AxCardItem clubCard = new AxCardItem<>(new Club("RCC Graphenwörth", URI.create("rcc.com"), null));
-//
-//            axAdapter.getDataset().add(0, clubCard);
-//            axAdapter.getDataset().remove(getPosition());
-//        }
-//    };
-
 }

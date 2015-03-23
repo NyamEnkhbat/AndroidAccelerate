@@ -53,13 +53,7 @@ public class ClubViewHolder extends  AxViewHolder implements GoogleApiClient.Con
     public void onBindViewHolder(AxAdapter.ViewHolder holder, int position, AxCardItem axCardItem) {
         Club club = (Club) axCardItem.get();
 
-        //TODO: Replace Test Data:
-
-            tfClubName.setText(club.getName());
-//            tfCondition.setText("Sunny");
-//            tfAditionalInfo.setText("Wind 11km/h Precip 0%");
-//            tfTemperature.setText("9°");
-//            ivCondition.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_fair));
+        tfClubName.setText(club.getName());
     }
 
     protected synchronized void buildGoogleApiClient() {

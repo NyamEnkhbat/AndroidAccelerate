@@ -3,7 +3,9 @@ package eu.isawsm.accelerate.ax;
 
 
 import android.annotation.TargetApi;
+import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,21 +24,23 @@ import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.facebook.AppEventsLogger;
 import com.github.nkzawa.emitter.Emitter;
 import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
+import eu.isawsm.accelerate.GoogleAuthenticationUtil;
 import eu.isawsm.accelerate.Model.Car;
 import eu.isawsm.accelerate.Model.Course;
 import eu.isawsm.accelerate.Model.Driver;
 import eu.isawsm.accelerate.R;
-import eu.isawsm.accelerate.UserSetupDialogFragment;
 import eu.isawsm.accelerate.ax.Util.AxPreferences;
 import eu.isawsm.accelerate.ax.Util.AxSocket;
 import eu.isawsm.accelerate.ax.viewholders.CarSettingsViewHolder;
 import eu.isawsm.accelerate.ax.viewholders.ClubViewHolder;
 import eu.isawsm.accelerate.ax.viewholders.ConnectionViewHolder;
+import eu.isawsm.accelerate.ax.viewmodel.Autentification;
 import eu.isawsm.accelerate.ax.viewmodel.AxDataset;
 import eu.isawsm.accelerate.ax.viewmodel.ConnectionSetup;
 
@@ -48,6 +52,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     private AxAdapter mAdapter;
     private SwipeRefreshLayout mSwipeLayout;
     private AxSocket mSocket;
+    private GoogleAuthenticationUtil mGAuth;
     private AxDataset<AxCardItem> mDataset;
     private Gson mGson = new Gson();
     private Driver mDriver;
@@ -64,14 +69,8 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     }
 
     private void setupDriver() {
-        Driver driver = Driver.get(this);
-        if(driver == null) {
-            UserSetupDialogFragment dialog = (UserSetupDialogFragment) DialogFragment.instantiate(this, UserSetupDialogFragment.class.getName(), new Bundle());
-            dialog.show(getFragmentManager(), "");
-            dialog.setCancelable(false);
-            return;
-        }
-        setDriver(driver);
+        //TODO Hide all other cards.
+        mDataset.add(new AxCardItem<>(new Autentification()));
     }
 
     public void initSocket(){
@@ -152,6 +151,13 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
             }
         });
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        mGAuth.onActivityResult(requestCode, resultCode);
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
 
     private Emitter.Listener onConnectionError = new Emitter.Listener() {
         @Override
@@ -282,5 +288,19 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
             }
         });
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Logs 'install' and 'app activate' App Events.
+        AppEventsLogger.activateApp(this);
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        // Logs 'app deactivate' App Event.
+        AppEventsLogger.deactivateApp(this);
     }
 }
