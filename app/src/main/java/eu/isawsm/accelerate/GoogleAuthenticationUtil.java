@@ -13,10 +13,20 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ImageView;
+import android.widget.Toast;
+
+import java.io.InputStream;
+import java.net.URI;
+
+import eu.isawsm.accelerate.Model.Driver;
 
 public class GoogleAuthenticationUtil implements OnClickListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -39,6 +49,7 @@ public class GoogleAuthenticationUtil implements OnClickListener,
     public static final int GOOGLE_PLUS_LOGIN_BUTTON_TAG = 21;
     public static final int GOOGLE_PLUS_LOGOUT_BUTTON_TAG = 22;
     public static final int GOOGLE_PLUS_REVOKE_BUTTON_TAG = 23;
+    private static final int PROFILE_PIC_SIZE = 400;
 
     private GoogleApiClient mGoogleApiClient;
 
@@ -170,9 +181,71 @@ public class GoogleAuthenticationUtil implements OnClickListener,
                 ? person.getDisplayName()
                 : mContext.getString(R.string.unknown_person);
         currentStatus = STATUS_SIGNED_IN;
-        //TODO save the person
 
+
+
+        //TODO save the person
+        getProfileInformation();
     }
+
+    /**
+     * Fetching user's information name, email, profile pic
+     * */
+    private void getProfileInformation() {
+        try {
+            if (Plus.PeopleApi.getCurrentPerson(mGoogleApiClient) != null) {
+                Person currentPerson = Plus.PeopleApi
+                        .getCurrentPerson(mGoogleApiClient);
+                String personName = currentPerson.getDisplayName();
+                String personPhotoUrl = currentPerson.getImage().getUrl();
+                String personGooglePlusProfile = currentPerson.getUrl();
+                String email = Plus.AccountApi.getAccountName(mGoogleApiClient);
+
+
+
+                Driver.get(mContext).setMail(URI.create(email), mContext);
+                Driver.get(mContext).setFirstname(personName, mContext);
+
+                // by default the profile url gives 50x50 px image only
+                // we can replace the value with whatever dimension we want by
+                // replacing sz=X
+                personPhotoUrl = personPhotoUrl.substring(0,
+                        personPhotoUrl.length() - 2)
+                        + PROFILE_PIC_SIZE;
+
+                new LoadProfileImage().execute(personPhotoUrl);
+
+            } else {
+                Toast.makeText(mContext,
+                        "Person information is null", Toast.LENGTH_LONG).show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Background Async task to load user profile picture from url
+     * */
+    private class LoadProfileImage extends AsyncTask<String, Void, Bitmap> {
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mIcon11 = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return mIcon11;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            Driver.get(mContext).setImage(result,mContext);
+        }
+    }
+
 
     @Override
     public void onConnectionSuspended(int cause) {
