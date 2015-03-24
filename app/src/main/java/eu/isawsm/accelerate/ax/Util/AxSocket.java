@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.List;
 
 import eu.isawsm.accelerate.Model.Car;
 import eu.isawsm.accelerate.Model.Driver;
@@ -27,6 +28,13 @@ public class AxSocket {
     }
 
     private  String lastAddress;
+
+    private List<Car> subscribedCars;
+
+
+    public AxSocket(){
+        subscribedCars = new ArrayList<>();
+    }
 
     public  boolean isConnected(){
         return socket != null && socket.connected();
@@ -70,7 +78,26 @@ public class AxSocket {
         socket.emit("registerDriver",  new Gson().toJson(driver));
     }
 
-    //public void registerCar(Car car) {
-    //    socket.emit("registerNewTransponder", car);
-    //}
+    public void subscribeTo(Car car, Emitter.Listener callback) {
+        socket.on(car.getTransponderID()+"", callback);
+        subscribedCars.add(car);
+    }
+
+    public void subscribeTo(Driver driver, Emitter.Listener callback){
+        for(Car c : driver.getCars()){
+            subscribeTo(c, callback);
+        }
+    }
+
+    public void unsubscribe(Car car){
+        socket.off(car.getTransponderID()+"");
+        subscribedCars.remove(car);
+    }
+
+    public void unsubscribe(Driver driver){
+        for(Car c: driver.getCars()){
+            unsubscribe(c);
+        }
+    }
+
 }

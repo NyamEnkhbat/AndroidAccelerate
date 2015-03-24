@@ -207,8 +207,9 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         public void call(Object... args) {
             //JSONObject data = (JSONObject) args[0];
             Driver driverWithIDs = mGson.fromJson(args[0].toString(), Driver.class);
-
             setDriver(driverWithIDs);
+            //TODO SetDriver is not needed anymore
+
         }
     };
 
@@ -258,12 +259,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_add_car:
-                mAdapter.addCarSetup();
-                mRecyclerView.scrollToPosition(0);
-                return true;
             case R.id.action_show_profile:
-
                 return true;
             case R.id.action_settings:
                 return true;
