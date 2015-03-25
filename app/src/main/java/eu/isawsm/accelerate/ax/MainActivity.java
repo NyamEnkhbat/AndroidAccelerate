@@ -3,9 +3,8 @@ package eu.isawsm.accelerate.ax;
 
 
 import android.annotation.TargetApi;
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -31,6 +30,7 @@ import com.google.gson.Gson;
 import org.json.JSONObject;
 
 import eu.isawsm.accelerate.GoogleAuthenticationUtil;
+import eu.isawsm.accelerate.IAuthenticator;
 import eu.isawsm.accelerate.Model.Car;
 import eu.isawsm.accelerate.Model.Course;
 import eu.isawsm.accelerate.Model.Driver;
@@ -52,7 +52,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     private AxAdapter mAdapter;
     private SwipeRefreshLayout mSwipeLayout;
     private AxSocket mSocket;
-    private GoogleAuthenticationUtil mGAuth;
+    private IAuthenticator mAuthenticator;
     private AxDataset<AxCardItem> mDataset;
     private Gson mGson = new Gson();
     private Driver mDriver;
@@ -68,9 +68,20 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         setupDriver();
     }
 
+    public void setAuthenticator(IAuthenticator authenticator){
+        this.mAuthenticator = authenticator;
+    }
+
     private void setupDriver() {
         //TODO Hide all other cards.
-        mDataset.add(new AxCardItem<>(new Autentification()));
+        if(Driver.get(this).getFirstname() == null ) {
+            mDataset.add(new AxCardItem<>(new Autentification()));
+        } else {
+            setTitle(Driver.get(this).toString());
+            mToolbar.setNavigationIcon(new BitmapDrawable(Driver.get(this).getImage()));
+
+        }
+
     }
 
     public void initSocket(){
@@ -154,7 +165,9 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mGAuth.onActivityResult(requestCode, resultCode);
+
+
+        mAuthenticator.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
     }
 

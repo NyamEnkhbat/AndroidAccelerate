@@ -27,8 +27,9 @@ import java.io.InputStream;
 import java.net.URI;
 
 import eu.isawsm.accelerate.Model.Driver;
+import eu.isawsm.accelerate.ax.MainActivity;
 
-public class GoogleAuthenticationUtil implements OnClickListener,
+public class GoogleAuthenticationUtil implements IAuthenticator, OnClickListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG  = "SignInActivity";
@@ -69,20 +70,12 @@ public class GoogleAuthenticationUtil implements OnClickListener,
      * Tracks whether a resolution Intent is in progress.
      */
     private boolean mIntentInProgress;
-    private Activity mContext;
+    private MainActivity mContext;
 
-    public GoogleAuthenticationUtil (Activity context) {
+    public GoogleAuthenticationUtil (MainActivity context) {
         mContext = context;
 
-        mGoogleApiClient = new GoogleApiClient.Builder(mContext)
-                .addApi(Plus.API, Plus.PlusOptions.builder()
-                        .addActivityTypes("http://schemas.google.com/AddActivity").build())
-                .addScope(Plus.SCOPE_PLUS_LOGIN)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
 
-        connect();
     }
     public void connect() {
         mGoogleApiClient.connect();
@@ -94,6 +87,18 @@ public class GoogleAuthenticationUtil implements OnClickListener,
 
     @Override
     public void onClick(View view) {
+
+        mGoogleApiClient = new GoogleApiClient.Builder(mContext)
+                .addApi(Plus.API, Plus.PlusOptions.builder()
+                        .addActivityTypes("http://schemas.google.com/AddActivity").build())
+                .addScope(Plus.SCOPE_PLUS_LOGIN)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+
+        connect();
+
+        mContext.setAuthenticator(this);
         switch((int)view.getTag()) {
             case GOOGLE_PLUS_LOGIN_BUTTON_TAG:
                 if (!mGoogleApiClient.isConnecting()) {
@@ -151,7 +156,7 @@ public class GoogleAuthenticationUtil implements OnClickListener,
                 .create();
     }
 
-    public void onActivityResult(int requestCode, int resultCode) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE_SIGN_IN
                 || requestCode == REQUEST_CODE_GET_GOOGLE_PLAY_SERVICES) {
             mIntentInProgress = false; //Previous resolution intent no longer in progress.
@@ -181,8 +186,6 @@ public class GoogleAuthenticationUtil implements OnClickListener,
                 ? person.getDisplayName()
                 : mContext.getString(R.string.unknown_person);
         currentStatus = STATUS_SIGNED_IN;
-
-
 
         //TODO save the person
         getProfileInformation();

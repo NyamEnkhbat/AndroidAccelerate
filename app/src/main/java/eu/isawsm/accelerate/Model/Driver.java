@@ -35,6 +35,10 @@ public class Driver {
         AxPreferences.setDriver(context, this);
     }
 
+    public Driver() {
+        cars = new ArrayList<>();
+    }
+
     public String getFirstname() {
         return firstname;
     }
@@ -119,5 +123,10 @@ public class Driver {
 
     public ArrayList<Car> getCars() {
         return cars;
+    }
+
+    @Override
+    public String toString() {
+        return firstname;
     }
 }
