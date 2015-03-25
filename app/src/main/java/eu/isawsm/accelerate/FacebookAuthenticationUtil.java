@@ -24,7 +24,7 @@ import eu.isawsm.accelerate.ax.MainActivity;
 public class FacebookAuthenticationUtil implements IAuthenticator, View.OnClickListener, Session.StatusCallback {
 
     private MainActivity mContext;
-    private static final String TAG = "FacebookAuthenticationUtil";
+    private static final String TAG = "FacebookAuthentication";
     public FacebookAuthenticationUtil(MainActivity mContext) {
         this.mContext = mContext;
 
@@ -78,6 +78,26 @@ public class FacebookAuthenticationUtil implements IAuthenticator, View.OnClickL
                     }
                 }
             }).executeAsync();
+        }
+    }
+
+    @Override
+    public void logoff() {
+        Session session = Session.getActiveSession();
+        if (session != null) {
+
+            if (!session.isClosed()) {
+                session.closeAndClearTokenInformation();
+                //clear your preferences if saved
+            }
+        } else {
+
+            session = new Session(mContext);
+            Session.setActiveSession(session);
+
+            session.closeAndClearTokenInformation();
+            //clear your preferences if saved
+
         }
     }
 

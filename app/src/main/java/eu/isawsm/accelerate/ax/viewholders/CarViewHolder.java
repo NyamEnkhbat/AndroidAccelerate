@@ -29,8 +29,13 @@ public class CarViewHolder extends AxViewHolder {
     public TextView tfBest;
     public TextView tfLaps;
     public TextView tfClass;
-    public ListView listView;
+    public ListView listView0;
+    public ListView listView1;
+    public ListView listView2;
     public ImageButton detailsButton;
+    LapAdapter lapAdapter0;
+    LapAdapter lapAdapter1;
+    LapAdapter lapAdapter2;
 
     public CarViewHolder(View v, AxAdapter mDataset, MainActivity context) {
         super(v, mDataset, context);
@@ -47,7 +52,10 @@ public class CarViewHolder extends AxViewHolder {
 
 
 
-        listView = (ListView) v.findViewById(R.id.listView);
+        listView0 = (ListView) v.findViewById(R.id.listView0);
+        listView1 = (ListView) v.findViewById(R.id.listView0);
+        listView2 = (ListView) v.findViewById(R.id.listView0);
+
         detailsButton = (ImageButton) v.findViewById(R.id.detailsButton);
     }
 
@@ -58,34 +66,74 @@ public class CarViewHolder extends AxViewHolder {
         tfClass.setText(car.getClazz().getName());
 
         tfConsistencyValue.setText(car.getConsitancy()+"%");
-        tfRank.setText(car.getRank());
+        tfRank.setText(car.getRank() +""); //if i pass an int it will search for a resource ID
 
-        tfAvg.setText(car.getAvgTime() + " ms");
-        tfBest.setText(car.getBestTime() + " ms");
-        tfLaps.setText(car.getLapCount());
+        tfAvg.setText(car.getAvgTime() + "");
+        tfBest.setText(car.getBestTime() + "");
+        tfLaps.setText(car.getLapCount() + "");
 
-        LapAdapter lapAdapter = new LapAdapter(context, R.layout.laplistrow);
-        listView.setAdapter(lapAdapter);
+        lapAdapter0 = new LapAdapter(context, R.layout.laplistrow);
+        lapAdapter0.positionOffset = 0;
+        listView0.setAdapter(lapAdapter0);
+
+        lapAdapter1 = new LapAdapter(context, R.layout.laplistrow);
+        lapAdapter1.positionOffset = 5;
+        listView0.setAdapter(lapAdapter1);
+
+        lapAdapter2 = new LapAdapter(context, R.layout.laplistrow);
+        lapAdapter2.positionOffset = 10;
+        listView0.setAdapter(lapAdapter2);
 
 
+        //TODO Testdata
+        addLap(new Lap(car, 29954, null));
+        addLap(new Lap(car, 19933, null));
+        addLap(new Lap(car, 29340, null));
+        addLap(new Lap(car, 24990, null));
+        addLap(new Lap(car, 42990, null));
 
-        lapAdapter.add(new Lap(car, 2990, null));
-        lapAdapter.add(new Lap(car, 1990, null));
-        lapAdapter.add(new Lap(car, 2990, null));
-        lapAdapter.add(new Lap(car, 2990, null));
-        lapAdapter.add(new Lap(car, 2990, null));
-        lapAdapter.add(new Lap(car, 2990, null));
-        lapAdapter.add(new Lap(car, 2990, null));
-        lapAdapter.add(new Lap(car, 2990, null));
+        addLap(new Lap(car, 34990, null));
+        addLap(new Lap(car, 24399, null));
+        addLap(new Lap(car, 29980, null));
+        addLap(new Lap(car, 29980, null));
+        addLap(new Lap(car, 29980, null));
 
+        addLap(new Lap(car, 29954, null));
+        addLap(new Lap(car, 19933, null));
+        addLap(new Lap(car, 29340, null));
+        addLap(new Lap(car, 24990, null));
+        addLap(new Lap(car, 42990, null));
+
+        addLap(new Lap(car, 29954, null));
+        addLap(new Lap(car, 19933, null));
+        addLap(new Lap(car, 29340, null));
+        addLap(new Lap(car, 24990, null));
+        addLap(new Lap(car, 42990, null));
     }
 
+
+    private void addLap(Lap lap) {
+        lapAdapter0.insert(lap,0);
+        if (lapAdapter0.getCount() > 5) {
+            lapAdapter1.insert(lapAdapter0.getItem(5),0);
+            lapAdapter0.remove(lapAdapter0.getItem(5));
+            if(lapAdapter1.getCount() > 5){
+                lapAdapter2.insert(lapAdapter1.getItem(5),0);
+                lapAdapter1.remove(lapAdapter1.getItem(5));
+                if(lapAdapter2.getCount() > 5 ){
+                    lapAdapter2.remove(lapAdapter2.getItem(5));
+                }
+            }
+        }
+    }
 
     public class LapAdapter extends ArrayAdapter<Lap> {
 
         public LapAdapter(Context context, int resource) {
             super(context, resource);
         }
+
+        int positionOffset = 1;
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
@@ -95,13 +143,16 @@ public class CarViewHolder extends AxViewHolder {
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.laplistrow, parent,false);
             }
 
+            TextView index = (TextView) convertView.findViewById(R.id.tfindex);
             TextView time = (TextView) convertView.findViewById(R.id.textView);
             ImageView upArrow = (ImageView) convertView.findViewById(R.id.upArrow);
             ImageView downArrow = (ImageView) convertView.findViewById(R.id.downArrow);
             ImageView star = (ImageView) convertView.findViewById(R.id.star);
             ImageView warn = (ImageView) convertView.findViewById(R.id.warn);
 
-            time.setText(lap.getTime() / 1000 + "");
+            index.setText((position+positionOffset+1)+".");
+
+            time.setText(lap.getTime() / 1000d + "");
 
             if (lap.getTime() < lap.getCar().getBestTime()){
                 star.setVisibility(View.VISIBLE);

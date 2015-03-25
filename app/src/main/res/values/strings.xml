@@ -34,4 +34,5 @@
     <string name="login_text">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat</string>
 
     <string name="facebook_app_id">797918650292923</string>
+    <string name="action_logoff">Sign off...</string>
 </resources>

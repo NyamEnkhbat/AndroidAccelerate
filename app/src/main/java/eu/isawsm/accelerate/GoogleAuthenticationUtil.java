@@ -96,8 +96,6 @@ public class GoogleAuthenticationUtil implements IAuthenticator, OnClickListener
                 .addOnConnectionFailedListener(this)
                 .build();
 
-        connect();
-
         mContext.setAuthenticator(this);
         switch((int)view.getTag()) {
             case GOOGLE_PLUS_LOGIN_BUTTON_TAG:
@@ -139,6 +137,23 @@ public class GoogleAuthenticationUtil implements IAuthenticator, OnClickListener
         }
     }
 
+    public void logoff(){
+        if (mGoogleApiClient.isConnected()) {
+            Plus.AccountApi.revokeAccessAndDisconnect(mGoogleApiClient).setResultCallback(
+                    new ResultCallback<Status>() {
+                        @Override
+                        public void onResult(Status status) {
+                            if (status.isSuccess()) {
+                                currentStatus = STATUS_REVOKE_ACCESS;
+                            } else {
+                                currentStatus = STATUS_REVOKE_ACCESS_ERROR;
+                            }
+                            mGoogleApiClient.reconnect();
+                        }
+                    }
+            );
+        }
+    }
 
     protected Dialog createGoogleDialog() {
 

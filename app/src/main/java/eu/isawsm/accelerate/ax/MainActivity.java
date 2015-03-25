@@ -42,6 +42,7 @@ import eu.isawsm.accelerate.ax.viewholders.ClubViewHolder;
 import eu.isawsm.accelerate.ax.viewholders.ConnectionViewHolder;
 import eu.isawsm.accelerate.ax.viewmodel.Autentification;
 import eu.isawsm.accelerate.ax.viewmodel.AxDataset;
+import eu.isawsm.accelerate.ax.viewmodel.CarSetup;
 import eu.isawsm.accelerate.ax.viewmodel.ConnectionSetup;
 
 public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayout.OnRefreshListener {
@@ -247,7 +248,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         if(car != null){
             mDataset.remove(carSettingsViewHolder.getPosition());
             mDataset.add(new AxCardItem<>(car));
-            mDriver.addCar(car, this);
+            Driver.get(this).addCar(car, this);
 
             if(mSocket == null || !mSocket.isConnected()) return;
 
@@ -272,9 +273,14 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_show_profile:
+            case R.id.action_add_car:
+                mDataset.add(new AxCardItem<>(new CarSetup()));
+                return true;
+            case R.id.action_logoff:
+                mAuthenticator.logoff();
                 return true;
             case R.id.action_settings:
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

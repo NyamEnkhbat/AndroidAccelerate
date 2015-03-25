@@ -70,7 +70,8 @@ public class AxSocket {
     }
 
     public void disconnect() {
-        socket.disconnect();
+        if(socket != null)
+            socket.disconnect();
     }
 
     public void registerDriver(Driver driver, Emitter.Listener callback) {

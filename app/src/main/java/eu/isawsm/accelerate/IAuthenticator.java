@@ -9,4 +9,6 @@ import android.content.Intent;
  */
 public interface IAuthenticator {
     public void onActivityResult(int requestCode, int resultCode, Intent data);
+
+    public void logoff();
 }
