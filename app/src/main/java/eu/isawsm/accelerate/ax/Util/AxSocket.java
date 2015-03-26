@@ -74,8 +74,7 @@ public class AxSocket {
             socket.disconnect();
     }
 
-    public void registerDriver(Driver driver, Emitter.Listener callback) {
-        socket.once("registerDriverSuccess", callback);
+    public void registerDriver(Driver driver) {
         socket.emit("registerDriver",  new Gson().toJson(driver));
     }
 

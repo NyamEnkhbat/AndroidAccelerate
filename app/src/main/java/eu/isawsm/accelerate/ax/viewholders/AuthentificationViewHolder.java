@@ -34,7 +34,6 @@ public class AuthentificationViewHolder extends AxViewHolder {
         googleButton.setTag(GoogleAuthenticationUtil.GOOGLE_PLUS_LOGIN_BUTTON_TAG);
         facebookButton.setReadPermissions(Arrays.asList("email"));
 
-
         googleButton.setOnClickListener(new GoogleAuthenticationUtil(context));
         facebookButton.setOnClickListener(new FacebookAuthenticationUtil(context));
     }

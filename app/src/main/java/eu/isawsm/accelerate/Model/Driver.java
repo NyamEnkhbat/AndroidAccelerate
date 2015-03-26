@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 
+import eu.isawsm.accelerate.IAuthenticator;
 import eu.isawsm.accelerate.ax.Util.AxPreferences;
 
 
@@ -24,6 +25,16 @@ public class Driver {
     private String password;
     private String Salt;
     private ArrayList<Car> cars;
+    private IAuthenticator authenticator;
+
+    public IAuthenticator getAuthenticator() {
+        return authenticator;
+    }
+
+    public void setAuthenticator(IAuthenticator authenticator, Context context) {
+        this.authenticator = authenticator;
+        AxPreferences.setDriver(context, this);
+    }
 
     public Driver(String firstname, String lastname, String acronym, Bitmap image, URI mail, Context context) {
         this.firstname = firstname;

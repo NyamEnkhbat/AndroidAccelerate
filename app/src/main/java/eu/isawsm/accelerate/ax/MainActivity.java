@@ -29,6 +29,7 @@ import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
+import eu.isawsm.accelerate.FacebookAuthenticationUtil;
 import eu.isawsm.accelerate.GoogleAuthenticationUtil;
 import eu.isawsm.accelerate.IAuthenticator;
 import eu.isawsm.accelerate.Model.Car;
@@ -37,6 +38,7 @@ import eu.isawsm.accelerate.Model.Driver;
 import eu.isawsm.accelerate.R;
 import eu.isawsm.accelerate.ax.Util.AxPreferences;
 import eu.isawsm.accelerate.ax.Util.AxSocket;
+import eu.isawsm.accelerate.ax.viewholders.AuthentificationViewHolder;
 import eu.isawsm.accelerate.ax.viewholders.CarSettingsViewHolder;
 import eu.isawsm.accelerate.ax.viewholders.ClubViewHolder;
 import eu.isawsm.accelerate.ax.viewholders.ConnectionViewHolder;
@@ -53,10 +55,8 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     private AxAdapter mAdapter;
     private SwipeRefreshLayout mSwipeLayout;
     private AxSocket mSocket;
-    private IAuthenticator mAuthenticator;
     private AxDataset<AxCardItem> mDataset;
     private Gson mGson = new Gson();
-    private Driver mDriver;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,12 +65,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         setToolBar();
         initSwipeRefrehLayout();
         initRecyclerView();
-        initSocket();
         setupDriver();
-    }
-
-    public void setAuthenticator(IAuthenticator authenticator){
-        this.mAuthenticator = authenticator;
     }
 
     private void setupDriver() {
@@ -78,9 +73,8 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         if(Driver.get(this).getFirstname() == null ) {
             mDataset.add(new AxCardItem<>(new Autentification()));
         } else {
-            setTitle(Driver.get(this).toString());
-            mToolbar.setNavigationIcon(new BitmapDrawable(Driver.get(this).getImage()));
 
+            onLoggedIn();
         }
 
     }
@@ -164,11 +158,11 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         });
     }
 
+
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-
-        mAuthenticator.onActivityResult(requestCode, resultCode, data);
+        Driver.get(this).getAuthenticator().onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -197,7 +191,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
             JSONObject data = (JSONObject) args[0];
 
             final Course course = mGson.fromJson(data.toString(),Course.class);
-            mSocket.registerDriver(AxPreferences.getDriver(getApplicationContext()),onDriverRegistered);
+            mSocket.registerDriver(AxPreferences.getDriver(getApplicationContext()));
 
             //Do i realy need to run this on UI thread?
             if (Looper.myLooper() == null) Looper.prepare();
@@ -216,16 +210,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         }
     };
 
-    private Emitter.Listener onDriverRegistered = new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-            //JSONObject data = (JSONObject) args[0];
-            Driver driverWithIDs = mGson.fromJson(args[0].toString(), Driver.class);
-            setDriver(driverWithIDs);
-            //TODO SetDriver is not needed anymore
 
-        }
-    };
 
     private void showConnectionSetup() {
         if(!mDataset.add(new AxCardItem<>(new ConnectionSetup()))) {
@@ -253,7 +238,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
             if(mSocket == null || !mSocket.isConnected()) return;
 
 
-            mSocket.registerDriver(AxPreferences.getDriver(this),onDriverRegistered);
+            mSocket.registerDriver(AxPreferences.getDriver(this));
            // mSocket.registerCar(car);
         }
     }
@@ -277,7 +262,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
                 mDataset.add(new AxCardItem<>(new CarSetup()));
                 return true;
             case R.id.action_logoff:
-                mAuthenticator.logoff();
+                Driver.get(this).getAuthenticator().logoff();
                 return true;
             case R.id.action_settings:
 
@@ -289,20 +274,12 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
 
     }
 
-    public void setDriver(final Driver driver) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mDriver = driver;
-                AxPreferences.setDriver(getApplicationContext(),driver);
+    public void updateCars() {
                 mAdapter.removeAllCars();
-                for(Car c : driver.getCars()){
+                for(Car c : Driver.get(this).getCars()){
                     mDataset.add(new AxCardItem<>(c));
                 }
                 mAdapter.notifyDataSetChanged();
-            }
-        });
-
     }
 
     @Override
@@ -318,4 +295,29 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         // Logs 'app deactivate' App Event.
         AppEventsLogger.deactivateApp(this);
     }
+
+    public void onLoginSuccess() {
+        AuthentificationViewHolder authenticatorViewHolder = mAdapter.getAuthentificationViewHolder();
+        mDataset.remove(authenticatorViewHolder.getPosition());
+
+        onLoggedIn();
+    }
+
+    private void onLoggedIn() {
+        setTitle(Driver.get(this).toString());
+        if(Driver.get(this).getImage() !=null)
+            mToolbar.setNavigationIcon(new BitmapDrawable(Driver.get(this).getImage()));
+        else
+            mToolbar.setNavigationIcon(null);
+        updateCars();
+        initSocket();
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.getItem(0).setEnabled(Driver.get(this).getFirstname() != null );
+        menu.getItem(1).setEnabled(Driver.get(this).getFirstname() != null );
+        return super.onPrepareOptionsMenu(menu);
+    }
+
 }

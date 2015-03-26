@@ -1,6 +1,8 @@
 package eu.isawsm.accelerate.ax.viewholders;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,14 +55,14 @@ public class CarViewHolder extends AxViewHolder {
 
 
         listView0 = (ListView) v.findViewById(R.id.listView0);
-        listView1 = (ListView) v.findViewById(R.id.listView0);
-        listView2 = (ListView) v.findViewById(R.id.listView0);
+        listView1 = (ListView) v.findViewById(R.id.listView1);
+        listView2 = (ListView) v.findViewById(R.id.listView2);
 
         detailsButton = (ImageButton) v.findViewById(R.id.detailsButton);
     }
 
     public void onBindViewHolder(AxAdapter.ViewHolder holder, int position, AxCardItem axCardItem) {
-        Car car = (Car) axCardItem.get();
+        final Car car = (Car) axCardItem.get();
 
         tfCarName.setText(car.getFullName());
         tfClass.setText(car.getClazz().getName());
@@ -78,38 +80,29 @@ public class CarViewHolder extends AxViewHolder {
 
         lapAdapter1 = new LapAdapter(context, R.layout.laplistrow);
         lapAdapter1.positionOffset = 5;
-        listView0.setAdapter(lapAdapter1);
+        listView1.setAdapter(lapAdapter1);
 
         lapAdapter2 = new LapAdapter(context, R.layout.laplistrow);
         lapAdapter2.positionOffset = 10;
-        listView0.setAdapter(lapAdapter2);
+        listView2.setAdapter(lapAdapter2);
 
 
-        //TODO Testdata
-        addLap(new Lap(car, 29954, null));
-        addLap(new Lap(car, 19933, null));
-        addLap(new Lap(car, 29340, null));
-        addLap(new Lap(car, 24990, null));
-        addLap(new Lap(car, 42990, null));
-
-        addLap(new Lap(car, 34990, null));
-        addLap(new Lap(car, 24399, null));
-        addLap(new Lap(car, 29980, null));
-        addLap(new Lap(car, 29980, null));
-        addLap(new Lap(car, 29980, null));
-
-        addLap(new Lap(car, 29954, null));
-        addLap(new Lap(car, 19933, null));
-        addLap(new Lap(car, 29340, null));
-        addLap(new Lap(car, 24990, null));
-        addLap(new Lap(car, 42990, null));
-
-        addLap(new Lap(car, 29954, null));
-        addLap(new Lap(car, 19933, null));
-        addLap(new Lap(car, 29340, null));
-        addLap(new Lap(car, 24990, null));
-        addLap(new Lap(car, 42990, null));
+        addTestData(new Lap(car,11111,null));
     }
+
+    private void addTestData(final Lap lap){
+        if(Looper.myLooper() == null) Looper.prepare();
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                addLap(new Lap(lap.getCar(), lap.getTime()+(long)(Math.random()*1000),null));
+                Log.d("TestData", "AddingLap");
+                addTestData(lap);
+            }
+        }, 1000);
+    }
+
 
 
     private void addLap(Lap lap) {
@@ -125,6 +118,7 @@ public class CarViewHolder extends AxViewHolder {
                 }
             }
         }
+
     }
 
     public class LapAdapter extends ArrayAdapter<Lap> {

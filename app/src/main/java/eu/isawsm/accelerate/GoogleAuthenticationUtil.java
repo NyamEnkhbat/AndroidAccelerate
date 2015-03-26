@@ -1,5 +1,6 @@
 package eu.isawsm.accelerate;
 
+import com.facebook.Session;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -72,9 +73,9 @@ public class GoogleAuthenticationUtil implements IAuthenticator, OnClickListener
     private boolean mIntentInProgress;
     private MainActivity mContext;
 
-    public GoogleAuthenticationUtil (MainActivity context) {
+    public GoogleAuthenticationUtil (MainActivity context)  {
         mContext = context;
-
+        Driver.get(mContext).setAuthenticator(this, mContext);
 
     }
     public void connect() {
@@ -96,7 +97,6 @@ public class GoogleAuthenticationUtil implements IAuthenticator, OnClickListener
                 .addOnConnectionFailedListener(this)
                 .build();
 
-        mContext.setAuthenticator(this);
         switch((int)view.getTag()) {
             case GOOGLE_PLUS_LOGIN_BUTTON_TAG:
                 if (!mGoogleApiClient.isConnecting()) {
@@ -294,5 +294,9 @@ public class GoogleAuthenticationUtil implements IAuthenticator, OnClickListener
                 Log.w(TAG, "Error sending the resolution Intent, connect() again.");
             }
         }
+    }
+
+    public boolean isSignedIn(){
+        return currentStatus == STATUS_SIGNED_IN;
     }
 }
