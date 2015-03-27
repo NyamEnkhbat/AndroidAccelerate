@@ -3,18 +3,23 @@ package eu.isawsm.accelerate.ax;
 
 
 import android.annotation.TargetApi;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,9 +34,6 @@ import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
-import eu.isawsm.accelerate.FacebookAuthenticationUtil;
-import eu.isawsm.accelerate.GoogleAuthenticationUtil;
-import eu.isawsm.accelerate.IAuthenticator;
 import eu.isawsm.accelerate.Model.Car;
 import eu.isawsm.accelerate.Model.Course;
 import eu.isawsm.accelerate.Model.Driver;
@@ -49,6 +51,7 @@ import eu.isawsm.accelerate.ax.viewmodel.ConnectionSetup;
 
 public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayout.OnRefreshListener {
 
+    private static final String TAG = "MainActivity";
     private Toolbar mToolbar;
     private RecyclerView mRecyclerView;
     private StaggeredGridLayoutManager mLayoutManager;
@@ -65,15 +68,17 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         setToolBar();
         initSwipeRefrehLayout();
         initRecyclerView();
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("Authentication"));
+
         setupDriver();
     }
 
     private void setupDriver() {
         //TODO Hide all other cards.
-        if(Driver.get(this).getFirstname() == null ) {
+        if(Driver.get(this) == null ) {
             mDataset.add(new AxCardItem<>(new Autentification()));
         } else {
-
             onLoggedIn();
         }
 
@@ -162,7 +167,14 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Driver.get(this).getAuthenticator().onActivityResult(requestCode, resultCode, data);
+        Intent intent = new Intent("View");
+        // add data
+        intent.putExtra("message", "onActivityResult");
+        intent.putExtra("requestCode", requestCode);
+        intent.putExtra("resultCode", resultCode);
+        intent.putExtra("data", data);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -262,7 +274,11 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
                 mDataset.add(new AxCardItem<>(new CarSetup()));
                 return true;
             case R.id.action_logoff:
-                Driver.get(this).getAuthenticator().logoff();
+                Intent intent = new Intent("View");
+                intent.putExtra("message", "logoff");
+                LocalBroadcastManager.getInstance(this).sendBroadcastSync(intent);
+                mAdapter.removeAll();
+                setupDriver();
                 return true;
             case R.id.action_settings:
 
@@ -296,14 +312,11 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         AppEventsLogger.deactivateApp(this);
     }
 
-    public void onLoginSuccess() {
-        AuthentificationViewHolder authenticatorViewHolder = mAdapter.getAuthentificationViewHolder();
-        mDataset.remove(authenticatorViewHolder.getPosition());
-
-        onLoggedIn();
-    }
-
     private void onLoggedIn() {
+        AuthentificationViewHolder authenticatorViewHolder = mAdapter.getAuthentificationViewHolder();
+        if(authenticatorViewHolder != null)
+            mDataset.remove(authenticatorViewHolder.getPosition());
+
         setTitle(Driver.get(this).toString());
         if(Driver.get(this).getImage() !=null)
             mToolbar.setNavigationIcon(new BitmapDrawable(Driver.get(this).getImage()));
@@ -315,9 +328,27 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.getItem(0).setEnabled(Driver.get(this).getFirstname() != null );
-        menu.getItem(1).setEnabled(Driver.get(this).getFirstname() != null );
+        menu.getItem(0).setEnabled(Driver.get(this) != null );
+        menu.getItem(1).setEnabled(Driver.get(this) != null );
         return super.onPrepareOptionsMenu(menu);
     }
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Extract data included in the Intent
+            if(intent.getAction().equals("Authentication")){
+                String message = intent.getStringExtra("Message");
+                switch (message){
+                    case "Login Success":
+                        onLoggedIn();
+                        break;
+                    default:
+                        Log.e(TAG, "Unexpected message: " + message);
+                }
+
+            }
+        }
+    };
 
 }

@@ -27,15 +27,6 @@ public class Driver {
     private ArrayList<Car> cars;
     private IAuthenticator authenticator;
 
-    public IAuthenticator getAuthenticator() {
-        return authenticator;
-    }
-
-    public void setAuthenticator(IAuthenticator authenticator, Context context) {
-        this.authenticator = authenticator;
-        AxPreferences.setDriver(context, this);
-    }
-
     public Driver(String firstname, String lastname, String acronym, Bitmap image, URI mail, Context context) {
         this.firstname = firstname;
         this.lastname = lastname;
@@ -46,8 +37,9 @@ public class Driver {
         AxPreferences.setDriver(context, this);
     }
 
-    public Driver() {
+    public Driver(Context context) {
         cars = new ArrayList<>();
+        AxPreferences.setDriver(context, this);
     }
 
     public String getFirstname() {

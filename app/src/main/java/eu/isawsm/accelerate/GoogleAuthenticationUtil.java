@@ -75,7 +75,6 @@ public class GoogleAuthenticationUtil implements IAuthenticator, OnClickListener
 
     public GoogleAuthenticationUtil (MainActivity context)  {
         mContext = context;
-        Driver.get(mContext).setAuthenticator(this, mContext);
 
     }
     public void connect() {
@@ -88,7 +87,6 @@ public class GoogleAuthenticationUtil implements IAuthenticator, OnClickListener
 
     @Override
     public void onClick(View view) {
-
         mGoogleApiClient = new GoogleApiClient.Builder(mContext)
                 .addApi(Plus.API, Plus.PlusOptions.builder()
                         .addActivityTypes("http://schemas.google.com/AddActivity").build())

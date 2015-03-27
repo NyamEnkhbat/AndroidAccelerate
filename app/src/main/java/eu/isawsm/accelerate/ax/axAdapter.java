@@ -54,6 +54,12 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
         }
     }
 
+    public void removeAll(){
+        for(AxViewHolder vh : viewHolders){
+            mDataset.remove(vh.getPosition());
+        }
+    }
+
     public AuthentificationViewHolder getAuthentificationViewHolder() {
         return getViewHolder(AuthentificationViewHolder.class);
     }

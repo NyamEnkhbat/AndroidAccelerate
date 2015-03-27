@@ -1,12 +1,16 @@
 package eu.isawsm.accelerate;
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 
@@ -34,7 +38,7 @@ public class FacebookAuthenticationUtil implements IAuthenticator, View.OnClickL
     private static final String TAG = "FacebookAuthentication";
     public FacebookAuthenticationUtil(MainActivity mContext) {
         this.mContext = mContext;
-        Driver.get(mContext).setAuthenticator(this, mContext);
+
 
     }
 
@@ -54,7 +58,10 @@ public class FacebookAuthenticationUtil implements IAuthenticator, View.OnClickL
     public void call(Session session, SessionState sessionState, Exception e) {
         if (sessionState.isOpened()) {
             Log.i(TAG, "Logged in...");
+            LocalBroadcastManager.getInstance(mContext).registerReceiver(mMessageReceiver,
+                    new IntentFilter("View"));
         } else if (sessionState.isClosed()) {
+            LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mMessageReceiver);
             Log.i(TAG, "Logged out...");
         }
     }
@@ -92,9 +99,12 @@ public class FacebookAuthenticationUtil implements IAuthenticator, View.OnClickL
         ProgressDialog mProgressDialog;
         @Override
         protected void onPostExecute(Void result) {
-            mContext.onLoginSuccess();
-            mProgressDialog.dismiss();
+            //mContext.onLoginSuccess();
+            Intent intent = new Intent("Authentication");
+            intent.putExtra("Message", "Login Success");
+            LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
 
+            mProgressDialog.dismiss();
         }
 
         @Override
@@ -106,12 +116,14 @@ public class FacebookAuthenticationUtil implements IAuthenticator, View.OnClickL
         @Override
         protected Void doInBackground(GraphUser... params) {
             GraphUser user = params[0];
+
+            new Driver(mContext);
             Driver.get(mContext).setMail(URI.create(user.asMap().get("email").toString()), mContext);
             Driver.get(mContext).setFirstname(user.getFirstName() + " " + user.getLastName(), mContext);
-            URL img_value = null;
+            URL imgURL = null;
             try {
-                img_value = new URL("http://graph.facebook.com/"+user.getId()+"/picture?type=large");
-                Driver.get(mContext).setImage(BitmapFactory.decodeStream(img_value.openConnection().getInputStream()),mContext);
+                imgURL = new URL("http://graph.facebook.com/"+user.getId()+"/picture?type=large");
+                Driver.get(mContext).setImage(BitmapFactory.decodeStream(imgURL.openConnection().getInputStream()),mContext);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -139,4 +151,24 @@ public class FacebookAuthenticationUtil implements IAuthenticator, View.OnClickL
         return Session.getActiveSession() !=null;
     }
 
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Extract data included in the Intent
+            String message = intent.getStringExtra("message");
+            switch (message){
+                case "onActivityResult":
+                    int requestCode = intent.getIntExtra("requestCode",-1);
+                    int resultCode = intent.getIntExtra("resultCode",-1);
+                    Intent data = intent.getParcelableExtra("data");
+                    onActivityResult(requestCode,resultCode,data);
+                    break;
+                case "logoff":
+                    logoff();
+                    break;
+                default:
+                    Log.e(TAG,"unexpected Message: " + message);
+            }
+        }
+    };
 }

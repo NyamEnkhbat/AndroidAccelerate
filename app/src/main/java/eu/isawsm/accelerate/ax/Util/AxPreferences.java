@@ -46,7 +46,7 @@ public class AxPreferences {
 
     public static Driver getDriver(Context context) {
         SharedPreferences preferences=PreferenceManager.getDefaultSharedPreferences(context);
-        return gson.fromJson(preferences.getString(DRIVER, gson.toJson(new Driver())),Driver.class);
+        return gson.fromJson(preferences.getString(DRIVER, null),Driver.class);
     }
 
     public static void putServerAddress(Context context, String address){
