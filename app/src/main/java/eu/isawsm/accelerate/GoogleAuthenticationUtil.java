@@ -1,14 +1,5 @@
 package eu.isawsm.accelerate;
 
-import com.facebook.Session;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.plus.Plus;
-import com.google.android.gms.plus.model.people.Person;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -21,24 +12,23 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.io.InputStream;
-import java.net.URI;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.plus.Plus;
+import com.google.android.gms.plus.model.people.Person;
 
-import eu.isawsm.accelerate.Model.Driver;
+import java.io.InputStream;
+
 import eu.isawsm.accelerate.ax.MainActivity;
 
+//NOTHING IN HERE WORKS! Not a thing.
 public class GoogleAuthenticationUtil implements IAuthenticator, OnClickListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-
-    private static final String TAG  = "SignInActivity";
-
-    private static final int DIALOG_GET_GOOGLE_PLAY_SERVICES = 1;
-
-    private static final int REQUEST_CODE_SIGN_IN = 1;
-    private static final int REQUEST_CODE_GET_GOOGLE_PLAY_SERVICES = 2;
 
     public static final int STATUS_SIGNED_OUT = 10;
     public static final int STATUS_SING_IN_ERROR = 11;
@@ -47,16 +37,16 @@ public class GoogleAuthenticationUtil implements IAuthenticator, OnClickListener
     public static final int STATUS_REVOKE_ACCESS_ERROR = 14;
     public static final int STATUS_SIGNED_IN = 15;
     public static final int STATUS_LOADING = 16;
-
     public static final int GOOGLE_PLUS_LOGIN_BUTTON_TAG = 21;
     public static final int GOOGLE_PLUS_LOGOUT_BUTTON_TAG = 22;
     public static final int GOOGLE_PLUS_REVOKE_BUTTON_TAG = 23;
+    private static final String TAG = "SignInActivity";
+    private static final int DIALOG_GET_GOOGLE_PLAY_SERVICES = 1;
+    private static final int REQUEST_CODE_SIGN_IN = 1;
+    private static final int REQUEST_CODE_GET_GOOGLE_PLAY_SERVICES = 2;
     private static final int PROFILE_PIC_SIZE = 400;
-
-    private GoogleApiClient mGoogleApiClient;
-
     public int currentStatus;
-
+    private GoogleApiClient mGoogleApiClient;
     /*
      * Stores the connection result from onConnectionFailed callbacks so that we can resolve them
      * when the user clicks sign-in.
@@ -73,10 +63,11 @@ public class GoogleAuthenticationUtil implements IAuthenticator, OnClickListener
     private boolean mIntentInProgress;
     private MainActivity mContext;
 
-    public GoogleAuthenticationUtil (MainActivity context)  {
+    public GoogleAuthenticationUtil(MainActivity context) {
         mContext = context;
 
     }
+
     public void connect() {
         mGoogleApiClient.connect();
     }
@@ -95,7 +86,7 @@ public class GoogleAuthenticationUtil implements IAuthenticator, OnClickListener
                 .addOnConnectionFailedListener(this)
                 .build();
 
-        switch((int)view.getTag()) {
+        switch ((int) view.getTag()) {
             case GOOGLE_PLUS_LOGIN_BUTTON_TAG:
                 if (!mGoogleApiClient.isConnecting()) {
                     int available = GooglePlayServicesUtil.isGooglePlayServicesAvailable(mContext);
@@ -135,7 +126,7 @@ public class GoogleAuthenticationUtil implements IAuthenticator, OnClickListener
         }
     }
 
-    public void logoff(){
+    public void logoff() {
         if (mGoogleApiClient.isConnected()) {
             Plus.AccountApi.revokeAccessAndDisconnect(mGoogleApiClient).setResultCallback(
                     new ResultCallback<Status>() {
@@ -206,7 +197,7 @@ public class GoogleAuthenticationUtil implements IAuthenticator, OnClickListener
 
     /**
      * Fetching user's information name, email, profile pic
-     * */
+     */
     private void getProfileInformation() {
         try {
             if (Plus.PeopleApi.getCurrentPerson(mGoogleApiClient) != null) {
@@ -218,9 +209,9 @@ public class GoogleAuthenticationUtil implements IAuthenticator, OnClickListener
                 String email = Plus.AccountApi.getAccountName(mGoogleApiClient);
 
 
-
-                Driver.get(mContext).setMail(URI.create(email), mContext);
-                Driver.get(mContext).setFirstname(personName, mContext);
+//TODO
+//                Driver.get(mContext).setMail(URI.create(email), mContext);
+//                Driver.get(mContext).setName(personName, mContext);
 
                 // by default the profile url gives 50x50 px image only
                 // we can replace the value with whatever dimension we want by
@@ -239,29 +230,6 @@ public class GoogleAuthenticationUtil implements IAuthenticator, OnClickListener
             e.printStackTrace();
         }
     }
-
-    /**
-     * Background Async task to load user profile picture from url
-     * */
-    private class LoadProfileImage extends AsyncTask<String, Void, Bitmap> {
-        protected Bitmap doInBackground(String... urls) {
-            String urldisplay = urls[0];
-            Bitmap mIcon11 = null;
-            try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
-                mIcon11 = BitmapFactory.decodeStream(in);
-            } catch (Exception e) {
-                Log.e("Error", e.getMessage());
-                e.printStackTrace();
-            }
-            return mIcon11;
-        }
-
-        protected void onPostExecute(Bitmap result) {
-            Driver.get(mContext).setImage(result,mContext);
-        }
-    }
-
 
     @Override
     public void onConnectionSuspended(int cause) {
@@ -294,7 +262,29 @@ public class GoogleAuthenticationUtil implements IAuthenticator, OnClickListener
         }
     }
 
-    public boolean isSignedIn(){
+    public boolean isSignedIn() {
         return currentStatus == STATUS_SIGNED_IN;
+    }
+
+    /**
+     * Background Async task to load user profile picture from url
+     */
+    private class LoadProfileImage extends AsyncTask<String, Void, Bitmap> {
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mIcon11 = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return mIcon11;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            //TODO Driver.get(mContext).setImage(result,mContext);
+        }
     }
 }

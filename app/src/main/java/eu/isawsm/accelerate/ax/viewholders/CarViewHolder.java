@@ -35,6 +35,7 @@ public class CarViewHolder extends AxViewHolder {
     public ListView listView1;
     public ListView listView2;
     public ImageButton detailsButton;
+    public Car car;
     LapAdapter lapAdapter0;
     LapAdapter lapAdapter1;
     LapAdapter lapAdapter2;
@@ -62,16 +63,21 @@ public class CarViewHolder extends AxViewHolder {
     }
 
     public void onBindViewHolder(AxAdapter.ViewHolder holder, int position, AxCardItem axCardItem) {
-        final Car car = (Car) axCardItem.get();
+        car = (Car) axCardItem.get();
 
-        tfCarName.setText(car.getFullName());
+        tfCarName.setText(car.getName());
         tfClass.setText(car.getClazz().getName());
-
-        tfConsistencyValue.setText(car.getConsitancy()+"%");
+        String consistency;
+        if (car.getConsistency() != -1) {
+            consistency = car.getConsistency() + "%";
+        } else {
+            consistency = "-";
+        }
+        tfConsistencyValue.setText(consistency);
         tfRank.setText(car.getRank() +""); //if i pass an int it will search for a resource ID
 
-        tfAvg.setText(car.getAvgTime() + "");
-        tfBest.setText(car.getBestTime() + "");
+        tfAvg.setText(car.getAvgTime() / 1000 + "");
+        tfBest.setText(car.getBestTime() / 1000 + "");
         tfLaps.setText(car.getLapCount() + "");
 
         lapAdapter0 = new LapAdapter(context, R.layout.laplistrow);
@@ -87,7 +93,13 @@ public class CarViewHolder extends AxViewHolder {
         listView2.setAdapter(lapAdapter2);
 
 
-        addTestData(new Lap(car,11111,null));
+        for (Lap l : car.getLaps()) {
+            addLap(l);
+        }
+
+        addTestData(new Lap(11111, null));
+
+
     }
 
     private void addTestData(final Lap lap){
@@ -96,9 +108,10 @@ public class CarViewHolder extends AxViewHolder {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                addLap(new Lap(lap.getCar(), lap.getTime()+(long)(Math.random()*1000),null));
+                Lap l = new Lap(lap.getTime() + (long) (Math.random() * 1000), null);
+                car.addLap(l);
                 Log.d("TestData", "AddingLap");
-                addTestData(lap);
+                axAdapter.notifyItemChanged(getPosition());
             }
         }, 1000);
     }
@@ -121,46 +134,73 @@ public class CarViewHolder extends AxViewHolder {
 
     }
 
+
+    private static class ViewHolder {
+        TextView index;
+        TextView time;
+        ImageView upArrow;
+        ImageView downArrow;
+        ImageView star;
+        ImageView warn;
+
+    }
+
     public class LapAdapter extends ArrayAdapter<Lap> {
 
+        int positionOffset = 1;
+        private ViewHolder viewHolder;
         public LapAdapter(Context context, int resource) {
             super(context, resource);
         }
-
-        int positionOffset = 1;
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             Lap lap = getItem(position);
 
+
             if(convertView == null) {
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.laplistrow, parent,false);
-            }
+                viewHolder = new ViewHolder();
 
-            TextView index = (TextView) convertView.findViewById(R.id.tfindex);
-            TextView time = (TextView) convertView.findViewById(R.id.textView);
-            ImageView upArrow = (ImageView) convertView.findViewById(R.id.upArrow);
-            ImageView downArrow = (ImageView) convertView.findViewById(R.id.downArrow);
-            ImageView star = (ImageView) convertView.findViewById(R.id.star);
-            ImageView warn = (ImageView) convertView.findViewById(R.id.warn);
-
-            index.setText((position+positionOffset+1)+".");
-
-            time.setText(lap.getTime() / 1000d + "");
-
-            if (lap.getTime() < lap.getCar().getBestTime()){
-                star.setVisibility(View.VISIBLE);
-                return convertView;
-            }
-            if(lap.getCar().getAvgTime() +5000 < lap.getTime()) {
-                warn.setVisibility(View.VISIBLE);
-                return convertView;
-            }
-
-            if(lap.getCar().getAvgTime() < lap.getTime()){
-                downArrow.setVisibility(View.VISIBLE);
+                convertView.setTag(viewHolder);
             } else {
-                upArrow.setVisibility(View.VISIBLE);
+                viewHolder = (ViewHolder) convertView.getTag();
+            }
+
+            viewHolder.index = (TextView) convertView.findViewById(R.id.tfindex);
+            viewHolder.time = (TextView) convertView.findViewById(R.id.textView);
+            viewHolder.upArrow = (ImageView) convertView.findViewById(R.id.upArrow);
+            viewHolder.downArrow = (ImageView) convertView.findViewById(R.id.downArrow);
+            viewHolder.star = (ImageView) convertView.findViewById(R.id.star);
+            viewHolder.warn = (ImageView) convertView.findViewById(R.id.warn);
+
+
+            viewHolder.index.setText(car.getLaps().indexOf(lap) + ".");
+
+            String lapTime = lap.getTime() / 1000d + "";
+            while (lapTime.length() < 6) {
+                lapTime += "0";
+            }
+            viewHolder.time.setText(lapTime);
+
+            viewHolder.star.setVisibility(View.GONE);
+            viewHolder.warn.setVisibility(View.GONE);
+            viewHolder.downArrow.setVisibility(View.GONE);
+            viewHolder.upArrow.setVisibility(View.GONE);
+
+            if (lap.getTime() < car.getBestTime()) {
+                viewHolder.star.setVisibility(View.VISIBLE);
+                return convertView;
+            }
+            if (car.getAvgTime() + 5000 < lap.getTime()) {
+                viewHolder.warn.setVisibility(View.VISIBLE);
+                return convertView;
+            }
+
+            if (car.getAvgTime() < lap.getTime()) {
+                viewHolder.downArrow.setVisibility(View.VISIBLE);
+            } else {
+                viewHolder.upArrow.setVisibility(View.VISIBLE);
             }
 
             return convertView;

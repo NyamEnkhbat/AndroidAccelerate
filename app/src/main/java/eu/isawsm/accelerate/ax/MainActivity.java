@@ -1,7 +1,6 @@
 package eu.isawsm.accelerate.ax;
 
 
-
 import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -34,9 +33,9 @@ import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
+import eu.isawsm.accelerate.Model.AxUser;
 import eu.isawsm.accelerate.Model.Car;
 import eu.isawsm.accelerate.Model.Course;
-import eu.isawsm.accelerate.Model.Driver;
 import eu.isawsm.accelerate.R;
 import eu.isawsm.accelerate.ax.Util.AxPreferences;
 import eu.isawsm.accelerate.ax.Util.AxSocket;
@@ -60,38 +59,105 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     private AxSocket mSocket;
     private AxDataset<AxCardItem> mDataset;
     private Gson mGson = new Gson();
+    private AxUser mUser;
+    private Emitter.Listener onConnectionSuccess = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            JSONObject data = (JSONObject) args[0];
+
+            final Course course = mGson.fromJson(data.toString(), Course.class);
+            mSocket.registerDriver(mUser);
+
+            //Do i realy need to run this on UI thread?
+            if (Looper.myLooper() == null) Looper.prepare();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    AxPreferences.putServerAddress(getApplicationContext(), mSocket.getLastAddress());
+                    AxCardItem clubCard = new AxCardItem<>(course.getTrack().getClub());
+                    if (mAdapter.getConnectionViewHolder() != null)
+                        mDataset.remove(mAdapter.getConnectionViewHolder().getPosition());
+                    mDataset.add(clubCard);
+                    mRecyclerView.scrollToPosition(0);
+                    mSwipeLayout.setRefreshing(false);
+                }
+            });
+
+        }
+    };
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Extract data included in the Intent
+            if (intent.getAction().equals("Authentication")) {
+                String message = intent.getStringExtra("Message");
+                switch (message) {
+                    case "Login Success":
+                        mUser = intent.getParcelableExtra("AxUser");
+                        onLoggedIn();
+                        break;
+                    default:
+                        Log.e(TAG, "Unexpected message: " + message);
+                }
+
+            }
+        }
+    };
+    private Emitter.Listener onConnectionError = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            mSocket.off();
+            if (Looper.myLooper() == null) Looper.prepare();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    showConnectionSetup();
+                    ClubViewHolder clubVieHolder = mAdapter.getClubVieHolder();
+                    if (clubVieHolder != null)
+                        mDataset.remove(mAdapter.getClubVieHolder().getPosition());
+                    mSwipeLayout.setRefreshing(false);
+                }
+            });
+
+        }
+    };
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ax_recycler);
+
         setSystemBarColor();
         setToolBar();
         initSwipeRefrehLayout();
         initRecyclerView();
-
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("Authentication"));
-
-        setupDriver();
+        initUser();
     }
 
-    private void setupDriver() {
-        //TODO Hide all other cards.
-        if(Driver.get(this) == null ) {
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mUser != null)
+            outState.putParcelable("AxUser", mUser);
+    }
+
+    private void initUser() {
+        mUser = AxPreferences.getAxIUser(this);
+        if (mUser == null) {
             mDataset.add(new AxCardItem<>(new Autentification()));
         } else {
             onLoggedIn();
         }
-
     }
 
-    public void initSocket(){
+    public void initSocket() {
         initSocket(AxPreferences.getServerAddress(this));
     }
 
     public void initSocket(String address) {
         mSocket = new AxSocket();
 
-        if(!mSocket.isConnected()) {
+        if (!mSocket.isConnected()) {
             //Workaround to show the refreshing indicator
             TypedValue typed_value = new TypedValue();
             getTheme().resolveAttribute(android.support.v7.appcompat.R.attr.actionBarSize, typed_value, true);
@@ -136,7 +202,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     private void setToolBar() {
         mToolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(mToolbar);
-   }
+    }
 
     private void initSwipeRefrehLayout() {
         mSwipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
@@ -163,8 +229,6 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         });
     }
 
-
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Intent intent = new Intent("View");
@@ -178,54 +242,8 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-
-    private Emitter.Listener onConnectionError = new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-            mSocket.off();
-            if (Looper.myLooper() == null) Looper.prepare();
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    showConnectionSetup();
-                    ClubViewHolder clubVieHolder = mAdapter.getClubVieHolder();
-                    if(clubVieHolder != null) mDataset.remove(mAdapter.getClubVieHolder().getPosition());
-                    mSwipeLayout.setRefreshing(false);
-                }
-            });
-
-        }
-    };
-
-    private Emitter.Listener onConnectionSuccess = new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-            JSONObject data = (JSONObject) args[0];
-
-            final Course course = mGson.fromJson(data.toString(),Course.class);
-            mSocket.registerDriver(AxPreferences.getDriver(getApplicationContext()));
-
-            //Do i realy need to run this on UI thread?
-            if (Looper.myLooper() == null) Looper.prepare();
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    AxPreferences.putServerAddress(getApplicationContext(), mSocket.getLastAddress());
-                    AxCardItem clubCard = new AxCardItem<>(course.getTrack().getClub());
-                    if(mAdapter.getConnectionViewHolder() != null) mDataset.remove(mAdapter.getConnectionViewHolder().getPosition());
-                    mDataset.add(clubCard);
-                    mRecyclerView.scrollToPosition(0);
-                    mSwipeLayout.setRefreshing(false);
-                }
-            });
-
-        }
-    };
-
-
-
     private void showConnectionSetup() {
-        if(!mDataset.add(new AxCardItem<>(new ConnectionSetup()))) {
+        if (!mDataset.add(new AxCardItem<>(new ConnectionSetup()))) {
             mAdapter.getConnectionViewHolder().mAcTVServerAdress.setError("Incorrect Address");
         }
         mRecyclerView.scrollToPosition(0);
@@ -234,31 +252,29 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        mSocket.disconnect();
-        mSocket.off();
+        if (mSocket != null) {
+            mSocket.disconnect();
+            mSocket.off();
+        }
     }
 
     public void onCarSetupSubmit(View view) {
         CarSettingsViewHolder carSettingsViewHolder = mAdapter.getCarSettingsViewHolder();
         Car car = carSettingsViewHolder.tryGetCar();
-        if(car != null){
+        if (car != null) {
             mDataset.remove(carSettingsViewHolder.getPosition());
             mDataset.add(new AxCardItem<>(car));
-            Driver.get(this).addCar(car, this);
+            mUser.addCar(car);
 
-            if(mSocket == null || !mSocket.isConnected()) return;
-
-
-            mSocket.registerDriver(AxPreferences.getDriver(this));
-           // mSocket.registerCar(car);
+            if (mSocket == null || !mSocket.isConnected()) return;
+            mSocket.registerDriver(mUser);
         }
     }
 
     public void onTestConnection(View view) {
         ConnectionViewHolder connectionViewHolder = mAdapter.getConnectionViewHolder();
         String address = connectionViewHolder.tryGetAddress();
-        if(address != null) initSocket(address);
+        if (address != null) initSocket(address);
     }
 
     @Override
@@ -278,7 +294,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
                 intent.putExtra("message", "logoff");
                 LocalBroadcastManager.getInstance(this).sendBroadcastSync(intent);
                 mAdapter.removeAll();
-                setupDriver();
+                initUser();
                 return true;
             case R.id.action_settings:
 
@@ -291,11 +307,11 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     }
 
     public void updateCars() {
-                mAdapter.removeAllCars();
-                for(Car c : Driver.get(this).getCars()){
-                    mDataset.add(new AxCardItem<>(c));
-                }
-                mAdapter.notifyDataSetChanged();
+        mAdapter.removeAllCars();
+        for (Car c : mUser.getCars()) {
+            mDataset.add(new AxCardItem<>(c));
+        }
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -306,20 +322,23 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     }
 
     @Override
-    protected void onPause(){
+    protected void onPause() {
         super.onPause();
         // Logs 'app deactivate' App Event.
+        AxPreferences.setAxIUser(this, mUser);
         AppEventsLogger.deactivateApp(this);
     }
 
     private void onLoggedIn() {
+
+        //TODO do this with the broadcast
         AuthentificationViewHolder authenticatorViewHolder = mAdapter.getAuthentificationViewHolder();
-        if(authenticatorViewHolder != null)
+        if (authenticatorViewHolder != null)
             mDataset.remove(authenticatorViewHolder.getPosition());
 
-        setTitle(Driver.get(this).toString());
-        if(Driver.get(this).getImage() !=null)
-            mToolbar.setNavigationIcon(new BitmapDrawable(Driver.get(this).getImage()));
+        setTitle(mUser.toString());
+        if (mUser.getImage() != null)
+            mToolbar.setNavigationIcon(new BitmapDrawable(mUser.getImage()));
         else
             mToolbar.setNavigationIcon(null);
         updateCars();
@@ -328,27 +347,9 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.getItem(0).setEnabled(Driver.get(this) != null );
-        menu.getItem(1).setEnabled(Driver.get(this) != null );
+        menu.getItem(0).setEnabled(mUser != null);
+        menu.getItem(1).setEnabled(mUser != null);
         return super.onPrepareOptionsMenu(menu);
     }
-
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            // Extract data included in the Intent
-            if(intent.getAction().equals("Authentication")){
-                String message = intent.getStringExtra("Message");
-                switch (message){
-                    case "Login Success":
-                        onLoggedIn();
-                        break;
-                    default:
-                        Log.e(TAG, "Unexpected message: " + message);
-                }
-
-            }
-        }
-    };
 
 }

@@ -1,11 +1,24 @@
 package eu.isawsm.accelerate.Model;
 
-import java.util.Stack;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * Created by Oliver on 31.01.2015.
  */
-public class Model {
+public class Model implements Parcelable {
+    public static final Creator<Model> CREATOR = new Creator<Model>() {
+        @Override
+        public Model createFromParcel(Parcel source) {
+            Model retVal = new Model((Manufacturer) source.readValue(null), source.readString(), source.readString(), source.readString(), source.readString(), source.readString());
+            return retVal;
+        }
+
+        @Override
+        public Model[] newArray(int size) {
+            return new Model[size];
+        }
+    };
     private Manufacturer manufacturer;
     private String name;
     private String drivetrain;
@@ -20,6 +33,16 @@ public class Model {
         this.motor = motor;
         this.type = type;
         this.scale = scale;
+    }
+
+    private Model(Parcel in) {
+        super();
+        setManufacturer((Manufacturer) in.readValue(null));
+        setName(in.readString());
+        setDrivetrain(in.readString());
+        setMotor(in.readString());
+        setType(in.readString());
+        setScale(in.readString());
     }
 
     public Manufacturer getManufacturer() {
@@ -68,5 +91,34 @@ public class Model {
 
     public void setScale(String scale) {
         this.scale = scale;
+    }
+
+    /**
+     * Describe the kinds of special objects contained in this Parcelable's
+     * marshalled representation.
+     *
+     * @return a bitmask indicating the set of special object types marshalled
+     * by the Parcelable.
+     */
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    /**
+     * Flatten this object in to a Parcel.
+     *
+     * @param dest  The Parcel in which the object should be written.
+     * @param flags Additional flags about how the object should be written.
+     *              May be 0 or {@link #PARCELABLE_WRITE_RETURN_VALUE}.
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(manufacturer);
+        dest.writeString(name);
+        dest.writeString(drivetrain);
+        dest.writeString(motor);
+        dest.writeString(type);
+        dest.writeString(scale);
     }
 }

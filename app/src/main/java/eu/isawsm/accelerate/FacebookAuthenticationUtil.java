@@ -8,8 +8,6 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
@@ -21,26 +19,33 @@ import com.facebook.SessionState;
 import com.facebook.model.GraphUser;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 
-import eu.isawsm.accelerate.Model.Driver;
+import eu.isawsm.accelerate.Model.AxUser;
 import eu.isawsm.accelerate.ax.MainActivity;
 
 /**
  * Created by olfad on 23.03.2015.
  */
-public class FacebookAuthenticationUtil implements IAuthenticator, View.OnClickListener, Session.StatusCallback  {
+public class FacebookAuthenticationUtil extends BroadcastReceiver implements IAuthenticator, View.OnClickListener, Session.StatusCallback {
 
-    private MainActivity mContext;
     private static final String TAG = "FacebookAuthentication";
+    private MainActivity mContext;
     public FacebookAuthenticationUtil(MainActivity mContext) {
         this.mContext = mContext;
-
-
+        LocalBroadcastManager.getInstance(mContext).registerReceiver(this,
+                new IntentFilter("View"));
     }
+
+
+    public FacebookAuthenticationUtil() {
+        LocalBroadcastManager.getInstance(mContext).registerReceiver(this,
+                new IntentFilter("View"));
+    }
+
+    ;
 
     @Override
     public void onClick(View v) {
@@ -58,10 +63,9 @@ public class FacebookAuthenticationUtil implements IAuthenticator, View.OnClickL
     public void call(Session session, SessionState sessionState, Exception e) {
         if (sessionState.isOpened()) {
             Log.i(TAG, "Logged in...");
-            LocalBroadcastManager.getInstance(mContext).registerReceiver(mMessageReceiver,
-                    new IntentFilter("View"));
+
         } else if (sessionState.isClosed()) {
-            LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mMessageReceiver);
+            LocalBroadcastManager.getInstance(mContext).unregisterReceiver(this);
             Log.i(TAG, "Logged out...");
         }
     }
@@ -93,41 +97,54 @@ public class FacebookAuthenticationUtil implements IAuthenticator, View.OnClickL
         }
     }
 
-    private class MyAsyncTask extends AsyncTask<GraphUser, Void, Void>
-    {
-
-        ProgressDialog mProgressDialog;
-        @Override
-        protected void onPostExecute(Void result) {
-            //mContext.onLoginSuccess();
-            Intent intent = new Intent("Authentication");
-            intent.putExtra("Message", "Login Success");
-            LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
-
-            mProgressDialog.dismiss();
-        }
-
-        @Override
-        protected void onPreExecute() {
-            mProgressDialog = ProgressDialog.show(mContext,
-                    "Loading...", "Data is Loading...");
-        }
-
-        @Override
-        protected Void doInBackground(GraphUser... params) {
-            GraphUser user = params[0];
-
-            new Driver(mContext);
-            Driver.get(mContext).setMail(URI.create(user.asMap().get("email").toString()), mContext);
-            Driver.get(mContext).setFirstname(user.getFirstName() + " " + user.getLastName(), mContext);
-            URL imgURL = null;
-            try {
-                imgURL = new URL("http://graph.facebook.com/"+user.getId()+"/picture?type=large");
-                Driver.get(mContext).setImage(BitmapFactory.decodeStream(imgURL.openConnection().getInputStream()),mContext);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
+    /**
+     * This method is called when the BroadcastReceiver is receiving an Intent
+     * broadcast.  During this time you can use the other methods on
+     * BroadcastReceiver to view/modify the current result values.  This method
+     * is always called within the main thread of its process, unless you
+     * explicitly asked for it to be scheduled on a different thread using
+     * {@link android.content.Context#registerReceiver(android.content.BroadcastReceiver,
+     * android.content.IntentFilter, String, android.os.Handler)}. When it runs on the main
+     * thread you should
+     * never perform long-running operations in it (there is a timeout of
+     * 10 seconds that the system allows before considering the receiver to
+     * be blocked and a candidate to be killed). You cannot launch a popup dialog
+     * in your implementation of onReceive().
+     * <p/>
+     * <p><b>If this BroadcastReceiver was launched through a &lt;receiver&gt; tag,
+     * then the object is no longer alive after returning from this
+     * function.</b>  This means you should not perform any operations that
+     * return a result to you asynchronously -- in particular, for interacting
+     * with services, you should use
+     * If you wish to interact with a service that is already running, you can use
+     * {@link #peekService}.
+     * <p/>
+     * <p>The Intent filters used in {@link android.content.Context#registerReceiver}
+     * and in application manifests are <em>not</em> guaranteed to be exclusive. They
+     * are hints to the operating system about how to find suitable recipients. It is
+     * possible for senders to force delivery to specific recipients, bypassing filter
+     * resolution.  For this reason, {@link #onReceive(android.content.Context, android.content.Intent) onReceive()}
+     * implementations should respond only to known actions, ignoring any unexpected
+     * Intents that they may receive.
+     *
+     * @param context The Context in which the receiver is running.
+     * @param intent  The Intent being received.
+     */
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        String message = intent.getStringExtra("message");
+        switch (message) {
+            case "onActivityResult":
+                int requestCode = intent.getIntExtra("requestCode", -1);
+                int resultCode = intent.getIntExtra("resultCode", -1);
+                Intent data = intent.getParcelableExtra("data");
+                onActivityResult(requestCode, resultCode, data);
+                break;
+            case "logoff":
+                logoff();
+                break;
+            default:
+                Log.e(TAG, "unexpected Message: " + message);
         }
     }
 
@@ -147,28 +164,68 @@ public class FacebookAuthenticationUtil implements IAuthenticator, View.OnClickL
         }
     }
 
-    public boolean isSignedIn(){
-        return Session.getActiveSession() !=null;
+    public boolean isSignedIn() {
+        return Session.getActiveSession() != null;
     }
 
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+    private class MyAsyncTask extends AsyncTask<GraphUser, Void, AxUser> {
+
+        ProgressDialog mProgressDialog;
+
         @Override
-        public void onReceive(Context context, Intent intent) {
-            // Extract data included in the Intent
-            String message = intent.getStringExtra("message");
-            switch (message){
-                case "onActivityResult":
-                    int requestCode = intent.getIntExtra("requestCode",-1);
-                    int resultCode = intent.getIntExtra("resultCode",-1);
-                    Intent data = intent.getParcelableExtra("data");
-                    onActivityResult(requestCode,resultCode,data);
-                    break;
-                case "logoff":
-                    logoff();
-                    break;
-                default:
-                    Log.e(TAG,"unexpected Message: " + message);
-            }
+        protected void onPostExecute(AxUser result) {
+            //mContext.onLoginSuccess();
+            Intent intent = new Intent("Authentication");
+            intent.putExtra("Message", "Login Success");
+            intent.putExtra("AxUser", result);
+
+            LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+            mProgressDialog.dismiss();
         }
-    };
+
+        @Override
+        protected void onPreExecute() {
+            mProgressDialog = ProgressDialog.show(mContext,
+                    "Loading...", "Data is Loading...");
+        }
+
+        @Override
+        protected AxUser doInBackground(GraphUser... params) {
+            try {
+                GraphUser user = params[0];
+
+                URI email = URI.create(user.asMap().get("email").toString());
+                String name = user.getFirstName() + " " + user.getLastName();
+
+                URL imgURL = new URL("http://graph.facebook.com/" + user.getId() + "/picture?type=large");
+                Bitmap image = BitmapFactory.decodeStream(imgURL.openConnection().getInputStream());
+
+                return new AxUser(name, image, email);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
+
+//    public BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            // Extract data included in the Intent
+//            String message = intent.getStringExtra("message");
+//            switch (message){
+//                case "onActivityResult":
+//                    int requestCode = intent.getIntExtra("requestCode",-1);
+//                    int resultCode = intent.getIntExtra("resultCode",-1);
+//                    Intent data = intent.getParcelableExtra("data");
+//                    onActivityResult(requestCode,resultCode,data);
+//                    break;
+//                case "logoff":
+//                    logoff();
+//                    break;
+//                default:
+//                    Log.e(TAG,"unexpected Message: " + message);
+//            }
+//        }
+//    };
 }

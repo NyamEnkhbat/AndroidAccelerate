@@ -4,50 +4,37 @@ import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.net.URI;
+
 /**
- * Created by Oliver on 31.01.2015.
+ * Created by ofade_000 on 29.03.2015.
  */
-public class Manufacturer implements Parcelable {
-    public static final Creator<Manufacturer> CREATOR = new Creator<Manufacturer>() {
+public class AxUser extends Driver implements Parcelable {
+    public static final Creator<AxUser> CREATOR = new Creator<AxUser>() {
         @Override
-        public Manufacturer createFromParcel(Parcel source) {
-            Manufacturer retVal = new Manufacturer(source.readString(), (Bitmap) source.readValue(null));
+        public AxUser createFromParcel(Parcel source) {
+            AxUser retVal = new AxUser(source.readString(), (Bitmap) source.readValue(null), (URI) source.readValue(null));
+            retVal.setCars((java.util.ArrayList<Car>) source.readValue(null));
             return retVal;
         }
 
         @Override
-        public Manufacturer[] newArray(int size) {
-            return new Manufacturer[size];
+        public AxUser[] newArray(int size) {
+            return new AxUser[size];
         }
     };
-    private String name;
-    private Bitmap image;
 
-    public Manufacturer(String name, Bitmap image) {
-        this.name = name;
-        this.image = image;
+
+    public AxUser(String name, Bitmap image, URI mail) {
+        super(name, image, mail);
     }
 
-    private Manufacturer(Parcel in) {
+    private AxUser(Parcel in) {
         super();
         setName(in.readString());
         setImage((Bitmap) in.readValue(null));
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Bitmap getImage() {
-        return image;
-    }
-
-    public void setImage(Bitmap image) {
-        this.image = image;
+        setMail((URI) in.readValue(null));
+        setCars((java.util.ArrayList<Car>) in.readValue(null));
     }
 
     /**
@@ -72,7 +59,8 @@ public class Manufacturer implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(getName());
-        dest.writeValue(image);
-
+        dest.writeValue(getImage());
+        dest.writeValue(getMail());
+        dest.writeList(getCars());
     }
 }

@@ -7,20 +7,15 @@ import android.preference.PreferenceManager;
 
 import com.google.gson.Gson;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import eu.isawsm.accelerate.Model.Car;
-import eu.isawsm.accelerate.Model.Driver;
+import eu.isawsm.accelerate.Model.AxUser;
 
 public class AxPreferences {
 
     private static final String DRIVER = "driver";
+    private static final String AX_SERVER_ADDRESS = "AxServerAddress";
+    private static final String AXUSER = "AxUser";
+    ;
     public static Gson gson;
-    private static final String AX_SERVER_ADDRESS="AxServerAddress";
-    private static final String DRIVER_NAME = "DriverName";
-    private static final String CARS = "cars";
-
     static {
         gson = new Gson();
     }
@@ -37,17 +32,19 @@ public class AxPreferences {
         return preferences.getString(key, _default);
     }
 
-    public static void setDriver(Context context, Driver driver) {
+    public static void setAxIUser(Context context, AxUser user) {
         SharedPreferences preferences=PreferenceManager.getDefaultSharedPreferences(context);
         Editor edit=preferences.edit();
-        edit.putString(DRIVER, gson.toJson(driver));
+        edit.putString(AXUSER, gson.toJson(user));
         edit.apply();
     }
 
-    public static Driver getDriver(Context context) {
+
+    public static AxUser getAxIUser(Context context) {
         SharedPreferences preferences=PreferenceManager.getDefaultSharedPreferences(context);
-        return gson.fromJson(preferences.getString(DRIVER, null),Driver.class);
+        return gson.fromJson(preferences.getString(AXUSER, null), AxUser.class);
     }
+
 
     public static void putServerAddress(Context context, String address){
         putSharedPreferencesString(context, AxPreferences.AX_SERVER_ADDRESS, address);
