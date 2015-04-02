@@ -45,10 +45,12 @@ public class FacebookAuthenticationUtil extends BroadcastReceiver implements IAu
                 new IntentFilter("View"));
     }
 
-    ;
-
     @Override
-    public void onClick(View v) {
+    public void onClick(View view) {
+        if(view.getId() != R.id.sign_in_button_fb) {
+            LocalBroadcastManager.getInstance(mContext).unregisterReceiver(this);
+            return;
+        }
         Session session = Session.getActiveSession();
         if (session != null) {
             if (!session.isOpened() && !session.isClosed()) {
@@ -71,6 +73,9 @@ public class FacebookAuthenticationUtil extends BroadcastReceiver implements IAu
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if(requestCode == GoogleAuthenticationUtil.REQUEST_CODE_RESOLVE_ERR) return;
+
         Session.getActiveSession().onActivityResult(mContext, requestCode, resultCode, data);
 
         if (Session.getActiveSession().isOpened())
@@ -143,6 +148,18 @@ public class FacebookAuthenticationUtil extends BroadcastReceiver implements IAu
             case "logoff":
                 logoff();
                 break;
+            case "onCreate":
+
+                break;
+            case "onStart":
+
+                break;
+            case "onStop":
+
+                break;
+            case "revokeAccess":
+
+                break;
             default:
                 Log.e(TAG, "unexpected Message: " + message);
         }
@@ -207,25 +224,4 @@ public class FacebookAuthenticationUtil extends BroadcastReceiver implements IAu
             return null;
         }
     }
-
-//    public BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            // Extract data included in the Intent
-//            String message = intent.getStringExtra("message");
-//            switch (message){
-//                case "onActivityResult":
-//                    int requestCode = intent.getIntExtra("requestCode",-1);
-//                    int resultCode = intent.getIntExtra("resultCode",-1);
-//                    Intent data = intent.getParcelableExtra("data");
-//                    onActivityResult(requestCode,resultCode,data);
-//                    break;
-//                case "logoff":
-//                    logoff();
-//                    break;
-//                default:
-//                    Log.e(TAG,"unexpected Message: " + message);
-//            }
-//        }
-//    };
 }

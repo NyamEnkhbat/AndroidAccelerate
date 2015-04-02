@@ -108,7 +108,7 @@ public class CarViewHolder extends AxViewHolder {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                Lap l = new Lap(lap.getTime() + (long) (Math.random() * 1000), null);
+                Lap l = new Lap(lap.getTime() + (long) (Math.random() * 4000), null);
                 car.addLap(l);
                 Log.d("TestData", "AddingLap");
                 axAdapter.notifyItemChanged(getPosition());
@@ -142,6 +142,7 @@ public class CarViewHolder extends AxViewHolder {
         ImageView downArrow;
         ImageView star;
         ImageView warn;
+        ImageView equal;
 
     }
 
@@ -173,9 +174,10 @@ public class CarViewHolder extends AxViewHolder {
             viewHolder.downArrow = (ImageView) convertView.findViewById(R.id.downArrow);
             viewHolder.star = (ImageView) convertView.findViewById(R.id.star);
             viewHolder.warn = (ImageView) convertView.findViewById(R.id.warn);
+            viewHolder.equal = (ImageView) convertView.findViewById(R.id.equal);
 
 
-            viewHolder.index.setText(car.getLaps().indexOf(lap) + ".");
+            viewHolder.index.setText(car.getLaps().indexOf(lap)+1 + ".");
 
             String lapTime = lap.getTime() / 1000d + "";
             while (lapTime.length() < 6) {
@@ -187,6 +189,7 @@ public class CarViewHolder extends AxViewHolder {
             viewHolder.warn.setVisibility(View.GONE);
             viewHolder.downArrow.setVisibility(View.GONE);
             viewHolder.upArrow.setVisibility(View.GONE);
+            viewHolder.equal.setVisibility(View.GONE);
 
             if (lap.getTime() < car.getBestTime()) {
                 viewHolder.star.setVisibility(View.VISIBLE);
@@ -197,10 +200,12 @@ public class CarViewHolder extends AxViewHolder {
                 return convertView;
             }
 
-            if (car.getAvgTime() < lap.getTime()) {
+            if (car.getAvgTime()+500 < lap.getTime()) {
                 viewHolder.downArrow.setVisibility(View.VISIBLE);
-            } else {
+            } else if(car.getAvgTime()-500 > lap.getTime() ) {
                 viewHolder.upArrow.setVisibility(View.VISIBLE);
+            } else {
+                viewHolder.equal.setVisibility(View.VISIBLE);
             }
 
             return convertView;

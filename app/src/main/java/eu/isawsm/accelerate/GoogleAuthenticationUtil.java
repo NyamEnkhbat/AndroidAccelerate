@@ -1,290 +1,218 @@
 package eu.isawsm.accelerate;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.plus.Plus;
-import com.google.android.gms.plus.model.people.Person;
+import com.google.android.gms.common.*;
+import com.google.android.gms.common.GooglePlayServicesClient.*;
+import com.google.android.gms.plus.PlusClient;
 
-import java.io.InputStream;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
 
+import eu.isawsm.accelerate.Model.AxUser;
 import eu.isawsm.accelerate.ax.MainActivity;
 
-//NOTHING IN HERE WORKS! Not a thing.
-public class GoogleAuthenticationUtil implements IAuthenticator, OnClickListener,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class GoogleAuthenticationUtil extends BroadcastReceiver implements IAuthenticator, View.OnClickListener,
+        ConnectionCallbacks, OnConnectionFailedListener {
+    private static final String TAG = "ExampleActivity";
+    public static final int REQUEST_CODE_RESOLVE_ERR = 9000;
 
-    public static final int STATUS_SIGNED_OUT = 10;
-    public static final int STATUS_SING_IN_ERROR = 11;
-    public static final int STATUS_SIGNING_IN = 12;
-    public static final int STATUS_REVOKE_ACCESS = 13;
-    public static final int STATUS_REVOKE_ACCESS_ERROR = 14;
-    public static final int STATUS_SIGNED_IN = 15;
-    public static final int STATUS_LOADING = 16;
-    public static final int GOOGLE_PLUS_LOGIN_BUTTON_TAG = 21;
-    public static final int GOOGLE_PLUS_LOGOUT_BUTTON_TAG = 22;
-    public static final int GOOGLE_PLUS_REVOKE_BUTTON_TAG = 23;
-    private static final String TAG = "SignInActivity";
-    private static final int DIALOG_GET_GOOGLE_PLAY_SERVICES = 1;
-    private static final int REQUEST_CODE_SIGN_IN = 1;
-    private static final int REQUEST_CODE_GET_GOOGLE_PLAY_SERVICES = 2;
-    private static final int PROFILE_PIC_SIZE = 400;
-    public int currentStatus;
-    private GoogleApiClient mGoogleApiClient;
-    /*
-     * Stores the connection result from onConnectionFailed callbacks so that we can resolve them
-     * when the user clicks sign-in.
-     */
+    private ProgressDialog mConnectionProgressDialog;
+    private PlusClient mPlusClient;
     private ConnectionResult mConnectionResult;
-    /*
-     * Tracks whether the sign-in button has been clicked so that we know to resolve all issues
-     * preventing sign-in without waiting.
-     */
-    private boolean mSignInClicked;
-    /*
-     * Tracks whether a resolution Intent is in progress.
-     */
-    private boolean mIntentInProgress;
     private MainActivity mContext;
 
     public GoogleAuthenticationUtil(MainActivity context) {
         mContext = context;
-
-    }
-
-    public void connect() {
-        mGoogleApiClient.connect();
-    }
-
-    public void disconnect() {
-        mGoogleApiClient.disconnect();
-    }
-
-    @Override
-    public void onClick(View view) {
-        mGoogleApiClient = new GoogleApiClient.Builder(mContext)
-                .addApi(Plus.API, Plus.PlusOptions.builder()
-                        .addActivityTypes("http://schemas.google.com/AddActivity").build())
-                .addScope(Plus.SCOPE_PLUS_LOGIN)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
+        LocalBroadcastManager.getInstance(mContext).registerReceiver(this,
+                new IntentFilter("View"));
+        mPlusClient = new PlusClient.Builder(mContext, this, this)
+                .setActions("http://schemas.google.com/AddActivity", "http://schemas.google.com/BuyActivity")
                 .build();
 
-        switch ((int) view.getTag()) {
-            case GOOGLE_PLUS_LOGIN_BUTTON_TAG:
-                if (!mGoogleApiClient.isConnecting()) {
-                    int available = GooglePlayServicesUtil.isGooglePlayServicesAvailable(mContext);
-                    if (available != ConnectionResult.SUCCESS) {
-                        createGoogleDialog().show();
-                        return;
-                    }
-
-                    mSignInClicked = true;
-                    currentStatus = STATUS_SIGNING_IN;
-                    resolveSignInError();
-                }
-                break;
-            case GOOGLE_PLUS_LOGOUT_BUTTON_TAG:
-                if (mGoogleApiClient.isConnected()) {
-                    Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
-                    mGoogleApiClient.reconnect();
-                }
-                break;
-            case GOOGLE_PLUS_REVOKE_BUTTON_TAG:
-                if (mGoogleApiClient.isConnected()) {
-                    Plus.AccountApi.revokeAccessAndDisconnect(mGoogleApiClient).setResultCallback(
-                            new ResultCallback<Status>() {
-                                @Override
-                                public void onResult(Status status) {
-                                    if (status.isSuccess()) {
-                                        currentStatus = STATUS_REVOKE_ACCESS;
-                                    } else {
-                                        currentStatus = STATUS_REVOKE_ACCESS_ERROR;
-                                    }
-                                    mGoogleApiClient.reconnect();
-                                }
-                            }
-                    );
-                }
-                break;
-        }
+        // Anzuzeigende Statusmeldung, wenn der Verbindungsfehler nicht behoben ist
+        mConnectionProgressDialog = new ProgressDialog(mContext);
+        mConnectionProgressDialog.setMessage("Signing in...");
     }
 
-    public void logoff() {
-        if (mGoogleApiClient.isConnected()) {
-            Plus.AccountApi.revokeAccessAndDisconnect(mGoogleApiClient).setResultCallback(
-                    new ResultCallback<Status>() {
-                        @Override
-                        public void onResult(Status status) {
-                            if (status.isSuccess()) {
-                                currentStatus = STATUS_REVOKE_ACCESS;
-                            } else {
-                                currentStatus = STATUS_REVOKE_ACCESS_ERROR;
-                            }
-                            mGoogleApiClient.reconnect();
-                        }
-                    }
-            );
-        }
+    public GoogleAuthenticationUtil() {
+
     }
 
-    protected Dialog createGoogleDialog() {
-
-        int available = GooglePlayServicesUtil.isGooglePlayServicesAvailable(mContext);
-        if (available == ConnectionResult.SUCCESS) {
-            return null;
-        }
-        if (GooglePlayServicesUtil.isUserRecoverableError(available)) {
-            return GooglePlayServicesUtil.getErrorDialog(
-                    available, mContext, REQUEST_CODE_GET_GOOGLE_PLAY_SERVICES);
-        }
-        return new AlertDialog.Builder(mContext)
-                .setMessage(R.string.plus_generic_error)
-                .setCancelable(true)
-                .create();
+    private void onStart() {
+        mPlusClient.connect();
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE_SIGN_IN
-                || requestCode == REQUEST_CODE_GET_GOOGLE_PLAY_SERVICES) {
-            mIntentInProgress = false; //Previous resolution intent no longer in progress.
-
-            if (resultCode == Activity.RESULT_OK) {
-                if (!mGoogleApiClient.isConnected() && !mGoogleApiClient.isConnecting()) {
-                    // Resolved a recoverable error, now try connect() again.
-                    mGoogleApiClient.connect();
-                }
-            } else {
-                mSignInClicked = false; // No longer in the middle of resolving sign-in errors.
-
-                if (resultCode == Activity.RESULT_CANCELED) {
-                    currentStatus = STATUS_SIGNED_OUT;
-                } else {
-                    currentStatus = STATUS_SING_IN_ERROR;
-                    Log.w(TAG, "Error during resolving recoverable error.");
-                }
-            }
-        }
-    }
-
-    @Override
-    public void onConnected(Bundle connectionHint) {
-        Person person = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
-        String currentPersonName = person != null
-                ? person.getDisplayName()
-                : mContext.getString(R.string.unknown_person);
-        currentStatus = STATUS_SIGNED_IN;
-
-        //TODO save the person
-        getProfileInformation();
-    }
-
-    /**
-     * Fetching user's information name, email, profile pic
-     */
-    private void getProfileInformation() {
-        try {
-            if (Plus.PeopleApi.getCurrentPerson(mGoogleApiClient) != null) {
-                Person currentPerson = Plus.PeopleApi
-                        .getCurrentPerson(mGoogleApiClient);
-                String personName = currentPerson.getDisplayName();
-                String personPhotoUrl = currentPerson.getImage().getUrl();
-                String personGooglePlusProfile = currentPerson.getUrl();
-                String email = Plus.AccountApi.getAccountName(mGoogleApiClient);
-
-
-//TODO
-//                Driver.get(mContext).setMail(URI.create(email), mContext);
-//                Driver.get(mContext).setName(personName, mContext);
-
-                // by default the profile url gives 50x50 px image only
-                // we can replace the value with whatever dimension we want by
-                // replacing sz=X
-                personPhotoUrl = personPhotoUrl.substring(0,
-                        personPhotoUrl.length() - 2)
-                        + PROFILE_PIC_SIZE;
-
-                new LoadProfileImage().execute(personPhotoUrl);
-
-            } else {
-                Toast.makeText(mContext,
-                        "Person information is null", Toast.LENGTH_LONG).show();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int cause) {
-        currentStatus = STATUS_LOADING;
-        mGoogleApiClient.connect();
+    private void onStop() {
+        mPlusClient.disconnect();
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult result) {
-        if (!mIntentInProgress) {
-            mConnectionResult = result;
-            if (mSignInClicked) {
-                resolveSignInError();
-            }
-        }
-    }
-
-    private void resolveSignInError() {
-        if (mConnectionResult.hasResolution()) {
+        if (result.hasResolution()) {
             try {
-                mIntentInProgress = true;
-                mConnectionResult.startResolutionForResult(mContext, REQUEST_CODE_SIGN_IN);
+                result.startResolutionForResult(mContext, REQUEST_CODE_RESOLVE_ERR);
             } catch (IntentSender.SendIntentException e) {
-                // The intent was canceled before it was sent.  Return to the default state and
-                // attempt to connect to get an updated ConnectionResult.
-                mIntentInProgress = false;
-                mGoogleApiClient.connect();
-                Log.w(TAG, "Error sending the resolution Intent, connect() again.");
+                mPlusClient.connect();
             }
+        }
+        // Speichern Sie das Ergebnis und beheben Sie den Verbindungsfehler bei einem Klick des Nutzers.
+        mConnectionResult = result;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int responseCode, Intent intent) {
+        if (requestCode == REQUEST_CODE_RESOLVE_ERR && responseCode == Activity.RESULT_OK) {
+            mConnectionResult = null;
+            mPlusClient.connect();
         }
     }
 
+    @Override
     public boolean isSignedIn() {
-        return currentStatus == STATUS_SIGNED_IN;
+        return mPlusClient.isConnected();
     }
 
-    /**
-     * Background Async task to load user profile picture from url
-     */
-    private class LoadProfileImage extends AsyncTask<String, Void, Bitmap> {
-        protected Bitmap doInBackground(String... urls) {
-            String urldisplay = urls[0];
-            Bitmap mIcon11 = null;
+    @Override
+    public void logoff() {
+        if (mPlusClient.isConnected()) {
+            mPlusClient.clearDefaultAccount();
+            mPlusClient.disconnect();
+            mPlusClient.connect();
+        }
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+
+        new MyAsyncTask().execute(mPlusClient);
+
+        mConnectionProgressDialog.dismiss();
+        Toast.makeText(mContext, "User is connected!", Toast.LENGTH_LONG).show();
+
+    }
+
+    @Override
+    public void onDisconnected() {
+        Log.d(TAG, "disconnected");
+    }
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.sign_in_button_g && !mPlusClient.isConnected()) {
+            if (mConnectionResult == null) {
+                mConnectionProgressDialog.show();
+                mPlusClient.connect();
+            } else {
+                try {
+                    mConnectionResult.startResolutionForResult(mContext, REQUEST_CODE_RESOLVE_ERR);
+                } catch (IntentSender.SendIntentException e) {
+                    // Versuchen Sie erneut, die Verbindung herzustellen.
+                    mConnectionResult = null;
+                    mPlusClient.connect();
+                }
+            }
+        } else {
+            LocalBroadcastManager.getInstance(mContext).unregisterReceiver(this);
+        }
+    }
+
+    public void revokeAccess(){
+        // Führen Sie vor dem Trennen der Verbindung clearDefaultAccount() aus.
+        mPlusClient.clearDefaultAccount();
+
+        mPlusClient.revokeAccessAndDisconnect(new PlusClient.OnAccessRevokedListener() {
+            @Override
+            public void onAccessRevoked(ConnectionResult status) {
+                // mPlusClient ist jetzt getrennt und der Zugriff wurde widerrufen.
+                // Lösen Sie App-Logik aus, um den Entwicklerrichtlinien zu entsprechen.
+            }
+        });
+    }
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        String message = intent.getStringExtra("message");
+        switch (message) {
+            case "onActivityResult":
+                int requestCode = intent.getIntExtra("requestCode", -1);
+                int resultCode = intent.getIntExtra("resultCode", -1);
+                Intent data = intent.getParcelableExtra("data");
+                onActivityResult(requestCode, resultCode, data);
+                break;
+            case "logoff":
+                logoff();
+                break;
+            case "onCreate":
+                break;
+            case "onStart":
+                onStart();
+                break;
+            case "onStop":
+                onStop();
+                break;
+            case "revokeAccess":
+                revokeAccess();
+                break;
+            default:
+                Log.e(TAG, "unexpected Message: " + message);
+        }
+    }
+
+    private class MyAsyncTask extends AsyncTask<PlusClient, Void, AxUser> {
+
+        ProgressDialog mProgressDialog;
+
+        @Override
+        protected void onPostExecute(AxUser result) {
+            //mContext.onLoginSuccess();
+            Intent intent = new Intent("Authentication");
+            intent.putExtra("Message", "Login Success");
+            intent.putExtra("AxUser", result);
+
+            Log.d(TAG,result.getName());
+            Log.d(TAG,result.getMail().toString());
+
+            LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+            mProgressDialog.dismiss();
+        }
+
+        @Override
+        protected void onPreExecute() {
+            mProgressDialog = ProgressDialog.show(mContext,
+                    "Loading...", "Data is Loading...");
+        }
+
+        @Override
+        protected AxUser doInBackground(PlusClient... params) {
             try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
-                mIcon11 = BitmapFactory.decodeStream(in);
-            } catch (Exception e) {
-                Log.e("Error", e.getMessage());
+                PlusClient user = params[0];
+
+                URI email = URI.create(user.getAccountName());
+                String name = user.getCurrentPerson().getDisplayName();
+
+                URL imgURL = new URL(user.getCurrentPerson().getImage().getUrl());
+                Bitmap image = BitmapFactory.decodeStream(imgURL.openConnection().getInputStream());
+
+                return new AxUser(name, image, email);
+            } catch (IOException e) {
                 e.printStackTrace();
             }
-            return mIcon11;
-        }
-
-        protected void onPostExecute(Bitmap result) {
-            //TODO Driver.get(mContext).setImage(result,mContext);
+            return null;
         }
     }
 }

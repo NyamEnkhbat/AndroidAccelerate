@@ -25,13 +25,13 @@ android {
 }
 repositories { mavenCentral() }
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile project(':HoloGraphLibrary')
     compile 'com.github.nkzawa:socket.io-client:0.4.0'
     compile 'com.google.code.gson:gson:2.3.1'
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.android.support:cardview-v7:21.0.3'
     compile 'com.android.support:recyclerview-v7:21.0.3'
-    compile project(':HoloGraphLibrary')
-    compile 'com.google.android.gms:play-services:6.5.87'
     compile 'com.facebook.android:facebook-android-sdk:3.23.1'
+    compile 'com.google.android.gms:play-services:6.1.71'
 }

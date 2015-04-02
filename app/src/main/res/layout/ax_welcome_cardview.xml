@@ -17,7 +17,7 @@
         android:id="@+id/sign_in_button_g"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/common_signin_button_text_long"
+        android:text="@string/login_text"
         android:layout_margin="5dp" />
 
     <TextView

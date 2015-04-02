@@ -1,5 +1,7 @@
 package eu.isawsm.accelerate.ax.viewmodel;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -14,7 +16,7 @@ import eu.isawsm.accelerate.ax.AxCardItem;
 /**
  * Created by olfad on 24.02.2015.
  */
-public class AxDataset<T> {
+public class AxDataset<T> implements Parcelable{
 
     private AxAdapter adapter;
     private LinkedHashSet<T> linkedHashSet;
@@ -56,5 +58,35 @@ public class AxDataset<T> {
     public T get(int index) {
         int reverseIndex = Math.abs(index -(size()-1));
         return new ArrayList<>(linkedHashSet).get(reverseIndex);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(adapter,flags);
+        dest.writeList(new ArrayList<>(linkedHashSet));
+    }
+    public static final Creator<AxDataset> CREATOR = new Creator<AxDataset>() {
+        @Override
+        public AxDataset createFromParcel(Parcel source) {
+            AxDataset retVal =new AxDataset(source.<AxAdapter>readParcelable(null));
+            retVal.linkedHashSet = (LinkedHashSet) source.readValue(null);
+            return retVal;
+        }
+
+        @Override
+        public AxDataset[] newArray(int size) {
+            return new AxDataset[size];
+        }
+    };
+
+    private AxDataset(Parcel in) {
+        super();
+        adapter = in.readParcelable(null);
+        linkedHashSet = (LinkedHashSet<T>) in.readValue(null);
     }
 }

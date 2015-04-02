@@ -39,13 +39,12 @@ import eu.isawsm.accelerate.Model.Course;
 import eu.isawsm.accelerate.R;
 import eu.isawsm.accelerate.ax.Util.AxPreferences;
 import eu.isawsm.accelerate.ax.Util.AxSocket;
-import eu.isawsm.accelerate.ax.viewholders.AuthentificationViewHolder;
+import eu.isawsm.accelerate.ax.viewholders.AuthenticationViewHolder;
 import eu.isawsm.accelerate.ax.viewholders.CarSettingsViewHolder;
 import eu.isawsm.accelerate.ax.viewholders.ClubViewHolder;
 import eu.isawsm.accelerate.ax.viewholders.ConnectionViewHolder;
-import eu.isawsm.accelerate.ax.viewmodel.Autentification;
+import eu.isawsm.accelerate.ax.viewmodel.Authentication;
 import eu.isawsm.accelerate.ax.viewmodel.AxDataset;
-import eu.isawsm.accelerate.ax.viewmodel.CarSetup;
 import eu.isawsm.accelerate.ax.viewmodel.ConnectionSetup;
 
 public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayout.OnRefreshListener {
@@ -139,12 +138,14 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         super.onSaveInstanceState(outState);
         if (mUser != null)
             outState.putParcelable("AxUser", mUser);
+        if(mDataset != null)
+            outState.putParcelable("AxDataset",mDataset);
     }
 
     private void initUser() {
         mUser = AxPreferences.getAxIUser(this);
         if (mUser == null) {
-            mDataset.add(new AxCardItem<>(new Autentification()));
+            mDataset.add(new AxCardItem<>(new Authentication()));
         } else {
             onLoggedIn();
         }
@@ -233,6 +234,8 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Intent intent = new Intent("View");
         // add data
+        System.out.println("ActivityResult" + requestCode + " " + resultCode + " " + data);
+
         intent.putExtra("message", "onActivityResult");
         intent.putExtra("requestCode", requestCode);
         intent.putExtra("resultCode", resultCode);
@@ -287,14 +290,15 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add_car:
-                mDataset.add(new AxCardItem<>(new CarSetup()));
+                mAdapter.addCarSetup();
                 return true;
             case R.id.action_logoff:
                 Intent intent = new Intent("View");
                 intent.putExtra("message", "logoff");
                 LocalBroadcastManager.getInstance(this).sendBroadcastSync(intent);
-                mAdapter.removeAll();
-                initUser();
+              //TODO  mAdapter.removeAll();
+                AxPreferences.setAxIUser(this, null);
+                this.recreate();
                 return true;
             case R.id.action_settings:
 
@@ -330,15 +334,14 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     }
 
     private void onLoggedIn() {
-
         //TODO do this with the broadcast
-        AuthentificationViewHolder authenticatorViewHolder = mAdapter.getAuthentificationViewHolder();
+        AuthenticationViewHolder authenticatorViewHolder = mAdapter.getAuthentificationViewHolder();
         if (authenticatorViewHolder != null)
             mDataset.remove(authenticatorViewHolder.getPosition());
 
         setTitle(mUser.toString());
         if (mUser.getImage() != null)
-            mToolbar.setNavigationIcon(new BitmapDrawable(mUser.getImage()));
+            mToolbar.setNavigationIcon(new BitmapDrawable(getResources(),mUser.getImage()));
         else
             mToolbar.setNavigationIcon(null);
         updateCars();

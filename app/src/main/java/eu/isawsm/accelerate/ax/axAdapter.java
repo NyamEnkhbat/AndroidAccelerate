@@ -1,6 +1,7 @@
 package eu.isawsm.accelerate.ax;
 
-import android.app.Activity;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,28 +9,25 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import eu.isawsm.accelerate.Model.Car;
 import eu.isawsm.accelerate.Model.Club;
 import eu.isawsm.accelerate.R;
-import eu.isawsm.accelerate.ax.viewholders.AuthentificationViewHolder;
+import eu.isawsm.accelerate.ax.viewholders.AuthenticationViewHolder;
 import eu.isawsm.accelerate.ax.viewholders.AxViewHolder;
 import eu.isawsm.accelerate.ax.viewholders.CarSettingsViewHolder;
 import eu.isawsm.accelerate.ax.viewholders.CarViewHolder;
 import eu.isawsm.accelerate.ax.viewholders.ClubViewHolder;
 import eu.isawsm.accelerate.ax.viewholders.ConnectionViewHolder;
-import eu.isawsm.accelerate.ax.viewholders.FriendsViewHolder;
-import eu.isawsm.accelerate.ax.viewholders.RecentLapsViewHolder;
-import eu.isawsm.accelerate.ax.viewmodel.Autentification;
+import eu.isawsm.accelerate.ax.viewmodel.Authentication;
 import eu.isawsm.accelerate.ax.viewmodel.AxDataset;
 import eu.isawsm.accelerate.ax.viewmodel.CarSetup;
 import eu.isawsm.accelerate.ax.viewmodel.ConnectionSetup;
 import eu.isawsm.accelerate.ax.viewmodel.Friends;
 import eu.isawsm.accelerate.ax.viewmodel.RecentLaps;
 
-public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
+public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> implements Parcelable {
     private AxDataset<AxCardItem> mDataset;
 
     private MainActivity context;
@@ -60,10 +58,40 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
         }
     }
 
-    public AuthentificationViewHolder getAuthentificationViewHolder() {
-        return getViewHolder(AuthentificationViewHolder.class);
+    public AuthenticationViewHolder getAuthentificationViewHolder() {
+        return getViewHolder(AuthenticationViewHolder.class);
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(lastPosition);
+//TODO        dest.writeSerializable(viewHolders);
+    }
+    public static final Creator<AxAdapter> CREATOR = new Creator<AxAdapter>() {
+        @Override
+        public AxAdapter createFromParcel(Parcel source) {
+            AxAdapter retVal = new AxAdapter((MainActivity) source.readValue(null));
+
+            return retVal;
+        }
+
+        @Override
+        public AxAdapter[] newArray(int size) {
+            return new AxAdapter[size];
+        }
+    };
+
+    private AxAdapter(Parcel in) {
+        super();
+
+        lastPosition = in.readInt();
+        viewHolders = (ArrayList<AxViewHolder>) in.readValue(null);
+    }
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -97,11 +125,7 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
             return R.layout.ax_club_cardview;
         } else if (mDataset.get(position).get() instanceof CarSetup) {
             return R.layout.ax_car_settings_cardview;
-        } else if (mDataset.get(position).get() instanceof RecentLaps) {
-            return R.layout.ax_recent_laps_cardview;
-        } else if(mDataset.get(position).get() instanceof Friends) {
-            return R.layout.ax_friends_cardview;
-        } else if(mDataset.get(position).get() instanceof Autentification) {
+        } else if(mDataset.get(position).get() instanceof Authentication) {
             return R.layout.ax_welcome_cardview;
         } else {
             return -1;
@@ -134,23 +158,11 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
             viewHolders.add(carSettingsViewHolder);
             return carSettingsViewHolder;
 
-        } else if(viewType == R.layout.ax_recent_laps_cardview){
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.ax_recent_laps_cardview, parent, false);
-            RecentLapsViewHolder recentLapsViewHolder = new RecentLapsViewHolder(v, this, context);
-            viewHolders.add(recentLapsViewHolder);
-            return recentLapsViewHolder;
-
-        } else if(viewType == R.layout.ax_friends_cardview) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.ax_friends_cardview, parent, false);
-            FriendsViewHolder friendsViewHolder = new FriendsViewHolder(v, this, context);
-            viewHolders.add(friendsViewHolder);
-            return friendsViewHolder;
-
         } else if (viewType == R.layout.ax_welcome_cardview) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.ax_welcome_cardview, parent, false);
-            AuthentificationViewHolder authentificationViewHolder = new AuthentificationViewHolder(v, this, context);
-            viewHolders.add(authentificationViewHolder);
-            return authentificationViewHolder;
+            AuthenticationViewHolder authenticationViewHolder = new AuthenticationViewHolder(v, this, context);
+            viewHolders.add(authenticationViewHolder);
+            return authenticationViewHolder;
 
         } else {
             throw new RuntimeException("Cardview not supported");

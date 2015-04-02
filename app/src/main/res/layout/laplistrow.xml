@@ -51,8 +51,16 @@
             android:id="@+id/warn"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:src="@drawable/stat_notify_error"
+            android:src="@drawable/abc_btn_radio_to_on_mtrl_015"
             android:tint="@android:color/holo_orange_dark"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/equal"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/abc_btn_radio_to_on_mtrl_015"
+            android:tint="@android:color/secondary_text_dark_nodisable"
             android:visibility="gone" />
 
         <TextView

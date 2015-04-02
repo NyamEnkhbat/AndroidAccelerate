@@ -1,6 +1,7 @@
 package eu.isawsm.accelerate;
 
 
+import android.content.BroadcastReceiver;
 import android.content.Intent;
 
 /**
