@@ -13,11 +13,11 @@ import java.util.List;
 /**
  * Created by olfad on 29.01.2015.
  */
-public class Car implements Parcelable {
+public class Car implements Parcelable, ICar {
     public static final Creator<Car> CREATOR = new Creator<Car>() {
         @Override
         public Car createFromParcel(Parcel source) {
-            Car retVal = new Car((Model) source.readParcelable(null), (Clazz)
+            Car retVal = new Car((IModel) source.readParcelable(null), (IClazz)
                     source.readParcelable(null), source.readLong(), (Bitmap) source.readValue(null));
 
             return retVal;
@@ -29,27 +29,27 @@ public class Car implements Parcelable {
         }
     };
     private static final int MINLAPS = 10;
-    private Model model;
-    private Clazz clazz;
+    private IModel IModel;
+    private IClazz IClazz;
     private long transponderID;
     private Bitmap picture;
-    private List<Lap> laps;
+    private List<ILap> ILaps;
 
-    public Car(Model model, Clazz clazz, long transponderID, Bitmap picture) {
-        this.model = model;
-        this.clazz = clazz;
+    public Car(IModel IModel, IClazz IClazz, long transponderID, Bitmap picture) {
+        this.IModel = IModel;
+        this.IClazz = IClazz;
         this.transponderID = transponderID;
         this.picture = picture;
-        laps = new ArrayList<>();
+        ILaps = new ArrayList<>();
     }
 
     private Car(Parcel in) {
         super();
-        setModel((Model) in.readParcelable(null));
-        setClazz((Clazz) in.readParcelable(null));
+        setModel((IModel) in.readParcelable(null));
+        setClazz((IClazz) in.readParcelable(null));
         setTransponderID(in.readLong());
         setPicture((Bitmap) in.readValue(null));
-        laps = new ArrayList<>();
+        ILaps = new ArrayList<>();
     }
 
     private static double median(double[] m) {
@@ -62,53 +62,63 @@ public class Car implements Parcelable {
         }
     }
 
-    public Model getModel() {
-        return model;
+    @Override
+    public IModel getModel() {
+        return IModel;
     }
 
-    public void setModel(Model model) {
-        this.model = model;
+    @Override
+    public void setModel(IModel IModel) {
+        this.IModel = IModel;
     }
 
-    public Clazz getClazz() {
-        return clazz;
+    @Override
+    public IClazz getClazz() {
+        return IClazz;
     }
 
-    public void setClazz(Clazz clazz) {
-        this.clazz = clazz;
+    @Override
+    public void setClazz(IClazz IClazz) {
+        this.IClazz = IClazz;
     }
 
+    @Override
     public long getTransponderID() {
         return transponderID;
     }
 
+    @Override
     public void setTransponderID(long transponderID) {
         this.transponderID = transponderID;
     }
 
+    @Override
     public Bitmap getPicture() {
         return picture;
     }
 
+    @Override
     public void setPicture(Bitmap picture) {
         this.picture = picture;
     }
 
+    @Override
     public double getAvgTime() {
-        if (laps.isEmpty()) return 0.0;
+        if (ILaps.isEmpty()) return 0.0;
 
         long sum = 0;
-        for (Lap l : laps) {
+        for (ILap l : ILaps) {
             sum += l.getTime();
         }
-        return sum / laps.size();
+        return sum / ILaps.size();
     }
 
+    @Override
     public double getBestTime() {
-        if (laps.isEmpty()) return 0;
-        long bestTime = laps.get(0).getTime();
+        if (ILaps.isEmpty()) return 0;
+        long bestTime = ILaps.get(0).getTime();
 
-        for (Lap l : laps) {
+        for (ILap l : ILaps) {
             if (l.getTime() < bestTime) {
                 bestTime = l.getTime();
             }
@@ -116,15 +126,17 @@ public class Car implements Parcelable {
         return bestTime;
     }
 
+    @Override
     public int getLapCount() {
-        return laps.size();
+        return ILaps.size();
     }
 
+    @Override
     public double getConsistency() {
-        if (laps.size() < MINLAPS) return -1;
-        double[] times = new double[laps.size()];
+        if (ILaps.size() < MINLAPS) return -1;
+        double[] times = new double[ILaps.size()];
         int i = 0;
-        for (Lap l : laps) {
+        for (ILap l : ILaps) {
             times[i] = l.getTime();
             i++;
         }
@@ -152,18 +164,22 @@ public class Car implements Parcelable {
         return bd.doubleValue();
     }
 
+    @Override
     public int getRank() {
         return 0;
     }
 
-    public List<Lap> getLaps() {
-        return laps;
+    @Override
+    public List<ILap> getLaps() {
+        return ILaps;
     }
 
-    public void addLap(Lap lap) {
-        laps.add(lap);
+    @Override
+    public void addLap(ILap ILap) {
+        ILaps.add(ILap);
     }
 
+    @Override
     public String getName() {
         String retVal = "";
         retVal += getModel().getManufacturer().getName();

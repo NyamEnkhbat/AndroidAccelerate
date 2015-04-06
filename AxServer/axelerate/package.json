@@ -1,9 +1,0 @@
-{
-  "name": "socket-axelerate-server",
-  "version": "0.0.1",
-  "description": "a Server for pushing timing information to the Axelerate client.",
-  "dependencies": {
-    "express": "^4.10.2",
-    "socket.io": "^1.3.2"
-  }
-}

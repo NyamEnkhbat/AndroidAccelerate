@@ -1,10 +1,8 @@
 package eu.isawsm.accelerate.ax.Util;
 
 import com.github.nkzawa.emitter.Emitter;
-import com.github.nkzawa.socketio.client.Ack;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
-import com.google.gson.Gson;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -75,11 +73,11 @@ public class AxSocket {
     }
 
     public void registerDriver(Driver driver) {
-        socket.emit("registerDriver",  new Gson().toJson(driver));
+        socket.emit("registerDriver",  driver);
     }
 
     public void subscribeTo(Car car, Emitter.Listener callback) {
-        socket.on(car.getTransponderID()+"", callback);
+        socket.on("LapCompleted:"+car.getTransponderID(), callback);
         subscribedCars.add(car);
     }
 
@@ -90,7 +88,7 @@ public class AxSocket {
     }
 
     public void unsubscribe(Car car){
-        socket.off(car.getTransponderID()+"");
+        socket.off("LapCompleted:"+car.getTransponderID());
         subscribedCars.remove(car);
     }
 

@@ -14,6 +14,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import eu.isawsm.accelerate.Model.Car;
+import eu.isawsm.accelerate.Model.ILap;
 import eu.isawsm.accelerate.Model.Lap;
 import eu.isawsm.accelerate.R;
 import eu.isawsm.accelerate.ax.AxAdapter;
@@ -93,7 +94,7 @@ public class CarViewHolder extends AxViewHolder {
         listView2.setAdapter(lapAdapter2);
 
 
-        for (Lap l : car.getLaps()) {
+        for (ILap l : car.getLaps()) {
             addLap(l);
         }
 
@@ -118,7 +119,7 @@ public class CarViewHolder extends AxViewHolder {
 
 
 
-    private void addLap(Lap lap) {
+    private void addLap(ILap lap) {
         lapAdapter0.insert(lap,0);
         if (lapAdapter0.getCount() > 5) {
             lapAdapter1.insert(lapAdapter0.getItem(5),0);
@@ -146,7 +147,7 @@ public class CarViewHolder extends AxViewHolder {
 
     }
 
-    public class LapAdapter extends ArrayAdapter<Lap> {
+    public class LapAdapter extends ArrayAdapter<ILap> {
 
         int positionOffset = 1;
         private ViewHolder viewHolder;
@@ -156,7 +157,7 @@ public class CarViewHolder extends AxViewHolder {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            Lap lap = getItem(position);
+            ILap lap = getItem(position);
 
 
             if(convertView == null) {

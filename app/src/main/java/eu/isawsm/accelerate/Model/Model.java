@@ -6,28 +6,28 @@ import android.os.Parcelable;
 /**
  * Created by Oliver on 31.01.2015.
  */
-public class Model implements Parcelable {
-    public static final Creator<Model> CREATOR = new Creator<Model>() {
+public class Model implements Parcelable, IModel {
+    public static final Creator<IModel> CREATOR = new Creator<IModel>() {
         @Override
-        public Model createFromParcel(Parcel source) {
-            Model retVal = new Model((Manufacturer) source.readValue(null), source.readString(), source.readString(), source.readString(), source.readString(), source.readString());
+        public IModel createFromParcel(Parcel source) {
+            IModel retVal = new Model((IManufacturer) source.readValue(null), source.readString(), source.readString(), source.readString(), source.readString(), source.readString());
             return retVal;
         }
 
         @Override
-        public Model[] newArray(int size) {
-            return new Model[size];
+        public IModel[] newArray(int size) {
+            return new IModel[size];
         }
     };
-    private Manufacturer manufacturer;
+    private IManufacturer IManufacturer;
     private String name;
     private String drivetrain;
     private String motor;
     private String type;
     private String scale;
 
-    public Model(Manufacturer manufacturer, String name, String drivetrain, String motor, String type, String scale) {
-        this.manufacturer = manufacturer;
+    public Model(IManufacturer IManufacturer, String name, String drivetrain, String motor, String type, String scale) {
+        this.IManufacturer = IManufacturer;
         this.name = name;
         this.drivetrain = drivetrain;
         this.motor = motor;
@@ -37,7 +37,7 @@ public class Model implements Parcelable {
 
     private Model(Parcel in) {
         super();
-        setManufacturer((Manufacturer) in.readValue(null));
+        setManufacturer((IManufacturer) in.readValue(null));
         setName(in.readString());
         setDrivetrain(in.readString());
         setMotor(in.readString());
@@ -45,50 +45,62 @@ public class Model implements Parcelable {
         setScale(in.readString());
     }
 
-    public Manufacturer getManufacturer() {
-        return manufacturer;
+    @Override
+    public IManufacturer getManufacturer() {
+        return IManufacturer;
     }
 
-    public void setManufacturer(Manufacturer manufacturer) {
-        this.manufacturer = manufacturer;
+    @Override
+    public void setManufacturer(IManufacturer IManufacturer) {
+        this.IManufacturer = IManufacturer;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public String getDrivetrain() {
         return drivetrain;
     }
 
+    @Override
     public void setDrivetrain(String drivetrain) {
         this.drivetrain = drivetrain;
     }
 
+    @Override
     public String getMotor() {
         return motor;
     }
 
+    @Override
     public void setMotor(String motor) {
         this.motor = motor;
     }
 
+    @Override
     public String getType() {
         return type;
     }
 
+    @Override
     public void setType(String type) {
         this.type = type;
     }
 
+    @Override
     public String getScale() {
         return scale;
     }
 
+    @Override
     public void setScale(String scale) {
         this.scale = scale;
     }
@@ -114,7 +126,7 @@ public class Model implements Parcelable {
      */
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(manufacturer);
+        dest.writeValue(IManufacturer);
         dest.writeString(name);
         dest.writeString(drivetrain);
         dest.writeString(motor);

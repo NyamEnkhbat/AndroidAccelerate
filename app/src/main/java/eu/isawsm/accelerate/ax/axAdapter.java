@@ -24,8 +24,6 @@ import eu.isawsm.accelerate.ax.viewmodel.Authentication;
 import eu.isawsm.accelerate.ax.viewmodel.AxDataset;
 import eu.isawsm.accelerate.ax.viewmodel.CarSetup;
 import eu.isawsm.accelerate.ax.viewmodel.ConnectionSetup;
-import eu.isawsm.accelerate.ax.viewmodel.Friends;
-import eu.isawsm.accelerate.ax.viewmodel.RecentLaps;
 
 public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> implements Parcelable {
     private AxDataset<AxCardItem> mDataset;

@@ -4,8 +4,8 @@
     tools:context="eu.isawsm.accelerate.ax.MainActivity">
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" app:showAsAction="never" />
-    <item android:id="@+id/action_logoff" android:title="@string/action_logoff"
-        android:orderInCategory="3" app:showAsAction="never"/>
+    <!--<item android:id="@+id/action_logoff" android:title="@string/action_logoff"
+        android:orderInCategory="3" app:showAsAction="never"/>-->
     <item android:id="@+id/action_add_car" android:title="@string/action_add_car"
         android:orderInCategory="3" app:showAsAction="never" android:icon="@drawable/ic_menu_add"/>
 </menu>

@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.drawable.BitmapDrawable;
+import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -31,11 +32,11 @@ import com.facebook.AppEventsLogger;
 import com.github.nkzawa.emitter.Emitter;
 import com.google.gson.Gson;
 
-import org.json.JSONObject;
+import java.util.Arrays;
 
 import eu.isawsm.accelerate.Model.AxUser;
 import eu.isawsm.accelerate.Model.Car;
-import eu.isawsm.accelerate.Model.Course;
+import eu.isawsm.accelerate.Model.Club;
 import eu.isawsm.accelerate.R;
 import eu.isawsm.accelerate.ax.Util.AxPreferences;
 import eu.isawsm.accelerate.ax.Util.AxSocket;
@@ -62,9 +63,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     private Emitter.Listener onConnectionSuccess = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
-            JSONObject data = (JSONObject) args[0];
-
-            final Course course = mGson.fromJson(data.toString(), Course.class);
+            final Club club = (Club) args[0];
             mSocket.registerDriver(mUser);
 
             //Do i realy need to run this on UI thread?
@@ -73,7 +72,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
                 @Override
                 public void run() {
                     AxPreferences.putServerAddress(getApplicationContext(), mSocket.getLastAddress());
-                    AxCardItem clubCard = new AxCardItem<>(course.getTrack().getClub());
+                    AxCardItem clubCard = new AxCardItem<>(club);
                     if (mAdapter.getConnectionViewHolder() != null)
                         mDataset.remove(mAdapter.getConnectionViewHolder().getPosition());
                     mDataset.add(clubCard);
@@ -106,6 +105,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         @Override
         public void call(Object... args) {
             mSocket.off();
+            Log.e(TAG, Arrays.toString(args));
             if (Looper.myLooper() == null) Looper.prepare();
             runOnUiThread(new Runnable() {
                 @Override
@@ -292,14 +292,14 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
             case R.id.action_add_car:
                 mAdapter.addCarSetup();
                 return true;
-            case R.id.action_logoff:
-                Intent intent = new Intent("View");
-                intent.putExtra("message", "logoff");
-                LocalBroadcastManager.getInstance(this).sendBroadcastSync(intent);
-              //TODO  mAdapter.removeAll();
-                AxPreferences.setAxIUser(this, null);
-                this.recreate();
-                return true;
+//            case R.id.action_logoff:
+//                Intent intent = new Intent("View");
+//                intent.putExtra("message", "logoff");
+//                LocalBroadcastManager.getInstance(this).sendBroadcastSync(intent);
+//              //TODO  mAdapter.removeAll();
+//                AxPreferences.setAxIUser(this, null);
+//                //TODO this.recreate();
+//                return true;
             case R.id.action_settings:
 
                 return true;
@@ -345,13 +345,13 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         else
             mToolbar.setNavigationIcon(null);
         updateCars();
+        invalidateOptionsMenu();
         initSocket();
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.getItem(0).setEnabled(mUser != null);
-        menu.getItem(1).setEnabled(mUser != null);
+        menu.setGroupVisible(0,mUser != null);
         return super.onPrepareOptionsMenu(menu);
     }
 

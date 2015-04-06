@@ -7,17 +7,17 @@ import android.os.Parcelable;
 /**
  * Created by Oliver on 31.01.2015.
  */
-public class Manufacturer implements Parcelable {
-    public static final Creator<Manufacturer> CREATOR = new Creator<Manufacturer>() {
+public class Manufacturer implements Parcelable, IManufacturer {
+    public static final Creator<IManufacturer> CREATOR = new Creator<IManufacturer>() {
         @Override
-        public Manufacturer createFromParcel(Parcel source) {
-            Manufacturer retVal = new Manufacturer(source.readString(), (Bitmap) source.readValue(null));
+        public IManufacturer createFromParcel(Parcel source) {
+            IManufacturer retVal = new Manufacturer(source.readString(), (Bitmap) source.readValue(null));
             return retVal;
         }
 
         @Override
-        public Manufacturer[] newArray(int size) {
-            return new Manufacturer[size];
+        public IManufacturer[] newArray(int size) {
+            return new IManufacturer[size];
         }
     };
     private String name;
@@ -34,18 +34,22 @@ public class Manufacturer implements Parcelable {
         setImage((Bitmap) in.readValue(null));
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public Bitmap getImage() {
         return image;
     }
 
+    @Override
     public void setImage(Bitmap image) {
         this.image = image;
     }

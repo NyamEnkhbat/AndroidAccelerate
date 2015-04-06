@@ -1,8 +1,0 @@
-<component name="libraryTable">
-  <library name="Converter">
-    <CLASSES>
-      <root url="jar:$PROJECT_DIR$/../../..//Z:/AmmConverter/lib/Plib.jar!/" />
-    </CLASSES>
-    <SOURCES />
-  </library>
-</component>

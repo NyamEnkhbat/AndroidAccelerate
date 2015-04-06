@@ -3,28 +3,32 @@ package eu.isawsm.accelerate.Model;
 /**
  * Created by olfad on 29.01.2015.
  */
-public class Lap {
+public class Lap implements ILap {
     private long time;
-    private Course course;
+    private ICourse ICourse;
 
-    public Lap(long time, Course course) {
+    public Lap(long time, ICourse ICourse) {
         this.time = time;
-        this.course = course;
+        this.ICourse = ICourse;
     }
 
+    @Override
     public long getTime() {
         return time;
     }
 
+    @Override
     public void setTime(long time) {
         this.time = time;
     }
 
-    public Course getCourse() {
-        return course;
+    @Override
+    public ICourse getCourse() {
+        return ICourse;
     }
 
-    public void setCourse(Course course) {
-        this.course = course;
+    @Override
+    public void setCourse(ICourse ICourse) {
+        this.ICourse = ICourse;
     }
 }

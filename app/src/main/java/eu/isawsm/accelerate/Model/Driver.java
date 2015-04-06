@@ -11,18 +11,18 @@ import java.util.ArrayList;
 /**
  * Created by olfad on 29.01.2015.
  */
-public class Driver implements Parcelable {
-    public static final Creator<Driver> CREATOR = new Creator<Driver>() {
+public class Driver implements Parcelable, IDriver {
+    public static final Creator<IDriver> CREATOR = new Creator<IDriver>() {
         @Override
-        public Driver createFromParcel(Parcel source) {
-            Driver retVal = new Driver(source.readString(), (Bitmap) source.readValue(null), (URI) source.readValue(null));
-            retVal.setCars((java.util.ArrayList<Car>) source.readValue(null));
+        public IDriver createFromParcel(Parcel source) {
+            IDriver retVal = new Driver(source.readString(), (Bitmap) source.readValue(null), (URI) source.readValue(null));
+            retVal.setCars((ArrayList<Car>) source.readValue(null));
             return retVal;
         }
 
         @Override
-        public Driver[] newArray(int size) {
-            return new Driver[size];
+        public IDriver[] newArray(int size) {
+            return new IDriver[size];
         }
     };
     private String name;
@@ -46,45 +46,55 @@ public class Driver implements Parcelable {
         setName(in.readString());
         setImage((Bitmap) in.readValue(null));
         setMail((URI) in.readValue(null));
-        setCars((java.util.ArrayList<Car>) in.readValue(null));
+        setCars((ArrayList<Car>) in.readValue(null));
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String firstname) {
         this.name = firstname;
     }
 
+    @Override
     public Bitmap getImage() {
         return image;
     }
 
+    @Override
     public void setImage(Bitmap image) {
         this.image = image;
     }
 
+    @Override
     public URI getMail() {
         return mail;
     }
 
+    @Override
     public void setMail(URI mail) {
         this.mail = mail;
     }
 
+    @Override
     public void addCar(Car car) {
         cars.add(car);
     }
 
+    @Override
     public void removeCar(Car car) {
         cars.remove(car);
     }
 
+    @Override
     public ArrayList<Car> getCars() {
         return cars;
     }
 
+    @Override
     public void setCars(ArrayList<Car> cars) {
         this.cars = cars;
     }

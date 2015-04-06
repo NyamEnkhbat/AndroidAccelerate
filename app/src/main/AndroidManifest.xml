@@ -7,7 +7,6 @@
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-
     <!--
      To retrieve OAuth 2.0 tokens or invalidate tokens to disconnect a user. This disconnect
      option is required to comply with the Google+ Sign-In developer policies

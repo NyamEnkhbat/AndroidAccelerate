@@ -10,14 +10,12 @@ import android.widget.EditText;
 
 import eu.isawsm.accelerate.Model.Car;
 import eu.isawsm.accelerate.Model.Clazz;
-import eu.isawsm.accelerate.Model.Driver;
 import eu.isawsm.accelerate.Model.Manufacturer;
 import eu.isawsm.accelerate.Model.Model;
 import eu.isawsm.accelerate.R;
 import eu.isawsm.accelerate.ax.AxAdapter;
 import eu.isawsm.accelerate.ax.AxCardItem;
 import eu.isawsm.accelerate.ax.MainActivity;
-import eu.isawsm.accelerate.ax.Util.AxPreferences;
 
 /**
  * Created by ofade_000 on 21.02.2015.

@@ -7,18 +7,18 @@ import android.os.Parcelable;
 /**
  * Created by Oliver on 31.01.2015.
  */
-public class Clazz implements Parcelable {
-    public static final Creator<Clazz> CREATOR = new Creator<Clazz>() {
+public class Clazz implements Parcelable, IClazz {
+    public static final Creator<IClazz> CREATOR = new Creator<IClazz>() {
         @Override
-        public Clazz createFromParcel(Parcel source) {
-            Clazz retVal = new Clazz(source.readString(), source.readString());
+        public IClazz createFromParcel(Parcel source) {
+            IClazz retVal = new Clazz(source.readString(), source.readString());
 
             return retVal;
         }
 
         @Override
-        public Clazz[] newArray(int size) {
-            return new Clazz[size];
+        public IClazz[] newArray(int size) {
+            return new IClazz[size];
         }
     };
     private String name;
@@ -36,18 +36,22 @@ public class Clazz implements Parcelable {
         setDescription(in.readString());
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public String getDescription() {
         return description;
     }
 
+    @Override
     public void setDescription(String description) {
         this.description = description;
     }

@@ -9,9 +9,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
 
-import eu.isawsm.accelerate.Model.Car;
 import eu.isawsm.accelerate.ax.AxAdapter;
-import eu.isawsm.accelerate.ax.AxCardItem;
 
 /**
  * Created by olfad on 24.02.2015.

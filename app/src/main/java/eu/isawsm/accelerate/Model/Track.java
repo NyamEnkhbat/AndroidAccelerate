@@ -3,28 +3,32 @@ package eu.isawsm.accelerate.Model;
 /**
  * Created by olfad on 29.01.2015.
  */
-public class Track {
+public class Track implements ITrack {
     private String type;
-    private Club club;
+    private ICourse ICourse;
 
-    public Track(String type, Club club) {
+    public Track(String type, ICourse ICourse) {
         this.type = type;
-        this.club = club;
+        this.ICourse = ICourse;
     }
 
+    @Override
     public String getType() {
         return type;
     }
 
+    @Override
     public void setType(String type) {
         this.type = type;
     }
 
-    public Club getClub() {
-        return club;
+    @Override
+    public ICourse getCourse() {
+        return ICourse;
     }
 
-    public void setClub(Club club) {
-        this.club = club;
+    @Override
+    public void setCourse(ICourse ICourse) {
+        this.ICourse = ICourse;
     }
 }
