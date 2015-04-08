@@ -1,14 +1,23 @@
 package eu.isawsm.accelerate.Model;
 
 import android.graphics.Bitmap;
+import android.os.Looper;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.github.nkzawa.emitter.Emitter;
+import com.google.gson.Gson;
+
+import org.json.JSONObject;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import eu.isawsm.accelerate.ax.AxCardItem;
+import eu.isawsm.accelerate.ax.Util.AxPreferences;
 
 /**
  * Created by olfad on 29.01.2015.

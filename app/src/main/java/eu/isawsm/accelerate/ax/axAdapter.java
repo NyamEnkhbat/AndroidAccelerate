@@ -10,6 +10,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import eu.isawsm.accelerate.Model.Car;
 import eu.isawsm.accelerate.Model.Club;
@@ -30,7 +31,7 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> implements Par
 
     private MainActivity context;
     private int lastPosition = -1;
-    private ArrayList<AxViewHolder> viewHolders;
+    private HashSet<AxViewHolder> viewHolders;
 
     public static void refresh() {
 
@@ -46,6 +47,7 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> implements Par
         for(AxViewHolder vh : viewHolders){
             if(vh instanceof CarViewHolder) {
                 mDataset.remove(vh.getPosition());
+                viewHolders.remove(vh);
             }
         }
     }
@@ -53,6 +55,7 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> implements Par
     public void removeAll(){
         for(AxViewHolder vh : viewHolders){
             mDataset.remove(vh.getPosition());
+            viewHolders.remove(vh);
         }
     }
 
@@ -88,7 +91,18 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> implements Par
         super();
 
         lastPosition = in.readInt();
-        viewHolders = (ArrayList<AxViewHolder>) in.readValue(null);
+        viewHolders = (HashSet<AxViewHolder>) in.readValue(null);
+    }
+
+    public CarViewHolder getCarViewHolder(Car car) {
+        for(AxViewHolder vh : viewHolders){
+            if(vh instanceof CarViewHolder) {
+               if(((CarViewHolder) vh).car.equals(car)){
+                   return (CarViewHolder) vh;
+               }
+            }
+        }
+        return null;
     }
 
     // Provide a reference to the views for each data item
@@ -106,7 +120,7 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> implements Par
 
     public AxAdapter(MainActivity context){
         this.context = context;
-        viewHolders = new ArrayList<>();
+        viewHolders = new HashSet<>();
     }
 
     public void setDataset(AxDataset<AxCardItem> myDataset){
@@ -136,7 +150,9 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> implements Par
                                                    int viewType) {
         if(viewType == R.layout.ax_car_cardview) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.ax_car_cardview, parent, false);
-            return new CarViewHolder(v, this, context);
+            CarViewHolder carViewHolder = new CarViewHolder(v, this, context);
+            viewHolders.add(carViewHolder);
+            return carViewHolder;
 
         } else if(viewType == R.layout.ax_connection_cardview) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.ax_connection_cardview, parent, false);

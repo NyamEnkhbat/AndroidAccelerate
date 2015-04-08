@@ -32,11 +32,15 @@ import com.facebook.AppEventsLogger;
 import com.github.nkzawa.emitter.Emitter;
 import com.google.gson.Gson;
 
+import org.json.JSONObject;
+
 import java.util.Arrays;
 
 import eu.isawsm.accelerate.Model.AxUser;
 import eu.isawsm.accelerate.Model.Car;
 import eu.isawsm.accelerate.Model.Club;
+import eu.isawsm.accelerate.Model.IClub;
+import eu.isawsm.accelerate.Model.Lap;
 import eu.isawsm.accelerate.R;
 import eu.isawsm.accelerate.ax.Util.AxPreferences;
 import eu.isawsm.accelerate.ax.Util.AxSocket;
@@ -63,7 +67,8 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     private Emitter.Listener onConnectionSuccess = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
-            final Club club = (Club) args[0];
+            JSONObject jsonObject =  (JSONObject) args[0];
+            final Club club = mGson.fromJson(jsonObject.toString(), Club.class);
             mSocket.registerDriver(mUser);
 
             //Do i realy need to run this on UI thread?
@@ -120,6 +125,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
 
         }
     };
+
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -263,7 +269,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
 
     public void onCarSetupSubmit(View view) {
         CarSettingsViewHolder carSettingsViewHolder = mAdapter.getCarSettingsViewHolder();
-        Car car = carSettingsViewHolder.tryGetCar();
+        final Car car = carSettingsViewHolder.tryGetCar();
         if (car != null) {
             mDataset.remove(carSettingsViewHolder.getPosition());
             mDataset.add(new AxCardItem<>(car));
@@ -271,8 +277,19 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
 
             if (mSocket == null || !mSocket.isConnected()) return;
             mSocket.registerDriver(mUser);
+            mSocket.subscribeTo(car, new Emitter.Listener() {
+                @Override
+                public void call(Object... args) {
+                    JSONObject jsonObject =  (JSONObject) args[0];
+                    final Lap lap = new Gson().fromJson(jsonObject.toString(), Lap.class);
+                    car.addLap(lap);
+                    mAdapter.notifyItemChanged(mAdapter.getCarViewHolder(car).getPosition());
+                }
+            });
         }
     }
+
+
 
     public void onTestConnection(View view) {
         ConnectionViewHolder connectionViewHolder = mAdapter.getConnectionViewHolder();

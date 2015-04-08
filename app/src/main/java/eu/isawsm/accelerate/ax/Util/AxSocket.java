@@ -10,6 +10,7 @@ import java.util.List;
 
 import eu.isawsm.accelerate.Model.Car;
 import eu.isawsm.accelerate.Model.Driver;
+import eu.isawsm.accelerate.Model.IDriver;
 
 /**
  * Created by ofade_000 on 22.02.2015.
@@ -56,6 +57,7 @@ public class AxSocket {
 
             socket.emit("TestConnection", socket.id());
         } catch (URISyntaxException e) {
+            e.printStackTrace();
             onConnectionError.call(e);
             return false;
         }
@@ -72,7 +74,7 @@ public class AxSocket {
             socket.disconnect();
     }
 
-    public void registerDriver(Driver driver) {
+    public void registerDriver(IDriver driver) {
         socket.emit("registerDriver",  driver);
     }
 
