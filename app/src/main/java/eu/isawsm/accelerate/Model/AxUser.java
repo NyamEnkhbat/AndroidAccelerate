@@ -37,6 +37,10 @@ public class AxUser extends Driver implements Parcelable {
         setCars((java.util.ArrayList<Car>) in.readValue(null));
     }
 
+    public AxUser() {
+        super();
+    }
+
     /**
      * Describe the kinds of special objects contained in this Parcelable's
      * marshalled representation.

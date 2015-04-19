@@ -26,15 +26,15 @@ import eu.isawsm.accelerate.ax.viewmodel.AxDataset;
 import eu.isawsm.accelerate.ax.viewmodel.CarSetup;
 import eu.isawsm.accelerate.ax.viewmodel.ConnectionSetup;
 
-public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> implements Parcelable {
+public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
     private AxDataset<AxCardItem> mDataset;
 
     private MainActivity context;
     private int lastPosition = -1;
     private HashSet<AxViewHolder> viewHolders;
 
-    public static void refresh() {
-
+    public void refresh() {
+        notifyDataSetChanged();
     }
 
     public void addCarSetup() {
@@ -44,48 +44,28 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> implements Par
     }
 
     public void removeAllCars() {
+        ArrayList<AxViewHolder> toBeRemoved = new ArrayList<>();
         for(AxViewHolder vh : viewHolders){
             if(vh instanceof CarViewHolder) {
                 mDataset.remove(vh.getPosition());
-                viewHolders.remove(vh);
+                toBeRemoved.add(vh);
             }
         }
+        viewHolders.removeAll(toBeRemoved);
     }
 
     public void removeAll(){
+        ArrayList<AxViewHolder> toBeRemoved = new ArrayList<>();
         for(AxViewHolder vh : viewHolders){
             mDataset.remove(vh.getPosition());
-            viewHolders.remove(vh);
+            toBeRemoved.add(vh);
         }
+        viewHolders.removeAll(toBeRemoved);
     }
 
     public AuthenticationViewHolder getAuthentificationViewHolder() {
         return getViewHolder(AuthenticationViewHolder.class);
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(lastPosition);
-//TODO        dest.writeSerializable(viewHolders);
-    }
-    public static final Creator<AxAdapter> CREATOR = new Creator<AxAdapter>() {
-        @Override
-        public AxAdapter createFromParcel(Parcel source) {
-            AxAdapter retVal = new AxAdapter((MainActivity) source.readValue(null));
-
-            return retVal;
-        }
-
-        @Override
-        public AxAdapter[] newArray(int size) {
-            return new AxAdapter[size];
-        }
-    };
 
     private AxAdapter(Parcel in) {
         super();
@@ -223,9 +203,9 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> implements Par
             viewToAnimate.startAnimation(animation);
             lastPosition = position;
         } else if (position > lastPosition){
-//            Animation animation = AnimationUtils.loadAnimation(context, R.anim.slide_in_up);
-//            viewToAnimate.startAnimation(animation);
-//            lastPosition = position;
+            Animation animation = AnimationUtils.loadAnimation(context, R.anim.slide_in_up);
+            viewToAnimate.startAnimation(animation);
+            lastPosition = position;
         }
 
     }

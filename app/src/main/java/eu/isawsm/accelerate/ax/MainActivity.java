@@ -54,7 +54,6 @@ import eu.isawsm.accelerate.ax.viewmodel.ConnectionSetup;
 
 public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayout.OnRefreshListener {
 
-    private static final String TAG = "MainActivity";
     private Toolbar mToolbar;
     private RecyclerView mRecyclerView;
     private StaggeredGridLayoutManager mLayoutManager;
@@ -69,8 +68,6 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         public void call(Object... args) {
             JSONObject jsonObject =  (JSONObject) args[0];
             final Club club = mGson.fromJson(jsonObject.toString(), Club.class);
-            mSocket.registerDriver(mUser);
-
             //Do i realy need to run this on UI thread?
             if (Looper.myLooper() == null) Looper.prepare();
             runOnUiThread(new Runnable() {
@@ -81,36 +78,18 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
                     if (mAdapter.getConnectionViewHolder() != null)
                         mDataset.remove(mAdapter.getConnectionViewHolder().getPosition());
                     mDataset.add(clubCard);
-                    mRecyclerView.scrollToPosition(0);
                     mSwipeLayout.setRefreshing(false);
+
                 }
             });
-
+            updateCars();
         }
     };
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            // Extract data included in the Intent
-            if (intent.getAction().equals("Authentication")) {
-                String message = intent.getStringExtra("Message");
-                switch (message) {
-                    case "Login Success":
-                        mUser = intent.getParcelableExtra("AxUser");
-                        onLoggedIn();
-                        break;
-                    default:
-                        Log.e(TAG, "Unexpected message: " + message);
-                }
 
-            }
-        }
-    };
     private Emitter.Listener onConnectionError = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
             mSocket.off();
-            Log.e(TAG, Arrays.toString(args));
             if (Looper.myLooper() == null) Looper.prepare();
             runOnUiThread(new Runnable() {
                 @Override
@@ -130,31 +109,14 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ax_recycler);
-
         setSystemBarColor();
         setToolBar();
         initSwipeRefrehLayout();
         initRecyclerView();
-        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("Authentication"));
-        initUser();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (mUser != null)
-            outState.putParcelable("AxUser", mUser);
-        if(mDataset != null)
-            outState.putParcelable("AxDataset",mDataset);
-    }
-
-    private void initUser() {
-        mUser = AxPreferences.getAxIUser(this);
-        if (mUser == null) {
-            mDataset.add(new AxCardItem<>(new Authentication()));
-        } else {
-            onLoggedIn();
-        }
+        initSocket();
+        //TODO for now we use the User just to hold our cars.
+        mUser = AxPreferences.getAxIUser(this) != null ? AxPreferences.getAxIUser(this): new AxUser();
+        updateCars();
     }
 
     public void initSocket() {
@@ -226,29 +188,13 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
 
     @Override
     public void onRefresh() {
-        new Handler().post(new Runnable() {
+        runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                AxAdapter.refresh();
+                mAdapter.refresh();
                 mSwipeLayout.setRefreshing(false);
-
             }
         });
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Intent intent = new Intent("View");
-        // add data
-        System.out.println("ActivityResult" + requestCode + " " + resultCode + " " + data);
-
-        intent.putExtra("message", "onActivityResult");
-        intent.putExtra("requestCode", requestCode);
-        intent.putExtra("resultCode", resultCode);
-        intent.putExtra("data", data);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void showConnectionSetup() {
@@ -267,6 +213,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         }
     }
 
+    //TODO Move this out of here
     public void onCarSetupSubmit(View view) {
         CarSettingsViewHolder carSettingsViewHolder = mAdapter.getCarSettingsViewHolder();
         final Car car = carSettingsViewHolder.tryGetCar();
@@ -274,22 +221,31 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
             mDataset.remove(carSettingsViewHolder.getPosition());
             mDataset.add(new AxCardItem<>(car));
             mUser.addCar(car);
-
-            if (mSocket == null || !mSocket.isConnected()) return;
-            mSocket.registerDriver(mUser);
-            mSocket.subscribeTo(car, new Emitter.Listener() {
-                @Override
-                public void call(Object... args) {
-                    JSONObject jsonObject =  (JSONObject) args[0];
-                    final Lap lap = new Gson().fromJson(jsonObject.toString(), Lap.class);
-                    car.addLap(lap);
-                    mAdapter.notifyItemChanged(mAdapter.getCarViewHolder(car).getPosition());
-                }
-            });
+            AxPreferences.setAxIUser(this, mUser);
+            subscribeToCar(car);
         }
     }
 
 
+    private void subscribeToCar(final Car car){
+        if (mSocket == null || !mSocket.isConnected()) return;
+        mSocket.subscribeTo(car, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                JSONObject jsonObject =  (JSONObject) args[0];
+                final Lap lap = new Gson().fromJson(jsonObject.toString(), Lap.class);
+                car.addLap(lap);
+                if(Looper.myLooper() == null) Looper.prepare();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAdapter.notifyItemChanged(mAdapter.getCarViewHolder(car).getPosition());
+                    }
+                });
+
+            }
+        });
+    }
 
     public void onTestConnection(View view) {
         ConnectionViewHolder connectionViewHolder = mAdapter.getConnectionViewHolder();
@@ -309,67 +265,29 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
             case R.id.action_add_car:
                 mAdapter.addCarSetup();
                 return true;
-//            case R.id.action_logoff:
-//                Intent intent = new Intent("View");
-//                intent.putExtra("message", "logoff");
-//                LocalBroadcastManager.getInstance(this).sendBroadcastSync(intent);
-//              //TODO  mAdapter.removeAll();
-//                AxPreferences.setAxIUser(this, null);
-//                //TODO this.recreate();
-//                return true;
             case R.id.action_settings:
-
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
-
-
     }
 
     public void updateCars() {
         mAdapter.removeAllCars();
         for (Car c : mUser.getCars()) {
             mDataset.add(new AxCardItem<>(c));
+            subscribeToCar(c);
         }
-        mAdapter.notifyDataSetChanged();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        // Logs 'install' and 'app activate' App Events.
-        AppEventsLogger.activateApp(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        // Logs 'app deactivate' App Event.
         AxPreferences.setAxIUser(this, mUser);
-        AppEventsLogger.deactivateApp(this);
     }
-
-    private void onLoggedIn() {
-        //TODO do this with the broadcast
-        AuthenticationViewHolder authenticatorViewHolder = mAdapter.getAuthentificationViewHolder();
-        if (authenticatorViewHolder != null)
-            mDataset.remove(authenticatorViewHolder.getPosition());
-
-        setTitle(mUser.toString());
-        if (mUser.getImage() != null)
-            mToolbar.setNavigationIcon(new BitmapDrawable(getResources(),mUser.getImage()));
-        else
-            mToolbar.setNavigationIcon(null);
-        updateCars();
-        invalidateOptionsMenu();
-        initSocket();
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.setGroupVisible(0,mUser != null);
-        return super.onPrepareOptionsMenu(menu);
-    }
-
 }

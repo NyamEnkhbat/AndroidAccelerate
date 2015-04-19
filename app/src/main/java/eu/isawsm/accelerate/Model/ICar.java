@@ -34,7 +34,7 @@ public interface ICar {
 
     int getRank();
 
-    List<ILap> getLaps();
+    List<Lap> getLaps();
 
     void addLap(ILap ILap);
 

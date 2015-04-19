@@ -19,7 +19,7 @@ public class Model implements Parcelable, IModel {
             return new IModel[size];
         }
     };
-    private IManufacturer IManufacturer;
+    private Manufacturer IManufacturer;
     private String name;
     private String drivetrain;
     private String motor;
@@ -27,7 +27,7 @@ public class Model implements Parcelable, IModel {
     private String scale;
 
     public Model(IManufacturer IManufacturer, String name, String drivetrain, String motor, String type, String scale) {
-        this.IManufacturer = IManufacturer;
+        this.IManufacturer = (Manufacturer) IManufacturer;
         this.name = name;
         this.drivetrain = drivetrain;
         this.motor = motor;
@@ -52,7 +52,7 @@ public class Model implements Parcelable, IModel {
 
     @Override
     public void setManufacturer(IManufacturer IManufacturer) {
-        this.IManufacturer = IManufacturer;
+        this.IManufacturer = (Manufacturer) IManufacturer;
     }
 
     @Override

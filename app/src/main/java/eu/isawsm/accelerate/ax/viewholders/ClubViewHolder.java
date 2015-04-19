@@ -54,7 +54,11 @@ public class ClubViewHolder extends AxViewHolder implements GoogleApiClient.Conn
         Club club = (Club) axCardItem.get();
 
         tfClubName.setText(club.getName());
-        context.getSupportActionBar().setSubtitle("@" + club.getName());
+       // context.getSupportActionBar().setSubtitle("@" + club.getName());
+
+        if(mGoogleApiClient != null &&mGoogleApiClient.isConnected()){
+            updateWeatherData(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+        }
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -111,7 +115,7 @@ public class ClubViewHolder extends AxViewHolder implements GoogleApiClient.Conn
 
     private void renderWeather(JSONObject json) {
         try {
-            tfClubName.setText(json.getString("name"));
+          //  tfClubName.setText(json.getString("name"));
 
 
             JSONObject details = json.getJSONArray("weather").getJSONObject(0);

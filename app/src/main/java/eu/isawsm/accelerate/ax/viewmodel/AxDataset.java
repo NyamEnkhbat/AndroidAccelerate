@@ -14,7 +14,7 @@ import eu.isawsm.accelerate.ax.AxAdapter;
 /**
  * Created by olfad on 24.02.2015.
  */
-public class AxDataset<T> implements Parcelable{
+public class AxDataset<T> {
 
     private AxAdapter adapter;
     private LinkedHashSet<T> linkedHashSet;
@@ -27,7 +27,7 @@ public class AxDataset<T> implements Parcelable{
 
     public boolean add(T t) {
         if(linkedHashSet.add(t)) {
-            adapter.notifyItemInserted(size());
+            adapter.notifyItemInserted(0);
             return true;
         } else {
             Log.d(this.getClass().getName(), t.toString() + " is already in DataSet => skipping");
@@ -56,35 +56,5 @@ public class AxDataset<T> implements Parcelable{
     public T get(int index) {
         int reverseIndex = Math.abs(index -(size()-1));
         return new ArrayList<>(linkedHashSet).get(reverseIndex);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeParcelable(adapter,flags);
-        dest.writeList(new ArrayList<>(linkedHashSet));
-    }
-    public static final Creator<AxDataset> CREATOR = new Creator<AxDataset>() {
-        @Override
-        public AxDataset createFromParcel(Parcel source) {
-            AxDataset retVal =new AxDataset(source.<AxAdapter>readParcelable(null));
-            retVal.linkedHashSet = (LinkedHashSet) source.readValue(null);
-            return retVal;
-        }
-
-        @Override
-        public AxDataset[] newArray(int size) {
-            return new AxDataset[size];
-        }
-    };
-
-    private AxDataset(Parcel in) {
-        super();
-        adapter = in.readParcelable(null);
-        linkedHashSet = (LinkedHashSet<T>) in.readValue(null);
     }
 }

@@ -38,7 +38,7 @@ public class Driver implements Parcelable, IDriver {
     }
 
     public Driver() {
-
+        cars = new ArrayList<>();
     }
 
     private Driver(Parcel in) {

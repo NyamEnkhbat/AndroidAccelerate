@@ -1,23 +1,14 @@
 package eu.isawsm.accelerate.Model;
 
 import android.graphics.Bitmap;
-import android.os.Looper;
 import android.os.Parcel;
 import android.os.Parcelable;
-
-import com.github.nkzawa.emitter.Emitter;
-import com.google.gson.Gson;
-
-import org.json.JSONObject;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import eu.isawsm.accelerate.ax.AxCardItem;
-import eu.isawsm.accelerate.ax.Util.AxPreferences;
 
 /**
  * Created by olfad on 29.01.2015.
@@ -38,15 +29,15 @@ public class Car implements Parcelable, ICar {
         }
     };
     private static final int MINLAPS = 10;
-    private IModel IModel;
-    private IClazz IClazz;
+    private Model IModel;
+    private Clazz IClazz;
     private long transponderID;
     private Bitmap picture;
-    private List<ILap> ILaps;
+    private List<Lap> ILaps;
 
     public Car(IModel IModel, IClazz IClazz, long transponderID, Bitmap picture) {
-        this.IModel = IModel;
-        this.IClazz = IClazz;
+        this.IModel = (Model) IModel;
+        this.IClazz = (Clazz) IClazz;
         this.transponderID = transponderID;
         this.picture = picture;
         ILaps = new ArrayList<>();
@@ -78,7 +69,7 @@ public class Car implements Parcelable, ICar {
 
     @Override
     public void setModel(IModel IModel) {
-        this.IModel = IModel;
+        this.IModel = (Model) IModel;
     }
 
     @Override
@@ -88,7 +79,7 @@ public class Car implements Parcelable, ICar {
 
     @Override
     public void setClazz(IClazz IClazz) {
-        this.IClazz = IClazz;
+        this.IClazz = (Clazz) IClazz;
     }
 
     @Override
@@ -179,13 +170,13 @@ public class Car implements Parcelable, ICar {
     }
 
     @Override
-    public List<ILap> getLaps() {
+    public List<Lap> getLaps() {
         return ILaps;
     }
 
     @Override
     public void addLap(ILap ILap) {
-        ILaps.add(ILap);
+        ILaps.add((Lap) ILap);
     }
 
     @Override

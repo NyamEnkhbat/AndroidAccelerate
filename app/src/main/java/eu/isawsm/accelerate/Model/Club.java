@@ -1,6 +1,8 @@
 package eu.isawsm.accelerate.Model;
 
 import android.graphics.Bitmap;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.net.URI;
 import java.util.List;

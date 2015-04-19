@@ -98,8 +98,7 @@ public class CarViewHolder extends AxViewHolder {
             addLap(l);
         }
 
-        addTestData(new Lap(11111, null));
-
+     //   addTestData(new Lap(11111, null));
 
     }
 
