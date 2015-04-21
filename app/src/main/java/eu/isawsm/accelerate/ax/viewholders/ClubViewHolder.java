@@ -56,7 +56,7 @@ public class ClubViewHolder extends AxViewHolder implements GoogleApiClient.Conn
         tfClubName.setText(club.getName());
        // context.getSupportActionBar().setSubtitle("@" + club.getName());
 
-        if(mGoogleApiClient != null &&mGoogleApiClient.isConnected()){
+        if(mGoogleApiClient != null &&mGoogleApiClient.isConnected() && mLastLocation != null){
             updateWeatherData(mLastLocation.getLatitude(), mLastLocation.getLongitude());
         }
     }

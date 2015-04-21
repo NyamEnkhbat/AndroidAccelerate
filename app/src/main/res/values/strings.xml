@@ -35,4 +35,5 @@
 
     <string name="facebook_app_id">797918650292923</string>
     <string name="action_logoff">Sign off...</string>
+    <string name="voiceToggle">Toggle Voice</string>
 </resources>

@@ -13,6 +13,9 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import eu.isawsm.accelerate.Model.Car;
 import eu.isawsm.accelerate.Model.ILap;
 import eu.isawsm.accelerate.Model.Lap;
@@ -94,7 +97,11 @@ public class CarViewHolder extends AxViewHolder {
         listView2.setAdapter(lapAdapter2);
 
 
-        for (ILap l : car.getLaps()) {
+        //dont want to get a java.util.ConcurrentModificationException when a Lap is added while iterating.
+        //todo this could lead to inconsistent data but who cares if that one lap is missing that happend in the same second where i opend up my app...
+        final List<Lap> lapArrayList = car.getLaps();
+
+        for (ILap l : lapArrayList) {
             addLap(l);
         }
 

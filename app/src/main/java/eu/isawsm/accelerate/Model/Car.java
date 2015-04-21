@@ -213,4 +213,21 @@ public class Car implements Parcelable, ICar {
         dest.writeLong(transponderID);
         dest.writeValue(picture);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Car car = (Car) o;
+
+        if (transponderID != car.transponderID) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (transponderID ^ (transponderID >>> 32));
+    }
 }

@@ -21,7 +21,7 @@ public interface IClub {
 
     void setImage(Bitmap image);
 
-    List<ITrack> getTracks();
+    List<Track> getTracks();
 
-    void setTracks(List<ITrack> tracks);
+    void setTracks(List<Track> tracks);
 }

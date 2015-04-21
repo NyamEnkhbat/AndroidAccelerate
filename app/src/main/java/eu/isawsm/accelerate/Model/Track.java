@@ -11,6 +11,9 @@ public class Track implements ITrack {
         this.type = type;
         this.ICourse = ICourse;
     }
+    public Track(){
+
+    }
 
     @Override
     public String getType() {

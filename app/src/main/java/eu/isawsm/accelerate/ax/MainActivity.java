@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.speech.tts.TextToSpeech;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -27,6 +28,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.facebook.AppEventsLogger;
 import com.github.nkzawa.emitter.Emitter;
@@ -35,7 +37,9 @@ import com.google.gson.Gson;
 import org.json.JSONObject;
 
 import java.util.Arrays;
+import java.util.Locale;
 
+import eu.isawsm.accelerate.BuildConfig;
 import eu.isawsm.accelerate.Model.AxUser;
 import eu.isawsm.accelerate.Model.Car;
 import eu.isawsm.accelerate.Model.Club;
@@ -52,7 +56,7 @@ import eu.isawsm.accelerate.ax.viewmodel.Authentication;
 import eu.isawsm.accelerate.ax.viewmodel.AxDataset;
 import eu.isawsm.accelerate.ax.viewmodel.ConnectionSetup;
 
-public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayout.OnRefreshListener {
+public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayout.OnRefreshListener, TextToSpeech.OnInitListener  {
 
     private Toolbar mToolbar;
     private RecyclerView mRecyclerView;
@@ -61,7 +65,9 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     private SwipeRefreshLayout mSwipeLayout;
     private AxSocket mSocket;
     private AxDataset<AxCardItem> mDataset;
+    private TextToSpeech tts;
     private Gson mGson = new Gson();
+    //TODO for now we use the User just to hold our cars.
     private AxUser mUser;
     private Emitter.Listener onConnectionSuccess = new Emitter.Listener() {
         @Override
@@ -79,10 +85,10 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
                         mDataset.remove(mAdapter.getConnectionViewHolder().getPosition());
                     mDataset.add(clubCard);
                     mSwipeLayout.setRefreshing(false);
+                    updateCars();
 
                 }
             });
-            updateCars();
         }
     };
 
@@ -113,9 +119,9 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         setToolBar();
         initSwipeRefrehLayout();
         initRecyclerView();
+        tts = new TextToSpeech(this, this);
+        mUser =  AxPreferences.getAxIUser(this) != null ? AxPreferences.getAxIUser(this): new AxUser();
         initSocket();
-        //TODO for now we use the User just to hold our cars.
-        mUser = AxPreferences.getAxIUser(this) != null ? AxPreferences.getAxIUser(this): new AxUser();
         updateCars();
     }
 
@@ -158,7 +164,12 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
                     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
                     @Override
                     public void onGlobalLayout() {
-                        mRecyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+                            mRecyclerView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                        } else {
+                            mRecyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                        }
+
                         int viewWidth = mRecyclerView.getMeasuredWidth();
                         float cardViewWidth = getResources().getDimension(R.dimen.cardview_layout_width);
                         int newSpanCount = (int) Math.floor(viewWidth / cardViewWidth);
@@ -183,7 +194,8 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) //Real Material Design is only possible in Lollipop and later
+            window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
     }
 
     @Override
@@ -206,11 +218,16 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
+        if (tts != null) {
+            tts.stop();
+            tts.shutdown();
+        }
         if (mSocket != null) {
             mSocket.disconnect();
             mSocket.off();
         }
+        super.onDestroy();
+
     }
 
     //TODO Move this out of here
@@ -234,6 +251,10 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
             public void call(Object... args) {
                 JSONObject jsonObject =  (JSONObject) args[0];
                 final Lap lap = new Gson().fromJson(jsonObject.toString(), Lap.class);
+
+                if(isVoiceEnabled) {
+                    speakTime(lap);
+                }
                 car.addLap(lap);
                 if(Looper.myLooper() == null) Looper.prepare();
                 runOnUiThread(new Runnable() {
@@ -245,6 +266,17 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
 
             }
         });
+    }
+
+    private void speakTime(Lap lap) {
+        String lapTime = lap.getTime() / 1000d + "";
+        while (lapTime.length() < 6) {
+            lapTime += "0";
+        }
+        System.out.println(lapTime);
+        String[] times = lapTime.split("\\.");
+
+        speakOut(times[0] + " " + times[1].substring(0, 2));
     }
 
     public void onTestConnection(View view) {
@@ -259,14 +291,20 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         return true;
     }
 
+    private boolean isVoiceEnabled = false;
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add_car:
                 mAdapter.addCarSetup();
                 return true;
-            case R.id.action_settings:
-                return true;
+            case R.id.action_voice:
+                isVoiceEnabled = !isVoiceEnabled;
+                if(isVoiceEnabled){
+                   Toast.makeText(this, "Voice Enabled", Toast.LENGTH_LONG).show();
+                } else
+                    Toast.makeText(this, "Voice Disabled", Toast.LENGTH_LONG).show();
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -289,5 +327,28 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     protected void onPause() {
         super.onPause();
         AxPreferences.setAxIUser(this, mUser);
+    }
+
+    /**
+     * Called to signal the completion of the TextToSpeech engine initialization.
+     *
+     * @param status {@link android.speech.tts.TextToSpeech#SUCCESS} or {@link android.speech.tts.TextToSpeech#ERROR}.
+     */
+    @Override
+    public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS) {
+
+            int result = tts.setLanguage(Locale.US);
+
+            if (result == TextToSpeech.LANG_MISSING_DATA
+                    || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("TTS", "This Language is not supported");
+            }
+        } else {
+            Log.e("TTS", "Initilization Failed!");
+        }
+    }
+    private void speakOut(String text) {
+        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
     }
 }

@@ -14,9 +14,9 @@ public class Club implements IClub {
     private String name;
     private URI url;
     private Bitmap image;
-    private List<ITrack> tracks;
+    private List<Track> tracks;
 
-    public Club(String name, URI url, Bitmap image, List<ITrack> tracks) {
+    public Club(String name, URI url, Bitmap image, List<Track> tracks) {
         this.name = name;
         this.url = url;
         this.image = image;
@@ -54,12 +54,12 @@ public class Club implements IClub {
     }
 
     @Override
-    public List<ITrack> getTracks() {
+    public List<Track> getTracks() {
         return tracks;
     }
 
     @Override
-    public void setTracks(List<ITrack> tracks) {
+    public void setTracks(List<Track> tracks) {
         this.tracks = tracks;
     }
 }
