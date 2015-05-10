@@ -2,6 +2,7 @@ package eu.isawsm.accelerate.ax;
 
 
 import android.annotation.TargetApi;
+import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -72,6 +73,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     private Emitter.Listener onConnectionSuccess = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
+            retryCount = 0;
             JSONObject jsonObject =  (JSONObject) args[0];
             final Club club = mGson.fromJson(jsonObject.toString(), Club.class);
             //Do i realy need to run this on UI thread?
@@ -95,6 +97,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     private Emitter.Listener onConnectionError = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
+            retryCount = 0;
             mSocket.off();
             if (Looper.myLooper() == null) Looper.prepare();
             runOnUiThread(new Runnable() {
@@ -111,18 +114,37 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         }
     };
 
+    private int retryCount = 0;
+
+    private Emitter.Listener onConnectionTimeout = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            if(retryCount > 15) {
+                onConnectionError.call(args);
+                return;
+            }
+
+            retryCount ++;
+            mSocket.tryConnect(AxPreferences.getServerAddress(mRecyclerView.getContext()), onConnectionSuccess, onConnectionError, onConnectionTimeout);
+
+        }
+    };
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.ax_recycler);
-        setSystemBarColor();
-        setToolBar();
-        initSwipeRefrehLayout();
-        initRecyclerView();
-        tts = new TextToSpeech(this, this);
-        mUser =  AxPreferences.getAxIUser(this) != null ? AxPreferences.getAxIUser(this): new AxUser();
-        initSocket();
-        updateCars();
+        try {
+            setContentView(R.layout.ax_recycler);
+            setSystemBarColor();
+            setToolBar();
+            initSwipeRefrehLayout();
+            initRecyclerView();
+            tts = new TextToSpeech(this, this);
+            mUser = AxPreferences.getAxIUser(this) != null ? AxPreferences.getAxIUser(this) : new AxUser();
+            initSocket();
+            updateCars();
+        } catch (Exception e) {
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG);
+        }
     }
 
     public void initSocket() {
@@ -139,7 +161,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
             mSwipeLayout.setProgressViewOffset(false, 0, getResources().getDimensionPixelSize(typed_value.resourceId));
             mSwipeLayout.setRefreshing(true);
 
-            mSocket.tryConnect(address, onConnectionSuccess, onConnectionError, onConnectionError);
+            mSocket.tryConnect(address, onConnectionSuccess, onConnectionError, onConnectionTimeout);
         }
     }
 
