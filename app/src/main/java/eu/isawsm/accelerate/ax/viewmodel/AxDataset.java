@@ -1,13 +1,9 @@
 package eu.isawsm.accelerate.ax.viewmodel;
 
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.Log;
 
 import java.util.ArrayList;
-
 import java.util.LinkedHashSet;
-
 
 import eu.isawsm.accelerate.ax.AxAdapter;
 
@@ -47,14 +43,14 @@ public class AxDataset<T> {
     public T remove(int index) {
         int reverseIndex = Math.abs(index -(size()-1));
         ArrayList<T> tmp = new ArrayList<>(linkedHashSet);
-        T t = tmp.remove(reverseIndex);
+        T t = tmp.remove(index);
         linkedHashSet = new LinkedHashSet<>(tmp);
-        adapter.notifyItemRemoved(reverseIndex);
+        adapter.notifyItemRemoved(index);
         return t;
     }
 
     public T get(int index) {
         int reverseIndex = Math.abs(index -(size()-1));
-        return new ArrayList<>(linkedHashSet).get(reverseIndex);
+        return new ArrayList<>(linkedHashSet).get(index);
     }
 }

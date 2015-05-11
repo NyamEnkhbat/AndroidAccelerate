@@ -2,19 +2,10 @@ package eu.isawsm.accelerate.ax;
 
 
 import android.annotation.TargetApi;
-import android.app.Application;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.graphics.drawable.BitmapDrawable;
-import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Looper;
 import android.speech.tts.TextToSpeech;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -31,29 +22,23 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import com.facebook.AppEventsLogger;
 import com.github.nkzawa.emitter.Emitter;
 import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
-import java.util.Arrays;
 import java.util.Locale;
 
-import eu.isawsm.accelerate.BuildConfig;
 import eu.isawsm.accelerate.Model.AxUser;
 import eu.isawsm.accelerate.Model.Car;
 import eu.isawsm.accelerate.Model.Club;
-import eu.isawsm.accelerate.Model.IClub;
 import eu.isawsm.accelerate.Model.Lap;
 import eu.isawsm.accelerate.R;
 import eu.isawsm.accelerate.ax.Util.AxPreferences;
 import eu.isawsm.accelerate.ax.Util.AxSocket;
-import eu.isawsm.accelerate.ax.viewholders.AuthenticationViewHolder;
 import eu.isawsm.accelerate.ax.viewholders.CarSettingsViewHolder;
 import eu.isawsm.accelerate.ax.viewholders.ClubViewHolder;
 import eu.isawsm.accelerate.ax.viewholders.ConnectionViewHolder;
-import eu.isawsm.accelerate.ax.viewmodel.Authentication;
 import eu.isawsm.accelerate.ax.viewmodel.AxDataset;
 import eu.isawsm.accelerate.ax.viewmodel.ConnectionSetup;
 
@@ -70,11 +55,12 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     private Gson mGson = new Gson();
     //TODO for now we use the User just to hold our cars.
     private AxUser mUser;
+    private int retryCount = 0;
     private Emitter.Listener onConnectionSuccess = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
             retryCount = 0;
-            JSONObject jsonObject =  (JSONObject) args[0];
+            JSONObject jsonObject = (JSONObject) args[0];
             final Club club = mGson.fromJson(jsonObject.toString(), Club.class);
             //Do i realy need to run this on UI thread?
             if (Looper.myLooper() == null) Looper.prepare();
@@ -93,7 +79,6 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
             });
         }
     };
-
     private Emitter.Listener onConnectionError = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
@@ -113,9 +98,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
 
         }
     };
-
-    private int retryCount = 0;
-
+    private boolean isVoiceEnabled = false;
     private Emitter.Listener onConnectionTimeout = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
@@ -186,7 +169,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
                     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
                     @Override
                     public void onGlobalLayout() {
-                        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
                             mRecyclerView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                         } else {
                             mRecyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
@@ -271,14 +254,14 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         mSocket.subscribeTo(car, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                JSONObject jsonObject =  (JSONObject) args[0];
+                JSONObject jsonObject = (JSONObject) args[0];
                 final Lap lap = new Gson().fromJson(jsonObject.toString(), Lap.class);
 
-                if(isVoiceEnabled) {
+                if (isVoiceEnabled) {
                     speakTime(lap);
                 }
                 car.addLap(lap);
-                if(Looper.myLooper() == null) Looper.prepare();
+                if (Looper.myLooper() == null) Looper.prepare();
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -295,7 +278,6 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         while (lapTime.length() < 6) {
             lapTime += "0";
         }
-        System.out.println(lapTime);
         String[] times = lapTime.split("\\.");
 
         speakOut(times[0] + " " + times[1].substring(0, 2));
@@ -313,8 +295,6 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         return true;
     }
 
-    private boolean isVoiceEnabled = false;
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -323,8 +303,8 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
                 return true;
             case R.id.action_voice:
                 isVoiceEnabled = !isVoiceEnabled;
-                if(isVoiceEnabled){
-                   Toast.makeText(this, "Voice Enabled", Toast.LENGTH_LONG).show();
+                if (isVoiceEnabled) {
+                    Toast.makeText(this, "Voice Enabled", Toast.LENGTH_LONG).show();
                 } else
                     Toast.makeText(this, "Voice Disabled", Toast.LENGTH_LONG).show();
             default:
@@ -333,9 +313,9 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     }
 
     public void updateCars() {
-        mAdapter.removeAllCars();
+        //      mAdapter.removeAllCars();
         for (Car c : mUser.getCars()) {
-            mDataset.add(new AxCardItem<>(c));
+            //     mDataset.add(new AxCardItem<>(c));
             subscribeToCar(c);
         }
     }
@@ -370,7 +350,9 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
             Log.e("TTS", "Initilization Failed!");
         }
     }
+
     private void speakOut(String text) {
         tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
     }
+
 }

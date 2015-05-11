@@ -2,14 +2,13 @@ package eu.isawsm.accelerate.ax.viewholders;
 
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.Button;
 import android.widget.MultiAutoCompleteTextView;
 
 import eu.isawsm.accelerate.R;
 import eu.isawsm.accelerate.ax.AxAdapter;
 import eu.isawsm.accelerate.ax.AxCardItem;
 import eu.isawsm.accelerate.ax.MainActivity;
-import eu.isawsm.accelerate.ax.viewmodel.ConnectionSetup;
+import eu.isawsm.accelerate.ax.Util.AxPreferences;
 
 /**
  * Created by ofade_000 on 21.02.2015.
@@ -25,7 +24,7 @@ public class ConnectionViewHolder extends AxViewHolder {
 
 
     public void onBindViewHolder(AxAdapter.ViewHolder holder, int position, AxCardItem axCardItem) {
-
+        mAcTVServerAdress.setText(AxPreferences.getServerAddress(context));
     }
 
 
