@@ -1,7 +1,6 @@
 package eu.isawsm.accelerate.ax;
 
 
-import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
@@ -44,7 +43,6 @@ import eu.isawsm.accelerate.ax.viewmodel.ConnectionSetup;
 
 public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayout.OnRefreshListener, TextToSpeech.OnInitListener  {
 
-    private Toolbar mToolbar;
     private RecyclerView mRecyclerView;
     private StaggeredGridLayoutManager mLayoutManager;
     private AxAdapter mAdapter;
@@ -126,7 +124,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
             initSocket();
             updateCars();
         } catch (Exception e) {
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG);
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -166,7 +164,6 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.getViewTreeObserver().addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
-                    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
                     @Override
                     public void onGlobalLayout() {
                         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
@@ -185,7 +182,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     }
 
     private void setToolBar() {
-        mToolbar = (Toolbar) findViewById(R.id.app_bar);
+        Toolbar mToolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(mToolbar);
     }
 
@@ -194,13 +191,13 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         mSwipeLayout.setOnRefreshListener(this);
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void setSystemBarColor() {
-        Window window = getWindow();
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) //Real Material Design is only possible in Lollipop and later
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {//Real Material Design is only possible in Lollipop and later
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        }
     }
 
     @Override
