@@ -4,13 +4,15 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 import eu.isawsm.accelerate.ax.AxAdapter;
+import eu.isawsm.accelerate.ax.AxCardItem;
 
 /**
  * Created by olfad on 24.02.2015.
  */
-public class AxDataset<T> {
+public class AxDataset<T extends AxCardItem> {
 
     private AxAdapter adapter;
     private LinkedHashSet<T> linkedHashSet;
@@ -23,7 +25,7 @@ public class AxDataset<T> {
 
     public boolean add(T t) {
         if(linkedHashSet.add(t)) {
-            adapter.notifyItemInserted(0);
+            adapter.notifyItemInserted(linkedHashSet.size()-1);
             return true;
         } else {
             Log.d(this.getClass().getName(), t.toString() + " is already in DataSet => skipping");
@@ -52,5 +54,9 @@ public class AxDataset<T> {
     public T get(int index) {
         int reverseIndex = Math.abs(index -(size()-1));
         return new ArrayList<>(linkedHashSet).get(index);
+    }
+
+    public List<T> getList(){
+        return new ArrayList<>(linkedHashSet);
     }
 }

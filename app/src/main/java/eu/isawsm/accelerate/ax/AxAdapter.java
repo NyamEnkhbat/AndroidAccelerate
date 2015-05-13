@@ -29,11 +29,9 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
 
     private MainActivity context;
     private int lastPosition = -1;
-    private HashSet<AxViewHolder> viewHolders;
 
     public AxAdapter(MainActivity context) {
         this.context = context;
-        viewHolders = new HashSet<>();
     }
 
     public void refresh() {
@@ -46,39 +44,13 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
         }
     }
 
-    public void removeAllCars() {
-        ArrayList<AxViewHolder> toBeRemoved = new ArrayList<>();
-        for(AxViewHolder vh : viewHolders){
-            if (vh instanceof CarViewHolder) {
-                mDataset.remove(vh.getPosition());
-                toBeRemoved.add(vh);
-            }
-        }
-        viewHolders.removeAll(toBeRemoved);
-    }
-
-    public void removeAll() {
-        ArrayList<AxViewHolder> toBeRemoved = new ArrayList<>();
-        for (AxViewHolder vh : viewHolders) {
-            mDataset.remove(vh.getPosition());
-            toBeRemoved.add(vh);
-        }
-        viewHolders.removeAll(toBeRemoved);
-    }
-
-    public AuthenticationViewHolder getAuthentificationViewHolder() {
-        return getViewHolder(AuthenticationViewHolder.class);
-    }
-
     public CarViewHolder getCarViewHolder(Car car) {
-        for (AxViewHolder vh : viewHolders) {
-            if (vh instanceof CarViewHolder) {
-                if (((CarViewHolder) vh).car.equals(car)) {
-                    return (CarViewHolder) vh;
-                }
+        for(AxCardItem cardItem : mDataset.getList()){
+            if(cardItem.get().equals(car)){
+                return (CarViewHolder) cardItem.getViewHolder();
             }
         }
-        return null;
+        return  null;
     }
 
     public void setDataset(AxDataset<AxCardItem> myDataset) {
@@ -108,33 +80,23 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
                                            int viewType) {
         if (viewType == R.layout.ax_car_cardview) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.ax_car_cardview, parent, false);
-            CarViewHolder carViewHolder = new CarViewHolder(v, this, context);
-            viewHolders.add(carViewHolder);
-            return carViewHolder;
+            return new CarViewHolder(v, this, context);
 
         } else if (viewType == R.layout.ax_connection_cardview) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.ax_connection_cardview, parent, false);
-            ConnectionViewHolder connectionViewHolder = new ConnectionViewHolder(v, this, context);
-            viewHolders.add(connectionViewHolder);
-            return connectionViewHolder;
+            return new ConnectionViewHolder(v, this, context);
 
         } else if (viewType == R.layout.ax_club_cardview) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.ax_club_cardview, parent, false);
-            ClubViewHolder clubViewHolder = new ClubViewHolder(v, this, context);
-            viewHolders.add(clubViewHolder);
-            return clubViewHolder;
+            return new ClubViewHolder(v, this, context);
 
         } else if (viewType == R.layout.ax_car_settings_cardview) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.ax_car_settings_cardview, parent, false);
-            CarSettingsViewHolder carSettingsViewHolder = new CarSettingsViewHolder(v, this, context);
-            viewHolders.add(carSettingsViewHolder);
-            return carSettingsViewHolder;
+            return new CarSettingsViewHolder(v, this, context);
 
         } else if (viewType == R.layout.ax_welcome_cardview) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.ax_welcome_cardview, parent, false);
-            AuthenticationViewHolder authenticationViewHolder = new AuthenticationViewHolder(v, this, context);
-            viewHolders.add(authenticationViewHolder);
-            return authenticationViewHolder;
+            return new AuthenticationViewHolder(v, this, context);
 
         } else {
             throw new RuntimeException("Cardview not supported");
@@ -145,6 +107,7 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
     @Override
     public void onBindViewHolder(AxViewHolder holder, int position) {
         setAnimation(holder.mView, position);
+        mDataset.get(position).setViewHolder(holder);
         holder.onBindViewHolder(holder, position, mDataset.get(position));
     }
 
@@ -161,9 +124,10 @@ public class AxAdapter extends RecyclerView.Adapter<AxViewHolder> {
     }
 
     private <T> T getViewHolder(Class<T> type) {  //TODO this is kinda awful
-        for (ViewHolder v : viewHolders) {
-            if (type.isInstance(v)) {
-                return (T) v;
+
+        for(AxCardItem cardItem : mDataset.getList()){
+            if(type.isInstance(cardItem.getViewHolder())){
+                return (T) cardItem.getViewHolder();
             }
         }
         return null;

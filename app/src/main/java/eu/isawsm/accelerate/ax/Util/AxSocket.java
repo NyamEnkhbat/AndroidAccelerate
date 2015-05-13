@@ -41,6 +41,7 @@ public class AxSocket {
 
     public  boolean tryConnect(String address, Emitter.Listener onConnectionSuccess, Emitter.Listener onConnectionError, Emitter.Listener onConnectionTimeout) {
 
+        if(address.isEmpty() ) return false;
         if(!address.startsWith("http"))
             address = "http://"+ address;
 
