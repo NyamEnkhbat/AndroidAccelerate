@@ -93,6 +93,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
                     mSwipeLayout.setRefreshing(false);
                 }
             });
+            System.out.println("Connection Error!");
 
         }
     };
@@ -106,6 +107,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
             }
 
             retryCount ++;
+            System.out.println("Timeout #" + retryCount + "/15 retrying...");
             mSocket.tryConnect(AxPreferences.getServerAddress(mRecyclerView.getContext()), onConnectionSuccess, onConnectionError, onConnectionTimeout);
 
         }
@@ -312,7 +314,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     public void updateCars() {
         //      mAdapter.removeAllCars();
         for (Car c : mUser.getCars()) {
-            //     mDataset.add(new AxCardItem<>(c));
+            mDataset.add(new AxCardItem<>(c));
             subscribeToCar(c);
         }
     }

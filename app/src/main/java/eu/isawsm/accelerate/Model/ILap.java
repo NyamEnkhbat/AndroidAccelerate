@@ -10,5 +10,5 @@ public interface ILap {
 
     ICourse getCourse();
 
-    void setCourse(ICourse ICourse);
+    void setCourse(Course Course);
 }

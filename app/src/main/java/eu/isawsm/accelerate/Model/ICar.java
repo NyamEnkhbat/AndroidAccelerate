@@ -24,13 +24,13 @@ public interface ICar {
 
     void setPicture(Bitmap picture);
 
-    double getAvgTime();
+    double getAvgTime(ICourse course);
 
-    double getBestTime();
+    double getBestTime(ICourse course);
 
-    int getLapCount();
+    int getLapCount(ICourse course);
 
-    double getConsistency();
+    double getConsistency(ICourse course);
 
     int getRank();
 

@@ -13,21 +13,8 @@ import java.util.List;
 /**
  * Created by olfad on 29.01.2015.
  */
-public class Car implements Parcelable, ICar {
-    public static final Creator<Car> CREATOR = new Creator<Car>() {
-        @Override
-        public Car createFromParcel(Parcel source) {
-            Car retVal = new Car((IModel) source.readParcelable(null), (IClazz)
-                    source.readParcelable(null), source.readLong(), (Bitmap) source.readValue(null));
+public class Car implements ICar {
 
-            return retVal;
-        }
-
-        @Override
-        public Car[] newArray(int size) {
-            return new Car[size];
-        }
-    };
     private static final int MINLAPS = 10;
     private Model IModel;
     private Clazz IClazz;
@@ -103,42 +90,54 @@ public class Car implements Parcelable, ICar {
     }
 
     @Override
-    public double getAvgTime() {
+    public double getAvgTime(ICourse course) {
         if (ILaps.isEmpty()) return 0.0;
 
         long sum = 0;
         for (ILap l : ILaps) {
-            sum += l.getTime();
+            if(l.getCourse().equals(course))
+              sum += l.getTime();
         }
         return sum / ILaps.size();
     }
 
     @Override
-    public double getBestTime() {
+    public double getBestTime(ICourse course) {
         if (ILaps.isEmpty()) return 0;
         long bestTime = ILaps.get(0).getTime();
 
         for (ILap l : ILaps) {
-            if (l.getTime() < bestTime) {
-                bestTime = l.getTime();
-            }
+            if(l.getCourse().equals(course))
+                if (l.getTime() < bestTime) {
+
+                    bestTime = l.getTime();
+                }
         }
         return bestTime;
     }
 
     @Override
-    public int getLapCount() {
-        return ILaps.size();
+    public int getLapCount(ICourse course) {
+
+        int retVal = 0;
+
+        for(ILap l: ILaps){
+            if(l.getCourse().equals(course))
+                retVal++;
+        }
+        return retVal;
     }
 
     @Override
-    public double getConsistency() {
-        if (ILaps.size() < MINLAPS) return -1;
+    public double getConsistency(ICourse course) {
+        if (getLapCount(course) < MINLAPS) return -1;
         double[] times = new double[ILaps.size()];
         int i = 0;
         for (ILap l : ILaps) {
-            times[i] = l.getTime();
-            i++;
+            if(l.getCourse().equals(course)){
+                times[i] = l.getTime();
+                i++;
+            }
         }
         //Median for all Times
         double median1 = median(times);
@@ -185,33 +184,6 @@ public class Car implements Parcelable, ICar {
         retVal += getModel().getManufacturer().getName();
         retVal += " "+getModel().getName();
         return retVal.trim();
-    }
-
-    /**
-     * Describe the kinds of special objects contained in this Parcelable's
-     * marshalled representation.
-     *
-     * @return a bitmask indicating the set of special object types marshalled
-     * by the Parcelable.
-     */
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    /**
-     * Flatten this object in to a Parcel.
-     *
-     * @param dest  The Parcel in which the object should be written.
-     * @param flags Additional flags about how the object should be written.
-     *              May be 0 or {@link #PARCELABLE_WRITE_RETURN_VALUE}.
-     */
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(getModel());
-        dest.writeValue(getClazz());
-        dest.writeLong(transponderID);
-        dest.writeValue(picture);
     }
 
     @Override

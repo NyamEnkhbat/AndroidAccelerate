@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.isawsm.accelerate.Model.Car;
+import eu.isawsm.accelerate.Model.Course;
+import eu.isawsm.accelerate.Model.ICourse;
 import eu.isawsm.accelerate.Model.ILap;
 import eu.isawsm.accelerate.Model.Lap;
 import eu.isawsm.accelerate.R;
@@ -43,6 +45,7 @@ public class CarViewHolder extends AxViewHolder {
     LapAdapter lapAdapter0;
     LapAdapter lapAdapter1;
     LapAdapter lapAdapter2;
+    ICourse currentCourse;
 
     public CarViewHolder(View v, AxAdapter mDataset, MainActivity context) {
         super(v, mDataset, context);
@@ -68,21 +71,24 @@ public class CarViewHolder extends AxViewHolder {
 
     public void onBindViewHolder(AxAdapter.ViewHolder holder, int position, AxCardItem axCardItem) {
         car = (Car) axCardItem.get();
+        if(!car.getLaps().isEmpty())
+            currentCourse = car.getLaps().get(car.getLaps().size()-1).getCourse();
 
         tfCarName.setText(car.getName());
         tfClass.setText(car.getClazz().getName());
         String consistency;
-        if (car.getConsistency() != -1) {
-            consistency = car.getConsistency() + "%";
+        if (car.getConsistency(currentCourse) != -1) {
+            consistency = car.getConsistency(currentCourse) + "%";
         } else {
             consistency = "-";
         }
         tfConsistencyValue.setText(consistency);
         tfRank.setText(car.getRank() +""); //if i pass an int it will search for a resource ID
 
-        tfAvg.setText(car.getAvgTime() / 1000 + "");
-        tfBest.setText(car.getBestTime() / 1000 + "");
-        tfLaps.setText(car.getLapCount() + "");
+
+        tfAvg.setText(car.getAvgTime(currentCourse) / 1000 + "");
+        tfBest.setText(car.getBestTime(currentCourse) / 1000 + "");
+        tfLaps.setText(car.getLapCount(currentCourse) + "");
 
         lapAdapter0 = new LapAdapter(context, R.layout.laplistrow);
         lapAdapter0.positionOffset = 0;
@@ -104,26 +110,7 @@ public class CarViewHolder extends AxViewHolder {
         for (ILap l : lapArrayList) {
             addLap(l);
         }
-
-     //   addTestData(new Lap(11111, null));
-
     }
-
-    private void addTestData(final Lap lap){
-        if(Looper.myLooper() == null) Looper.prepare();
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Lap l = new Lap(lap.getTime() + (long) (Math.random() * 4000), null);
-                car.addLap(l);
-                Log.d("TestData", "AddingLap");
-                axAdapter.notifyItemChanged(getPosition());
-            }
-        }, 1000);
-    }
-
-
 
     private void addLap(ILap lap) {
         lapAdapter0.insert(lap,0);
@@ -198,18 +185,18 @@ public class CarViewHolder extends AxViewHolder {
             viewHolder.upArrow.setVisibility(View.GONE);
             viewHolder.equal.setVisibility(View.GONE);
 
-            if (lap.getTime() < car.getBestTime()) {
+            if (lap.getTime() < car.getBestTime(currentCourse)) {
                 viewHolder.star.setVisibility(View.VISIBLE);
                 return convertView;
             }
-            if (car.getAvgTime() + 5000 < lap.getTime()) {
+            if (car.getAvgTime(currentCourse) + 5000 < lap.getTime()) {
                 viewHolder.warn.setVisibility(View.VISIBLE);
                 return convertView;
             }
 
-            if (car.getAvgTime()+500 < lap.getTime()) {
+            if (car.getAvgTime(currentCourse)+500 < lap.getTime()) {
                 viewHolder.downArrow.setVisibility(View.VISIBLE);
-            } else if(car.getAvgTime()-500 > lap.getTime() ) {
+            } else if(car.getAvgTime(currentCourse)-500 > lap.getTime() ) {
                 viewHolder.upArrow.setVisibility(View.VISIBLE);
             } else {
                 viewHolder.equal.setVisibility(View.VISIBLE);

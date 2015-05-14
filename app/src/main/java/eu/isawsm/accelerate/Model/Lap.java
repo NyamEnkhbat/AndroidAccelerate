@@ -5,11 +5,11 @@ package eu.isawsm.accelerate.Model;
  */
 public class Lap implements ILap {
     private long time;
-    private ICourse ICourse;
+    private Course Course;
 
-    public Lap(long time, ICourse ICourse) {
+    public Lap(long time, Course Course) {
         this.time = time;
-        this.ICourse = ICourse;
+        this.Course = Course;
     }
 
     @Override
@@ -24,11 +24,11 @@ public class Lap implements ILap {
 
     @Override
     public ICourse getCourse() {
-        return ICourse;
+        return Course;
     }
 
     @Override
-    public void setCourse(ICourse ICourse) {
-        this.ICourse = ICourse;
+    public void setCourse(Course Course) {
+        this.Course = Course;
     }
 }
