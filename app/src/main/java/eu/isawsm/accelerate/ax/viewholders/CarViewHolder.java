@@ -1,9 +1,6 @@
 package eu.isawsm.accelerate.ax.viewholders;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,14 +10,11 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import eu.isawsm.accelerate.Model.Car;
-import eu.isawsm.accelerate.Model.Course;
-import eu.isawsm.accelerate.Model.ICourse;
-import eu.isawsm.accelerate.Model.ILap;
-import eu.isawsm.accelerate.Model.Lap;
+import Shared.Car;
+import Shared.Course;
+import Shared.Lap;
 import eu.isawsm.accelerate.R;
 import eu.isawsm.accelerate.ax.AxAdapter;
 import eu.isawsm.accelerate.ax.AxCardItem;
@@ -45,7 +39,7 @@ public class CarViewHolder extends AxViewHolder {
     LapAdapter lapAdapter0;
     LapAdapter lapAdapter1;
     LapAdapter lapAdapter2;
-    ICourse currentCourse;
+    Course currentCourse;
 
     public CarViewHolder(View v, AxAdapter mDataset, MainActivity context) {
         super(v, mDataset, context);
@@ -107,12 +101,12 @@ public class CarViewHolder extends AxViewHolder {
         //todo this could lead to inconsistent data but who cares if that one lap is missing that happend in the same second where i opend up my app...
         final List<Lap> lapArrayList = car.getLaps();
 
-        for (ILap l : lapArrayList) {
+        for (Lap l : lapArrayList) {
             addLap(l);
         }
     }
 
-    private void addLap(ILap lap) {
+    private void addLap(Lap lap) {
         lapAdapter0.insert(lap,0);
         if (lapAdapter0.getCount() > 5) {
             lapAdapter1.insert(lapAdapter0.getItem(5),0);
@@ -140,7 +134,7 @@ public class CarViewHolder extends AxViewHolder {
 
     }
 
-    public class LapAdapter extends ArrayAdapter<ILap> {
+    public class LapAdapter extends ArrayAdapter<Lap> {
 
         int positionOffset = 1;
         private ViewHolder viewHolder;
@@ -150,7 +144,7 @@ public class CarViewHolder extends AxViewHolder {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            ILap lap = getItem(position);
+            Lap lap = getItem(position);
 
 
             if(convertView == null) {

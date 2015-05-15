@@ -6,6 +6,9 @@ import android.os.Parcelable;
 
 import java.net.URI;
 
+import Shared.Car;
+import Shared.Driver;
+
 /**
  * Created by ofade_000 on 29.03.2015.
  */

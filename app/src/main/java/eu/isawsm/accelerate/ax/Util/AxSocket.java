@@ -8,9 +8,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.isawsm.accelerate.Model.Car;
-import eu.isawsm.accelerate.Model.Driver;
-import eu.isawsm.accelerate.Model.IDriver;
+import Shared.Car;
+import Shared.Driver;
 
 /**
  * Created by ofade_000 on 22.02.2015.
@@ -78,7 +77,7 @@ public class AxSocket {
             socket.disconnect();
     }
 
-    public void registerDriver(IDriver driver) {
+    public void registerDriver(Driver driver) {
         socket.emit("registerDriver",  driver);
     }
 

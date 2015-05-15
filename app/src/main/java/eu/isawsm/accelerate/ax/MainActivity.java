@@ -28,10 +28,10 @@ import org.json.JSONObject;
 
 import java.util.Locale;
 
+import Shared.Car;
+import Shared.Club;
+import Shared.Lap;
 import eu.isawsm.accelerate.Model.AxUser;
-import eu.isawsm.accelerate.Model.Car;
-import eu.isawsm.accelerate.Model.Club;
-import eu.isawsm.accelerate.Model.Lap;
 import eu.isawsm.accelerate.R;
 import eu.isawsm.accelerate.ax.Util.AxPreferences;
 import eu.isawsm.accelerate.ax.Util.AxSocket;
@@ -253,8 +253,8 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         mSocket.subscribeTo(car, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                JSONObject jsonObject = (JSONObject) args[0];
-                final Lap lap = new Gson().fromJson(jsonObject.toString(), Lap.class);
+              //  JSONObject jsonObject = (JSONObject) args[0];
+                final Lap lap = new Gson().fromJson(args[0].toString(), Lap.class);
 
                 if (isVoiceEnabled) {
                     speakTime(lap);

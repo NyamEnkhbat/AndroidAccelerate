@@ -7,11 +7,6 @@
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <!--
-     To retrieve OAuth 2.0 tokens or invalidate tokens to disconnect a user. This disconnect
-     option is required to comply with the Google+ Sign-In developer policies
-    -->
-    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
 
     <application
         android:allowBackup="true"
@@ -24,10 +19,6 @@
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
             android:value=".ax.MainActivity" />
-        <meta-data
-            android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id" />
-
         <activity
             android:name="eu.isawsm.accelerate.ax.MainActivity"
             android:label="@string/title_activity_main"
@@ -39,11 +30,6 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name="eu.isawsm.accelerate.FacebookAuthenticationUtil" />
-        <receiver android:name="eu.isawsm.accelerate.GoogleAuthenticationUtil" />
-        <activity
-            android:name="com.facebook.LoginActivity"
-            android:label="FB-Login" />
 
     </application>
 

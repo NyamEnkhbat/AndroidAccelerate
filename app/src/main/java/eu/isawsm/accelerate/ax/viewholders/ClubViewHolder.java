@@ -19,7 +19,7 @@ import org.json.JSONObject;
 import java.text.DateFormat;
 import java.util.Date;
 
-import eu.isawsm.accelerate.Model.Club;
+import Shared.Club;
 import eu.isawsm.accelerate.R;
 import eu.isawsm.accelerate.ax.AxAdapter;
 import eu.isawsm.accelerate.ax.AxCardItem;

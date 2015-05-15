@@ -8,13 +8,10 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 
-import eu.isawsm.accelerate.Model.Car;
-import eu.isawsm.accelerate.Model.Clazz;
-import eu.isawsm.accelerate.Model.IClazz;
-import eu.isawsm.accelerate.Model.IManufacturer;
-import eu.isawsm.accelerate.Model.IModel;
-import eu.isawsm.accelerate.Model.Manufacturer;
-import eu.isawsm.accelerate.Model.Model;
+import Shared.Car;
+import Shared.Clazz;
+import Shared.Manufacturer;
+import Shared.Model;
 import eu.isawsm.accelerate.R;
 import eu.isawsm.accelerate.ax.AxAdapter;
 import eu.isawsm.accelerate.ax.AxCardItem;
@@ -76,9 +73,9 @@ public class CarSettingsViewHolder extends AxViewHolder {
     }
 
     private Car createCar(){
-        IManufacturer manufacturer = new Manufacturer(tvManufacturer.getText().toString(), null);
-        IModel model = new Model(manufacturer,tvModel.getText().toString(), "", "", "", "");
-        IClazz clazz = new Clazz(tvClass.getText().toString(), "");
+        Manufacturer manufacturer = new Manufacturer(tvManufacturer.getText().toString(), null);
+        Model model = new Model(manufacturer,tvModel.getText().toString(), "", "", "", "");
+        Clazz clazz = new Clazz(tvClass.getText().toString(), "");
         long transponderID = Long.parseLong(etTransponder.getText().toString());
         Bitmap picture = null;
 
