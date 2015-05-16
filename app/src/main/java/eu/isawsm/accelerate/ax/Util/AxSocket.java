@@ -47,6 +47,9 @@ public class AxSocket {
         if(!address.startsWith("http"))
             address = "http://"+ address;
 
+        if(!address.contains(":")){
+            address += ":1337";
+        }
         try {
             setLastAddress(address);
 

@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import Shared.Car;
@@ -72,7 +73,7 @@ public class CarViewHolder extends AxViewHolder {
         tfClass.setText(car.getClazz().getName());
         String consistency;
         if (car.getConsistency(currentCourse) != -1) {
-            consistency = car.getConsistency(currentCourse) + "%";
+            consistency = car.getConsistency(currentCourse, 50) + "%";
         } else {
             consistency = "-";
         }
@@ -80,7 +81,7 @@ public class CarViewHolder extends AxViewHolder {
         tfRank.setText(car.getRank() +""); //if i pass an int it will search for a resource ID
 
 
-        tfAvg.setText(car.getAvgTime(currentCourse) / 1000 + "");
+        tfAvg.setText(car.getAvgTime(currentCourse, 50) / 1000 + "");
         tfBest.setText(car.getBestTime(currentCourse) / 1000 + "");
         tfLaps.setText(car.getLapCount(currentCourse) + "");
 
@@ -99,7 +100,7 @@ public class CarViewHolder extends AxViewHolder {
 
         //dont want to get a java.util.ConcurrentModificationException when a Lap is added while iterating.
         //todo this could lead to inconsistent data but who cares if that one lap is missing that happend in the same second where i opend up my app...
-        final List<Lap> lapArrayList = car.getLaps();
+        final List<Lap> lapArrayList = new ArrayList<>(car.getLaps());
 
         for (Lap l : lapArrayList) {
             addLap(l);

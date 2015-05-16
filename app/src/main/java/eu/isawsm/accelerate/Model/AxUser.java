@@ -5,6 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.net.URI;
+import java.util.ArrayList;
 
 import Shared.Car;
 import Shared.Driver;
@@ -32,7 +33,7 @@ public class AxUser extends Driver implements Parcelable {
         super(name, image, mail);
     }
 
-    private AxUser(Parcel in) {
+    public AxUser(Parcel in) {
         super();
         setName(in.readString());
         setImage((Bitmap) in.readValue(null));
@@ -42,6 +43,12 @@ public class AxUser extends Driver implements Parcelable {
 
     public AxUser() {
         super();
+    }
+
+    public AxUser getCopy() {
+        AxUser retVal = new AxUser(getName(), getImage(), getMail());
+        retVal.setCars(new ArrayList<>(getCars()));
+        return retVal;
     }
 
     /**

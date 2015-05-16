@@ -3,6 +3,7 @@ package eu.isawsm.accelerate.ax;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -80,7 +81,6 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     private Emitter.Listener onConnectionError = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
-            retryCount = 0;
             mSocket.off();
             if (Looper.myLooper() == null) Looper.prepare();
             runOnUiThread(new Runnable() {
@@ -93,7 +93,26 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
                     mSwipeLayout.setRefreshing(false);
                 }
             });
-            System.out.println("Connection Error!");
+
+            if(retryCount < 15) {
+
+                if(Looper.myLooper() == null) Looper.prepare();
+                Handler handler = new Handler();
+
+
+
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(mSocket.isConnected()) return;
+                        retryCount ++;
+                        System.out.println("Connection Error #" + retryCount + "/15 retrying...");
+                        mSocket.tryConnect(AxPreferences.getServerAddress(mRecyclerView.getContext()), onConnectionSuccess, onConnectionError, onConnectionTimeout);
+                    }
+                }, 1000);
+
+            }
+
 
         }
     };
@@ -136,6 +155,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
 
     public void initSocket(String address) {
         mSocket = new AxSocket();
+        retryCount = 0;
 
         if (!mSocket.isConnected()) {
             //Workaround to show the refreshing indicator

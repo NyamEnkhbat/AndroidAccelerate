@@ -35,7 +35,7 @@ public class AxPreferences {
     public static void setAxIUser(Context context, AxUser user) {
         SharedPreferences preferences=PreferenceManager.getDefaultSharedPreferences(context);
         Editor edit=preferences.edit();
-        edit.putString(AXUSER, gson.toJson(user));
+        edit.putString(AXUSER, gson.toJson(user.getCopy()));
         edit.apply();
     }
 
