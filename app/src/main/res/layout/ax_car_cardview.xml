@@ -31,7 +31,7 @@
                  android:layout_marginTop="10dp"
                  android:gravity="fill_horizontal|fill_vertical"
                  android:textColor="@android:color/tertiary_text_light"
-                 android:textSize="24dp" />
+                 android:textSize="24sp" />
 
                 <TextView
                     android:id="@+id/tfClass"
@@ -43,7 +43,6 @@
                     android:layout_marginLeft="15dp"
                     android:layout_toEndOf="@+id/tfCarName"
                  android:gravity="bottom"
-                    android:text="Modified"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="@android:color/tertiary_text_light" />
 
@@ -63,9 +62,6 @@
                         android:id="@+id/linearLayout4"
                         android:layout_width="0dp"
                      android:layout_height="match_parent"
-                        android:layout_alignBottom="@+id/ivCar"
-                     android:layout_alignTop="@+id/linearLayout2"
-                     android:layout_centerHorizontal="true"
                         android:layout_weight=".33"
                         android:gravity="center"
                         android:orientation="vertical"
@@ -75,11 +71,6 @@
                             android:id="@+id/tfRank"
                          android:layout_width="wrap_content"
                          android:layout_height="wrap_content"
-                         android:layout_above="@+id/textView4"
-                            android:layout_alignEnd="@+id/textView4"
-                            android:layout_alignRight="@+id/textView4"
-                         android:layout_toRightOf="@+id/ivCar"
-                            android:text="1"
                             android:textAppearance="?android:attr/textAppearanceLarge"
                          android:textColor="@color/colorPrimary"
                          android:textSize="31dp" />
@@ -88,10 +79,7 @@
                          android:id="@+id/textView4"
                          android:layout_width="wrap_content"
                          android:layout_height="wrap_content"
-                         android:layout_alignBottom="@+id/ivCar"
-                         android:layout_toEndOf="@+id/ivCar"
-                         android:layout_toRightOf="@+id/ivCar"
-                         android:text="Rank"
+                         android:text="@string/rank"
                          android:textColor="@android:color/tertiary_text_light" />
                     </LinearLayout>
 
@@ -99,9 +87,6 @@
                         android:id="@+id/linearLayout3"
                         android:layout_width="0dp"
                      android:layout_height="match_parent"
-                        android:layout_alignBottom="@+id/ivCar"
-                     android:layout_alignTop="@+id/linearLayout2"
-                     android:layout_centerHorizontal="true"
                         android:layout_weight=".33"
                         android:gravity="center"
                         android:orientation="vertical">
@@ -110,23 +95,15 @@
                             android:id="@+id/tfConsistencyValue"
                          android:layout_width="wrap_content"
                          android:layout_height="wrap_content"
-                         android:layout_above="@+id/textView6"
-                            android:layout_alignEnd="@+id/textView6"
-                            android:layout_alignRight="@+id/textView6"
-                         android:layout_toRightOf="@+id/ivCar"
-                            android:text="100%"
                             android:textAppearance="?android:attr/textAppearanceLarge"
                          android:textColor="@color/colorPrimary"
-                         android:textSize="31dp" />
+                         android:textSize="31sp" />
 
                      <TextView
                          android:id="@+id/textView6"
                          android:layout_width="wrap_content"
                          android:layout_height="wrap_content"
-                         android:layout_alignBottom="@+id/ivCar"
-                         android:layout_toEndOf="@+id/ivCar"
-                         android:layout_toRightOf="@+id/ivCar"
-                         android:text="Consistency"
+                         android:text="@string/consistency"
                          android:textColor="@android:color/tertiary_text_light" />
                     </LinearLayout>
 
@@ -134,10 +111,6 @@
                      android:id="@+id/linearLayout"
                      android:layout_width="0dp"
                      android:layout_height="fill_parent"
-                     android:layout_alignBottom="@+id/ivCar"
-                     android:layout_alignParentEnd="true"
-                     android:layout_alignParentRight="true"
-                     android:layout_alignTop="@+id/ivCar"
                      android:layout_weight=".33"
                      android:gravity="center_vertical|center_horizontal"
                      android:orientation="vertical"
@@ -151,13 +124,8 @@
                          <TextView
                              android:layout_width="wrap_content"
                              android:layout_height="wrap_content"
-                             android:layout_alignBaseline="@+id/tfLaps"
-                             android:layout_alignBottom="@+id/tfLaps"
-
-                             android:layout_toEndOf="@+id/ivCondition"
-                             android:layout_toRightOf="@+id/ivCondition"
                              android:padding="2dp"
-                             android:text="Avg:"
+                             android:text="@string/avg"
                              android:textAppearance="?android:attr/textAppearanceSmall"
                              android:textColor="@android:color/tertiary_text_light" />
 
@@ -166,7 +134,6 @@
                              android:layout_width="wrap_content"
                              android:layout_height="wrap_content"
                              android:gravity="right"
-                             android:text="15.36"
                              android:textColor="@color/colorPrimary" />
                      </LinearLayout>
 
@@ -178,11 +145,8 @@
                          <TextView
                              android:layout_width="wrap_content"
                              android:layout_height="wrap_content"
-                             android:layout_below="@+id/tfCarName"
-                             android:layout_toEndOf="@+id/imageView5"
-                             android:layout_toRightOf="@+id/imageView5"
                              android:padding="2dp"
-                             android:text="Best:"
+                             android:text="@string/best"
                              android:textAppearance="?android:attr/textAppearanceSmall"
                              android:textColor="@android:color/tertiary_text_light" />
 
@@ -191,7 +155,6 @@
                              android:layout_width="fill_parent"
                              android:layout_height="wrap_content"
                              android:gravity="right"
-                             android:text="15.36"
                              android:textColor="@color/colorPrimary" />
                      </LinearLayout>
 
@@ -203,11 +166,8 @@
                          <TextView
                              android:layout_width="wrap_content"
                              android:layout_height="wrap_content"
-                             android:layout_alignTop="@+id/imageView6"
-                             android:layout_toEndOf="@+id/imageView6"
-                             android:layout_toRightOf="@+id/imageView6"
                              android:padding="2dp"
-                             android:text="Laps:"
+                             android:text="@string/laps"
                              android:textAppearance="?android:attr/textAppearanceSmall"
                              android:textColor="@android:color/tertiary_text_light" />
 
@@ -216,7 +176,6 @@
                              android:layout_width="fill_parent"
                              android:layout_height="wrap_content"
                              android:gravity="right"
-                             android:text="1254"
                              android:textColor="@color/colorPrimary" />
                      </LinearLayout>
 
@@ -234,14 +193,15 @@
                  android:background="@android:color/transparent"
                  android:src="@drawable/ic_menu_forward"
                  android:tint="@color/colorPrimary"
-                 android:visibility="gone" />
+                 android:contentDescription="@string/more" />
 
                 <LinearLayout
                  android:layout_width="fill_parent"
                  android:layout_height="fill_parent"
                  android:layout_below="@+id/linearLayout2"
                     android:gravity="center_horizontal"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:baselineAligned="false">
 
                     <ListView
                      android:id="@+id/listView0"

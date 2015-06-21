@@ -1,0 +1,30 @@
+<resources>
+
+    <string name="action_add_car">Auto Hinzufügen</string>
+    <string name="action_settings">Einstellungen</string>
+    <string name="addcar">Auto Hinzufügen</string>
+    <string name="avg">Durchschn:</string>
+    <string name="best">Beste:</string>
+    <string name="clazz">Classe</string>
+    <string name="connectionsuccessful">Verbunden</string>
+    <string name="consistency">Beständigkeit</string>
+    <string name="could_not_connect_error">Verbindungsfehler</string>
+    <string name="crash_toast_text">Etwas ist schief gelaufen!</string>
+    <string name="invalid_address_error">Bitte geben Sie eine gültige Adresse ein</string>
+    <string name="laps">Runden:</string>
+    <string name="manufacturer">Hersteller</string>
+    <string name="model">Model</string>
+    <string name="more">mehr..</string>
+    <string name="nowheaterdata">Keine Wetter Daten</string>
+    <string name="place_not_found">Keine Wetter Daten gefunden</string>
+    <string name="rank">Platz</string>
+    <string name="text_connection">Verbindung Testen</string>
+    <string name="timingserveraddresshint">Zeitnahme Server Adresse</string>
+    <string name="title_activity_user_config">Benutzer Einstellungen</string>
+    <string name="transpondernumber">Transponder Nummer</string>
+    <string name="voiceToggle">Stummschalten</string>
+    <string name="thiscantbeemptyerror">Dieses Feld muss ausgefüllt werden</string>
+    <string name="SettingsAction">Settings</string>
+    <string name="currentWeatherContentDesc">Current Weather</string>
+
+</resources>

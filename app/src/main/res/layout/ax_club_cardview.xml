@@ -19,9 +19,10 @@
             android:layout_gravity="center"
             android:gravity="center">
 
+
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/headlineHight"
+                android:layout_height="@dimen/headlineHeight"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:id="@+id/tfClubName"
                 android:layout_alignParentTop="true"
@@ -29,20 +30,20 @@
                 android:layout_alignParentStart="true"
                 android:linksClickable="false"
                 android:gravity="center_vertical"
-                android:textColor="@android:color/tertiary_text_dark"
-                android:text="Location" />
+                android:textColor="@android:color/tertiary_text_dark" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="75dp"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="N/A"
+                android:text="@string/NA"
                 android:id="@+id/tfTemperature"
                 android:textColor="@android:color/tertiary_text_dark"
-                android:textSize="65dp"
+                android:textSize="65sp"
                 android:gravity="center"
                 android:layout_alignTop="@+id/ivCondition"
-                android:layout_toRightOf="@+id/ivCondition" />
+                android:layout_toRightOf="@+id/ivCondition"
+                android:layout_toEndOf="@+id/ivCondition"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -52,7 +53,7 @@
                 android:layout_below="@+id/tfClubName"
                 android:layout_alignLeft="@+id/tfClubName"
                 android:layout_alignStart="@+id/tfClubName"
-                android:text="No wheater data" />
+                android:text="@string/nowheaterdata" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -61,7 +62,9 @@
                 android:textColor="@android:color/darker_gray"
                 android:layout_below="@+id/tfClubName"
                 android:layout_toRightOf="@+id/tfCondition"
-                android:layout_marginLeft="5dp" />
+                android:layout_toEndOf="@+id/tfCondition"
+                android:layout_marginLeft="5dp"
+                android:layout_marginStart="5dp"/>
 
             <ImageView
                 android:layout_width="92dp"
@@ -70,7 +73,8 @@
                 android:layout_below="@+id/tfCondition"
                 android:layout_alignLeft="@+id/tfCondition"
                 android:layout_alignStart="@+id/tfCondition"
-                android:src="@drawable/ic_tornado" />
+                android:src="@drawable/ic_tornado"
+                android:contentDescription="@string/currentWeatherContentDesc" />
         </RelativeLayout>
 
     </android.support.v7.widget.CardView>

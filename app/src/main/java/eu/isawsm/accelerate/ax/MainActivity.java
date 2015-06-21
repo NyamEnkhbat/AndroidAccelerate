@@ -1,6 +1,8 @@
 package eu.isawsm.accelerate.ax;
 
 
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -27,7 +29,14 @@ import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.net.InetAddress;
 import java.util.Locale;
+
+import javax.jmdns.JmDNS;
+import javax.jmdns.ServiceEvent;
+import javax.jmdns.ServiceInfo;
+import javax.jmdns.ServiceListener;
 
 import Shared.Car;
 import Shared.Club;
@@ -134,7 +143,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        try {
+
             setContentView(R.layout.ax_recycler);
             setSystemBarColor();
             setToolBar();
@@ -142,18 +151,90 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
             initRecyclerView();
             tts = new TextToSpeech(this, this);
             mUser = AxPreferences.getAxIUser(this) != null ? AxPreferences.getAxIUser(this) : new AxUser();
+
             initSocket();
-            updateCars();
-        } catch (Exception e) {
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+        updateCars();
+
+    }
+
+
+    private  JmDNS mdnsService;
+    public void initSocket()  {
+        AsyncTask<Void, Void, Void> asyncTask = new netconfTask().execute();
+
+        while (asyncTask.getStatus() != AsyncTask.Status.FINISHED){
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+
+        mdnsService.addServiceListener("AxService",  new ServiceListener() {
+            @Override
+            public void serviceResolved(ServiceEvent event) {
+                System.out.println("Service resolved: " + event.getName() +
+                        " of type " +    event.getType());
+            }
+
+            @Override
+            public void serviceRemoved(ServiceEvent event) {
+                System.out.println("Service removed: " + event.getName() +
+                        " of type " + event.getType());
+            }
+
+            @Override
+            public void serviceAdded(ServiceEvent event) {
+                System.out.println("Service added: " + event.getName() +
+                        " of type " + event.getType());
+                ServiceInfo info = mdnsService.getServiceInfo(event.getType(), event.getName());
+                System.out.println("Service info: " + info); // --> null
+            }
+
+        });
+
+    }
+
+    private class netconfTask extends AsyncTask<Void, Void, Void> {
+
+        private Exception exception;
+
+        protected Void doInBackground(Void... urls) {
+            try {
+                InetAddress addr = InetAddress.getLocalHost();
+                String hostname = InetAddress.getByName(addr.getHostName()).toString();
+                mdnsService = JmDNS.create();
+
+               // ServiceInfo[] infos = mdnsService.list("my-service-type");
+                // Retrieve service info from either ServiceInfo[] returned here or listener callback method above.
+               // initSocket(infos[0].getHostAddresses()[0]);
+
+              //  mdnsService.removeServiceListener("my-service-type", mdnsServiceListener);
+             //   mdnsService.close();
+            } catch (Exception e) {
+                this.exception = e;
+                return null;
+            }
+            return null;
+        }
+
+        protected void onPostExecute(Void ignored) {
+            if(this.exception != null){
+                this.exception.printStackTrace();
+            }
+            // TODO: check this.exception
+            // TODO: do something with the feed
         }
     }
 
-    public void initSocket() {
-        initSocket(AxPreferences.getServerAddress(this));
-    }
-
     public void initSocket(String address) {
+        if (address == null ||  address.isEmpty()){
+            showConnectionSetup();
+            return;
+        }
+
         mSocket = new AxSocket();
         retryCount = 0;
 
@@ -234,8 +315,9 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     }
 
     private void showConnectionSetup() {
+        mSwipeLayout.setRefreshing(false);
         if (!mDataset.add(new AxCardItem<>(new ConnectionSetup()))) {
-            mAdapter.getConnectionViewHolder().mAcTVServerAdress.setError("Incorrect Address");
+            mAdapter.getConnectionViewHolder().mAcTVServerAdress.setError(getResources().getString(R.string.invalid_address_error));
         }
         mRecyclerView.scrollToPosition(0);
     }
@@ -299,13 +381,16 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
         }
         String[] times = lapTime.split("\\.");
 
-        speakOut(times[0] + " " + times[1].substring(0, 2));
+        speakOut(times[0] + "  " + times[1].charAt(0) + " " + times[1].charAt(1));
     }
 
     public void onTestConnection(View view) {
         ConnectionViewHolder connectionViewHolder = mAdapter.getConnectionViewHolder();
         String address = connectionViewHolder.tryGetAddress();
-        if (address != null) initSocket(address);
+        if (address == null || address.isEmpty()){
+            showConnectionSetup();
+        }
+        initSocket(address);
     }
 
     @Override
@@ -320,12 +405,19 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
             case R.id.action_add_car:
                 mAdapter.addCarSetup();
                 return true;
+
             case R.id.action_voice:
-                isVoiceEnabled = !isVoiceEnabled;
-                if (isVoiceEnabled) {
-                    Toast.makeText(this, "Voice Enabled", Toast.LENGTH_LONG).show();
-                } else
-                    Toast.makeText(this, "Voice Disabled", Toast.LENGTH_LONG).show();
+                item.setChecked(!item.isChecked());
+                isVoiceEnabled = !item.isChecked();
+                if(isVoiceEnabled)   item.setIcon(R.drawable.ic_lock_ringer_on_alpha);
+                else  item.setIcon(R.drawable.ic_lock_ringer_off_alpha);
+                return true;
+
+            case R.id.action_settings:
+                Intent openSettingsIntent = new Intent(this, SettingsActivity.class);
+                startActivity(openSettingsIntent);
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -358,8 +450,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     @Override
     public void onInit(int status) {
         if (status == TextToSpeech.SUCCESS) {
-
-            int result = tts.setLanguage(Locale.US);
+            int result = tts.setLanguage(getResources().getConfiguration().locale);
 
             if (result == TextToSpeech.LANG_MISSING_DATA
                     || result == TextToSpeech.LANG_NOT_SUPPORTED) {

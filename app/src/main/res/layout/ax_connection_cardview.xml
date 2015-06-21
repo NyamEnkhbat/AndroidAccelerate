@@ -43,7 +43,6 @@
                 android:text="@string/text_connection"
                 android:id="@+id/bTestConnection"
                 android:layout_gravity="end"
-                android:nestedScrollingEnabled="false"
                 style="@style/defaultButton"
                 android:onClick="onTestConnection"/>
 

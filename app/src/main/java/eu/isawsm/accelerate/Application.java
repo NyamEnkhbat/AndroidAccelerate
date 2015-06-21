@@ -4,7 +4,7 @@ import org.acra.*;
 import org.acra.annotation.*;
 
         @ReportsCrashes( // will not be used
-                mailTo = "ofaderbauer@gmail.com",
+                mailTo = "help.axelerate@gmail.com",
                 mode = ReportingInteractionMode.TOAST,
                 resToastText = R.string.crash_toast_text)
 

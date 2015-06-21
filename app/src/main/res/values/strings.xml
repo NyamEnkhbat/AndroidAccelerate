@@ -1,40 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <string name="app_name" translatable="false">Accelerate</string>
-    <string name="title_activity_main">Axelerate</string>
-    <string name="timingserveraddresshint">Timing Server Adress</string>
+    <string name="app_name" translatable="false">Axelerate</string>
+    <string name="title_activity_main" translatable="false">Axelerate</string>
+    <string name="timingserveraddresshint">Timing Server Address</string>
     <string name="text_connection">Test Connection</string>
     <string name="connectionsuccessful">Connection Successful</string>
     <!-- Menu -->
     <string name="action_add_car">Add Car</string>
-    <string name="action_add_firend">Add Friend</string>
     <string name="action_settings">Settings</string>
     <!-- Put your own APP ID here -->
-    <string name="open_weather_maps_app_id">11111</string>
+    <string name="open_weather_maps_app_id" translatable="false">11111</string>
     <string name="place_not_found">Sorry, no weather data found.</string>
-    <string name="action_show_profile">Profile…</string>
     <string name="invalid_address_error">Please enter a valid address</string>
     <string name="could_not_connect_error">Could not connect</string>
-    <string name="username">Your Name</string>
-    <string name="drivernamedialogsubmit">Submit</string>
-    <string name="please_enter_your_full_name">Please enter you Name</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_user_config">UserConfig</string>
 
-    <string name="logintext">Sign in with Google</string>
-    <string name="signing_in_status">Signing in with Google+.</string>
-    <string name="plus_generic_error">Sign in with Google is not available.</string>
-    <string name="signed_out_status">Signed out.</string>
-    <string name="sign_in_error_status">Error signing in.</string>
-    <string name="unknown_person">Unknown</string>
-    <string name="signed_in_status">Signed in as \"%s\".</string>
-    <string name="loading_status">Loading…</string>
-    <string name="or">OR</string>
-    <string name="login_text">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat</string>
-
-    <string name="facebook_app_id">797918650292923</string>
-    <string name="action_logoff">Sign off...</string>
-    <string name="voiceToggle">Toggle Voice</string>
+    <string name="voiceToggle">Mute</string>
     <string name="crash_toast_text">Something went wrong!</string>
+    <string name="rank">Rank</string>
+    <string name="consistency">Consistency</string>
+    <string name="avg">Avg:</string>
+    <string name="best">Best:</string>
+    <string name="laps">Laps:</string>
+    <string name="more">more..</string>
+    <string name="manufacturer">Manufacturer</string>
+    <string name="model">Model</string>
+    <string name="clazz">Class</string>
+    <string name="transpondernumber">Transponder Number</string>
+    <string name="addcar">Add Car</string>
+    <string name="NA" translatable="false">N/A</string>
+    <string name="nowheaterdata">No weather data</string>
+    <string name="thiscantbeemptyerror">This cant be empty!</string>
+    <string name="SettingsAction">Settings</string>
+    <string name="currentWeatherContentDesc">Current Weather</string>
+    <string name="title_activity_ax_car_detail">AxCarDetailActivity</string>
+
+    <string name="hello_world">Hello world!</string>
 </resources>

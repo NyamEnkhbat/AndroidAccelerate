@@ -16,8 +16,7 @@
             android:id="@+id/tfindex"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"
-            android:text="1" />
+            android:layout_marginRight="5dp" />
 
         <ImageView
             android:id="@+id/downArrow"
@@ -27,6 +26,7 @@
             android:rotation="180"
             android:scaleType="center"
             android:src="@drawable/abc_ic_commit_search_api_mtrl_alpha"
+            android:tint="@android:color/holo_red_light"
             android:visibility="gone" />
         <ImageView
             android:id="@+id/upArrow"
@@ -35,6 +35,7 @@
             android:layout_gravity="center_vertical"
             android:scaleType="center"
             android:src="@drawable/abc_ic_commit_search_api_mtrl_alpha"
+            android:tint="@android:color/holo_green_light"
             android:visibility="gone" />
 
         <ImageView
@@ -42,6 +43,7 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:src="@drawable/btn_rating_star_off_normal_holo_light"
+            android:tint="@android:color/holo_orange_light"
             android:visibility="gone" />
 
         <ImageView
@@ -49,6 +51,7 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:src="@drawable/stat_notify_error"
+            android:tint="@android:color/holo_orange_dark"
             android:visibility="gone" />
 
         <ImageView
@@ -56,13 +59,13 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:src="@drawable/abc_btn_radio_to_on_mtrl_015"
+            android:tint="@android:color/darker_gray"
             android:visibility="gone" />
 
         <TextView
             android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:text="17.457" />
+            android:layout_marginLeft="5dp"/>
     </LinearLayout>
 </LinearLayout>

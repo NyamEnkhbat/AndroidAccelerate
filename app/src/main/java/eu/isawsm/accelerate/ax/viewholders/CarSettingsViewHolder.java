@@ -65,7 +65,7 @@ public class CarSettingsViewHolder extends AxViewHolder {
 
     private boolean checkInput(EditText v){
         if(v.getText().toString().trim().isEmpty()){
-            v.setError("This cant be empty!");
+            v.setError(context.getResources().getString(R.string.thiscantbeemptyerror));
             v.requestFocus();
             return false;
         }

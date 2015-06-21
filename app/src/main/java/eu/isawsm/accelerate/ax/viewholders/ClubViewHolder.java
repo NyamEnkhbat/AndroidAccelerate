@@ -117,7 +117,7 @@ public class ClubViewHolder extends AxViewHolder implements GoogleApiClient.Conn
         try {
           //  tfClubName.setText(json.getString("name"));
 
-
+//TODO Locate that stuff
             JSONObject details = json.getJSONArray("weather").getJSONObject(0);
             JSONObject main = json.getJSONObject("main");
             tfCondition.setText(details.getString("description"));
