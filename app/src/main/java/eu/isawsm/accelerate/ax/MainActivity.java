@@ -2,6 +2,7 @@ package eu.isawsm.accelerate.ax;
 
 
 import android.content.Intent;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
@@ -32,6 +34,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceEvent;
@@ -108,8 +111,6 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
                 if(Looper.myLooper() == null) Looper.prepare();
                 Handler handler = new Handler();
 
-
-
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -158,74 +159,85 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
     }
 
 
-    private  JmDNS mdnsService;
     public void initSocket()  {
-        AsyncTask<Void, Void, Void> asyncTask = new netconfTask().execute();
 
-        while (asyncTask.getStatus() != AsyncTask.Status.FINISHED){
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-
-        mdnsService.addServiceListener("AxService",  new ServiceListener() {
-            @Override
-            public void serviceResolved(ServiceEvent event) {
-                System.out.println("Service resolved: " + event.getName() +
-                        " of type " +    event.getType());
-            }
-
-            @Override
-            public void serviceRemoved(ServiceEvent event) {
-                System.out.println("Service removed: " + event.getName() +
-                        " of type " + event.getType());
-            }
-
-            @Override
-            public void serviceAdded(ServiceEvent event) {
-                System.out.println("Service added: " + event.getName() +
-                        " of type " + event.getType());
-                ServiceInfo info = mdnsService.getServiceInfo(event.getType(), event.getName());
-                System.out.println("Service info: " + info); // --> null
-            }
-
-        });
+            new netconfTask().execute();
 
     }
 
-    private class netconfTask extends AsyncTask<Void, Void, Void> {
+    private class netconfTask extends AsyncTask<Void, Void, String> {
 
         private Exception exception;
+        private android.net.wifi.WifiManager.MulticastLock lock;
+        private String type = "_AxNetConf._tcp.local.";
+        private JmDNS jmdns;
+        private ServiceListener listener;
 
-        protected Void doInBackground(Void... urls) {
+
+        private void setUp() { // to be called by onCreate
+            android.net.wifi.WifiManager wifi =
+                    (android.net.wifi.WifiManager)
+                            getSystemService(android.content.Context.WIFI_SERVICE);
+            lock = wifi.createMulticastLock("HeeereDnssdLock");
+            lock.setReferenceCounted(true);
+            lock.acquire();
+
+        }
+
+        protected String doInBackground(Void... urls) {
+
+            final String[] retVal = {""};
+
+            setUp();
+
             try {
-                InetAddress addr = InetAddress.getLocalHost();
-                String hostname = InetAddress.getByName(addr.getHostName()).toString();
-                mdnsService = JmDNS.create();
 
-               // ServiceInfo[] infos = mdnsService.list("my-service-type");
-                // Retrieve service info from either ServiceInfo[] returned here or listener callback method above.
-               // initSocket(infos[0].getHostAddresses()[0]);
+                WifiManager wm = (WifiManager) getSystemService(WIFI_SERVICE);
+                String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
+                InetAddress deviceIpAddress = InetAddress.getByName(ip);
 
-              //  mdnsService.removeServiceListener("my-service-type", mdnsServiceListener);
-             //   mdnsService.close();
-            } catch (Exception e) {
-                this.exception = e;
-                return null;
+                jmdns = JmDNS.create(deviceIpAddress, ip);
+
+                jmdns.addServiceListener(type, listener = new ServiceListener() {
+                    public void serviceResolved(final ServiceEvent ev) {
+                        Log.i("AxNetConf", "Service resolved: "
+                                + ev.getInfo().getQualifiedName()
+                                + " port:" + ev.getInfo().getPort());
+                        for (final InetAddress a : ev.getInfo().getInetAddresses()) {
+                            Log.i("AxNetConf", a.toString());
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    initSocket(a.getHostAddress() + ":" + ev.getInfo().getPort());
+                                }
+                            });
+                        }
+                    }
+
+                    public void serviceRemoved(ServiceEvent ev) {
+                        Log.i("AxNetConf", "Service removed: " + ev.getName());
+                    }
+
+                    public void serviceAdded(ServiceEvent event) {
+                        // Required to force serviceResolved to be called again
+                        // (after the first search)
+                        jmdns.requestServiceInfo(event.getType(), event.getName(), 1);
+                    }
+
+                });
+
+            //    jmdns.removeServiceListener(type, listener);
+              //  jmdns.close();
+
+                return retVal[0];
+            } catch (IOException e) {
+                e.printStackTrace();
             }
             return null;
         }
 
         protected void onPostExecute(Void ignored) {
-            if(this.exception != null){
-                this.exception.printStackTrace();
-            }
-            // TODO: check this.exception
-            // TODO: do something with the feed
+            if (lock != null) lock.release();
         }
     }
 
@@ -457,7 +469,7 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
                 Log.e("TTS", "This Language is not supported");
             }
         } else {
-            Log.e("TTS", "Initilization Failed!");
+            Log.e("TTS", "Initialization Failed!");
         }
     }
 
