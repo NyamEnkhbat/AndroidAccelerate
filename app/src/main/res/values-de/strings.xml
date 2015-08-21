@@ -24,7 +24,7 @@
     <string name="transpondernumber">Transponder Nummer</string>
     <string name="voiceToggle">Stummschalten</string>
     <string name="thiscantbeemptyerror">Dieses Feld muss ausgefüllt werden</string>
-    <string name="SettingsAction">Settings</string>
+    <string name="SettingsAction">Einstellungen</string>
     <string name="currentWeatherContentDesc">Current Weather</string>
 
 </resources>

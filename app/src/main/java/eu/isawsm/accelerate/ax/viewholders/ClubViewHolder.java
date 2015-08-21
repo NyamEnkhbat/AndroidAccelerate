@@ -162,6 +162,8 @@ public class ClubViewHolder extends AxViewHolder implements GoogleApiClient.Conn
                 break;
         }
 
+        if(actualId == 800 || actualId == 801) icon = context.getResources().getDrawable(R.drawable.ic_fair);
+        else if(actualId == 802 || actualId == 803) icon = context.getResources().getDrawable(R.drawable.ic_mostly_cloudy);
         ivCondition.setImageDrawable(icon);
     }
 }

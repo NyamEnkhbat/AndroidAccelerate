@@ -160,8 +160,9 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
 
 
     public void initSocket()  {
+        initSocket(null);
+        new netconfTask().execute();
 
-            new netconfTask().execute();
 
     }
 
@@ -200,6 +201,10 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
 
                 jmdns.addServiceListener(type, listener = new ServiceListener() {
                     public void serviceResolved(final ServiceEvent ev) {
+
+                        if (mAdapter.getConnectionViewHolder() != null)
+                            mDataset.remove(mAdapter.getConnectionViewHolder().getPosition());
+
                         Log.i("AxNetConf", "Service resolved: "
                                 + ev.getInfo().getQualifiedName()
                                 + " port:" + ev.getInfo().getPort());
@@ -212,6 +217,8 @@ public class MainActivity extends ActionBarActivity  implements SwipeRefreshLayo
                                 }
                             });
                         }
+
+
                     }
 
                     public void serviceRemoved(ServiceEvent ev) {
