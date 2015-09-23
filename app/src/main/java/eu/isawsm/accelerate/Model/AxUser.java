@@ -1,11 +1,15 @@
 package eu.isawsm.accelerate.Model;
 
+import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.provider.ContactsContract;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import Shared.Car;
 import Shared.Driver;
@@ -18,7 +22,7 @@ public class AxUser extends Driver implements Parcelable {
         @Override
         public AxUser createFromParcel(Parcel source) {
             AxUser retVal = new AxUser(source.readString(), (Bitmap) source.readValue(null), (URI) source.readValue(null));
-            retVal.setCars((java.util.ArrayList<Car>) source.readValue(null));
+            retVal.setCars(new HashSet<>((ArrayList<Car>) source.readValue(null)));
             return retVal;
         }
 
@@ -38,7 +42,7 @@ public class AxUser extends Driver implements Parcelable {
         setName(in.readString());
         setImage((Bitmap) in.readValue(null));
         setMail((URI) in.readValue(null));
-        setCars((java.util.ArrayList<Car>) in.readValue(null));
+        setCars(new HashSet<Car>((ArrayList<Car>) in.readValue(null)));
     }
 
     public AxUser() {
@@ -47,9 +51,10 @@ public class AxUser extends Driver implements Parcelable {
 
     public AxUser getCopy() {
         AxUser retVal = new AxUser(getName(), getImage(), getMail());
-        retVal.setCars(new ArrayList<>(getCars()));
+        retVal.setCars(new HashSet<>(getCars()));
         return retVal;
     }
+
 
     /**
      * Describe the kinds of special objects contained in this Parcelable's
@@ -75,6 +80,6 @@ public class AxUser extends Driver implements Parcelable {
         dest.writeString(getName());
         dest.writeValue(getImage());
         dest.writeValue(getMail());
-        dest.writeList(getCars());
+        dest.writeList(new ArrayList<>(getCars()));
     }
 }

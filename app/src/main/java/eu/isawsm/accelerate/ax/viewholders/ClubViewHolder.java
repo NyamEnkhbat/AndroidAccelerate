@@ -94,15 +94,7 @@ public class ClubViewHolder extends AxViewHolder implements GoogleApiClient.Conn
         new Thread() {
             public void run() {
                 final JSONObject json = RemoteFetch.getJSON(context, lat, lon);
-                if (json == null) {
-                    handler.post(new Runnable() {
-                        public void run() {
-                            Toast.makeText(context,
-                                    context.getString(R.string.place_not_found),
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    });
-                } else {
+                if (json != null) {
                     handler.post(new Runnable() {
                         public void run() {
                             renderWeather(json);
@@ -115,8 +107,6 @@ public class ClubViewHolder extends AxViewHolder implements GoogleApiClient.Conn
 
     private void renderWeather(JSONObject json) {
         try {
-          //  tfClubName.setText(json.getString("name"));
-
 //TODO Locate that stuff
             JSONObject details = json.getJSONArray("weather").getJSONObject(0);
             JSONObject main = json.getJSONObject("main");
@@ -124,10 +114,6 @@ public class ClubViewHolder extends AxViewHolder implements GoogleApiClient.Conn
             tfAditionalInfo.setText("Humidity: " + main.getString("humidity"));
 
             tfTemperature.setText(Math.round(main.getDouble("temp") - 273.15) + "℃");
-
-            DateFormat df = DateFormat.getDateTimeInstance();
-            String updatedOn = df.format(new Date(json.getLong("dt") * 1000));
-            //updatedField.setText("Last update: " + updatedOn);
 
             setWeatherIcon(details.getInt("id"));
 

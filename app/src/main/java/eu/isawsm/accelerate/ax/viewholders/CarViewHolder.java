@@ -67,7 +67,7 @@ public class CarViewHolder extends AxViewHolder {
     public void onBindViewHolder(AxAdapter.ViewHolder holder, int position, AxCardItem axCardItem) {
         car = (Car) axCardItem.get();
         if(!car.getLaps().isEmpty())
-            currentCourse = car.getLaps().get(car.getLaps().size()-1).getCourse();
+            currentCourse = new ArrayList<>(car.getLaps()).get(car.getLaps().size()-1).getCourse();
 
         tfCarName.setText(car.getName());
         tfClass.setText(car.getClazz().getName());
@@ -166,7 +166,7 @@ public class CarViewHolder extends AxViewHolder {
             viewHolder.equal = (ImageView) convertView.findViewById(R.id.equal);
 
 
-            viewHolder.index.setText(car.getLaps().indexOf(lap)+1 + ".");
+            viewHolder.index.setText(new ArrayList<>(car.getLaps()).indexOf(lap)+1 + ".");
 
             String lapTime = lap.getTime() / 1000d + "";
             while (lapTime.length() < 6) {

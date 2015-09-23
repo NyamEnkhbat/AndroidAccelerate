@@ -1,8 +1,12 @@
 package eu.isawsm.accelerate.ax.Util;
 
+import android.util.Log;
+
 import com.github.nkzawa.emitter.Emitter;
+import com.github.nkzawa.socketio.client.Ack;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
+import com.google.gson.Gson;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -38,17 +42,16 @@ public class AxSocket {
         return socket != null && socket.connected();
     }
 
-    public  boolean tryConnect(String address, Emitter.Listener onConnectionSuccess, Emitter.Listener onConnectionError, Emitter.Listener onConnectionTimeout) {
+    public  boolean tryConnect(String address, Emitter.Listener onConnectionSuccess, Emitter.Listener onConnectionError, Emitter.Listener onConnectionTimeout,  Emitter.Listener onDriverMerged) {
 
         if(address.isEmpty() ){
             return false;
         }
-        if(!address.startsWith("http"))
-            address = "http://"+ address;
-
         if(!address.contains(":")){
             address += ":1337";
         }
+        if(!address.startsWith("http"))
+            address = "http://"+ address;
         try {
             setLastAddress(address);
 
@@ -56,10 +59,12 @@ public class AxSocket {
             socket.connect();
 
             socket.once("Welcome", onConnectionSuccess);
-            socket.once(Socket.EVENT_ERROR, onConnectionError);
-            socket.once(Socket.EVENT_CONNECT_ERROR, onConnectionError);
+            socket.once(Socket.EVENT_DISCONNECT, onConnectionError);
+           // socket.once(Socket.EVENT_CONNECT_ERROR, onConnectionError);
             socket.once(Socket.EVENT_CONNECT_TIMEOUT, onConnectionTimeout);
+            socket.on("driverMerged", onDriverMerged);
 
+            Log.i("AxSocket", "Testing connection");
             socket.emit("TestConnection", socket.id());
         } catch (URISyntaxException e) {
             e.printStackTrace();
@@ -79,8 +84,10 @@ public class AxSocket {
             socket.disconnect();
     }
 
-    public void registerDriver(Driver driver) {
-        socket.emit("registerDriver",  driver);
+    public void registerDriver(final Driver driver) {
+        String driverJson = new Gson().toJson(driver);
+        Log.i("AxSocket", "Registering Driver " + driverJson);
+        socket.emit("registerDriver", driverJson);
     }
 
     public void subscribeTo(Car car, Emitter.Listener callback) {
